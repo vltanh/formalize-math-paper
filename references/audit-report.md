@@ -19,14 +19,14 @@ finding:
 | Gap | A claim used without justification: "clearly", "it is easy to see", an omitted case, an implicit condition | What is missing and why it holds, or does not |
 | Typo | Wrong cross-reference ("Theorem 1.2" for 1.3), self-citation, a variable name slip | Location and correction |
 | Missing hypothesis | A statement whose proof needs a condition the statement does not have | The condition, and where the formalization states it |
-| Redundant hypothesis | A statement hypothesis that the proof never uses (the linter's unused-variable warnings find these in Lean) | The hypothesis, and whether the Lean statement drops it |
+| Redundant hypothesis | A statement hypothesis that the proof never uses: start from the hypotheses that the cleanup removed | The hypothesis, and whether the Lean statement drops it |
 | Use of a cited result | Each citation used in a proof: are its hypotheses checked, is it applied in the form it was proved in? | A verdict: correct, applied loosely but correctly, or misstated or misapplied |
 
 Verify every finding before reporting it:
 
 - Quote the TeX text. Do not report from memory of the PDF.
-- Recompute every arithmetic claim, by script if needed: products of constants, `4 · 265 ≤ 1024`,
-  thresholds such as `x ≥ 1.6·10¹⁰ (log x)²`.
+- Recompute every arithmetic claim, by script if needed: products and sums of constants,
+  inequalities between explicit numbers, and thresholds that must hold for all large parameters.
 - Decide whether the result survives, and say so. Most errors in good papers are slips that
   leave the result intact. Overstating them destroys trust.
 - A finding about the paper must hold for the paper's own statement. A step that only fails

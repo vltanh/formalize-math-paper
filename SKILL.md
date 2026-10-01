@@ -101,8 +101,8 @@ These explain the rules below. Apply them when a situation is not covered.
 | 4. Stage 1 | prove everything the paper proves | only cited results remain, as axioms in `External/` |
 | 5. Stage 2 | prove the cited results | zero axioms |
 | 6. Verify | axiom audit, dependency table, Comparator | `scripts/Audit.lean` passes |
-| 7. Audit | `REPORT.md`, `README.md` | every finding checked against the TeX source |
-| 8. Cleanup | no warnings, no stale files | build shows only Challenge's `sorry`s |
+| 7. Cleanup | no warnings, no unused hypotheses, no stale files | build shows only Challenge's `sorry`s |
+| 8. Audit | `REPORT.md`, `README.md` | every finding checked against the TeX source |
 | 9. Package | CI, Palomar files and checks, publication with permission | preflight reports `status: pass` |
 
 Commit at each milestone, with a message that says what changed and why.
@@ -241,10 +241,20 @@ End with zero axioms in the project.
   - Are sums, counts and unions taken over exactly the paper's index sets?
   - Are the constants exact?
 
-### Phase 7: Audit report and documentation
+### Phase 7: Cleanup
+
+Read `references/cleanup.md`. In short: remove unused hypotheses with `scripts/strip_unused.py`,
+over several rounds because each removal can leave others unused. Fix the remaining linter
+warnings, and rename files or namespaces whose names mislead (for example, helper files called
+`External`). Delete stale notes. An unused hypothesis of a paper result is one that the paper's
+statement does not need: remove it, which makes the Lean statement more general than the
+paper's, and record it for the audit. Challenge statements stay exactly the paper's.
+
+### Phase 8: Audit report and documentation
 
 Read `references/audit-report.md` for the structure of `REPORT.md` and `README.md` and how to
-check findings. Two things users care about:
+check findings. Start from what the earlier phases recorded: the slips and gaps noted while
+reading and proving, and the hypotheses that the cleanup removed. Two things users care about:
 
 - The report analyzes the paper and the current formalization. It is not a history of the
   repair, and it does not point to superseded drafts or pull requests.
@@ -255,15 +265,6 @@ Keep links from the documents to the code current with `scripts/linkify_docs.py`
 `.ilean` files, so run it after `lake build`), and check Markdown tables with
 `scripts/check_md_tables.py`: in GitHub's Markdown, a `|` inside a table cell splits the cell even
 inside backticks.
-
-### Phase 8: Cleanup
-
-Read `references/cleanup.md`. In short: remove unused hypotheses with `scripts/strip_unused.py`,
-over several rounds because each removal can leave others unused. Fix the remaining linter
-warnings, and rename files or namespaces whose names mislead (for example, helper files called
-`External`). Delete stale notes. When a paper result loses a hypothesis that its proof never used,
-its Lean statement becomes more general than the paper's: list these in the report's
-redundant-hypotheses section. Challenge statements stay exactly the paper's.
 
 ### Phase 9: Package and publish
 
@@ -315,8 +316,10 @@ needs from user:  decisions or permissions
 - **Stage 2:** every cited result proved or derived from Mathlib; zero project axioms.
 - **Verification:** clean build; `scripts/Audit.lean` passes for every declaration; Comparator
   accepts the solution.
+- **Cleanup:** the build prints only Challenge's `sorry` warnings; unused hypotheses removed, and
+  those of paper results recorded; misleading names fixed; stale draft notes deleted.
 - **Documentation:** `REPORT.md` and `README.md` written, links current, tables valid, findings
-  checked against the source, no stale draft notes.
+  checked against the source.
 - **Packaging (if wanted):** CI green; Palomar's metadata and source checks pass; preflight
   `status: pass` on the exact commit to submit; the user decides about submission and
   registration.

@@ -13,10 +13,11 @@ The skill guides the work end to end:
 - prove everything the paper proves (Stage 1), then every result it cites (Stage 2), until the
   project has no `sorry` and no `axiom`;
 - verify: the axioms of every declaration, and Comparator;
+- clean up: remove unused hypotheses and other warnings;
 - write `REPORT.md`, an audit of the paper against the formalization (errors and gaps, missing
   and redundant hypotheses, how the paper uses each cited result), and `README.md`;
-- clean up warnings, and package the project for the [Palomar](https://palomar-registry.org)
-  registry (Challenge/Solution, `comparator.json`, `formalization.yaml`, preflight).
+- package the project for the [Palomar](https://palomar-registry.org) registry
+  (Challenge/Solution, `comparator.json`, `formalization.yaml`, preflight).
 
 It also covers turning an existing, never-compiled Lean draft into a project that builds.
 
@@ -76,12 +77,6 @@ formalizations faster, but they are not required.
 | `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, Palomar packaging, cleanup |
 | `scripts/` | Helpers: checking one file, `sorry`-ing failing proofs, converting to the module system, statement diffs, removing unused hypotheses, linking documentation to the code, checking Markdown tables |
 | `assets/` | Templates: the axiom and dependency audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
-
-## Example
-
-[lean4-graham-rearrangement-conjecture](https://github.com/vltanh/lean4-graham-rearrangement-conjecture)
-formalizes H. T. Pham and L. Sauermann, *On Graham's rearrangement conjecture*, with this
-workflow. It started from an uncompiled draft and ended with a passing Palomar preflight.
 
 ## License
 

@@ -30,14 +30,13 @@ hypotheses often reveal redundant hypotheses of the paper.
    - "automatically included section variable(s) unused": add `omit [Inst] in` before the
      theorem.
    - Deprecations: use the replacement that the warning names.
-4. Rerun everything: `lake build`, `scripts/Audit.lean`, `lake comparator`,
-   `scripts/linkify_docs.py`, `scripts/check_md_tables.py`, and Palomar's local checks. Line
-   numbers move, so relink the documentation.
-5. Document, and commit:
+4. Rerun the checks: `lake build`, `scripts/Audit.lean` and `lake comparator`, and, if
+   documents already link to the code, `scripts/linkify_docs.py`, since line numbers move.
+5. Record, and commit:
    - Run `python3 scripts/stmt_diff.py <commit before cleanup>`.
    - For each paper result that lost a hypothesis, the Lean statement is now more general than
-     the paper's. List it in the report's redundant-hypotheses table and the README summary,
-     with the hypothesis and why it is not needed.
+     the paper's. Record the result, the hypothesis and why it is not needed. The audit lists
+     them in the report's redundant-hypotheses table and the README summary.
    - Definitions that lost an unused parameter change how readers see them. Mention it under
      "How the formalization reads the paper" if they are paper notions.
    - The Challenge statements stay exactly the paper's.
