@@ -29,6 +29,14 @@ and links the skill into each of them:
 npx skills add vltanh/formalize-math-paper -g      # for your user; omit -g to install into the current project
 ```
 
+The installer puts the skill in `~/.agents/skills/`, which most agents read, and links it into
+the directories of those that do not. Antigravity reads user-wide skills only from
+`~/.gemini/config/skills/`, so link it there too:
+
+```sh
+mkdir -p ~/.gemini/config/skills && ln -s ~/.agents/skills/formalize-math-paper ~/.gemini/config/skills/
+```
+
 Or copy the repository into your agent's skills directory by hand:
 
 ```sh
@@ -40,7 +48,7 @@ git clone https://github.com/vltanh/formalize-math-paper <skills-dir>/formalize-
 | Claude Code | `~/.claude/skills/` | `.claude/skills/` |
 | OpenAI Codex | `~/.agents/skills/` (older versions: `~/.codex/skills/`) | `.agents/skills/` |
 | Gemini CLI | `~/.gemini/skills/` or `~/.agents/skills/` | `.gemini/skills/` or `.agents/skills/` |
-| Google Antigravity | `~/.gemini/config/skills/` (IDE), `~/.gemini/antigravity-cli/skills/` (CLI) | `.agents/skills/` |
+| Google Antigravity | `~/.gemini/config/skills/` | `.agents/skills/` |
 | GitHub Copilot (VS Code) | `~/.copilot/skills/`, `~/.agents/skills/` or `~/.claude/skills/` | `.github/skills/`, `.agents/skills/` or `.claude/skills/` |
 | Cursor | `~/.cursor/skills/` or `~/.agents/skills/` | `.cursor/skills/` or `.agents/skills/` |
 | Other agents | their skills directory; many read `~/.agents/skills/` | `.agents/skills/` |
