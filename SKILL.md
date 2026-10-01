@@ -10,6 +10,16 @@ description: >-
   finish or audit a Lean formalization of a paper, preprint, arXiv link or list of numbered
   theorems; asks to "make this Lean draft compile" or to remove sorries or axioms from one; or
   wants a Lean project made submittable to Palomar, even if they name only one of these steps.
+license: Apache-2.0
+compatibility: >-
+  Any agent that supports Agent Skills (SKILL.md), such as Claude Code, Codex, Gemini CLI,
+  Antigravity, GitHub Copilot or Cursor. Needs a shell, git, Python 3 and a Lean 4 toolchain
+  (elan); the GitHub CLI and bubblewrap for publishing and Comparator. Parallel sub-agents help
+  but are optional.
+metadata:
+  author: The-Anh Vu-Le
+  version: "1.0.0"
+  repository: https://github.com/vltanh/formalize-math-paper
 ---
 
 # Formalizing a mathematics paper in Lean 4
@@ -127,7 +137,7 @@ it, and do not link to it from the deliverables.
 ### Phase 1: Inventory
 
 Read the whole paper before writing Lean. Keep a working checklist, outside the deliverables
-(the scratchpad or an untracked `notes/`), with:
+(a scratch directory or an untracked `notes/`), with:
 
 - definitions and notation, including implicit conventions (logarithm base, what `⊆` means,
   indexing);
@@ -192,8 +202,9 @@ formalize the intended argument and record the slip as an E-item; the statement 
 Results the paper imports from the literature may be stated as axioms in `External/Topic/`, each
 with its citation, theorem or equation number, the exact specialization used, and a stable name.
 
-For more than a handful of `sorry`s, split the work among parallel subagents by file group,
-following the dependency order. `references/parallel-repair.md` has the procedure, an agent brief
+For more than a handful of `sorry`s, split the work by file group, following the dependency
+order, among parallel sub-agents if your environment provides them, or work through the groups
+one at a time. `references/parallel-repair.md` has the procedure, an agent brief
 to copy, and the integration checklist. In particular, compare every declaration's statement with
 the pre-repair commit (`scripts/stmt_diff.py`), because agents sometimes change statements
 without reporting it.

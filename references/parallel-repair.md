@@ -1,6 +1,8 @@
-# Proving in parallel with subagents
+# Proving in parallel with sub-agents
 
-Once every statement elaborates, the remaining `sorry`s can be split among parallel subagents.
+Once every statement elaborates, the remaining `sorry`s can be split among parallel sub-agents,
+on platforms that provide them. Without sub-agents, the same partition and the same brief work
+for one agent going through the file groups in order.
 Statements are fixed and each module's `.olean` exists, so an agent can work on its files
 against the compiled interfaces of the files they import, without waiting for upstream proofs.
 
@@ -20,7 +22,7 @@ against the compiled interfaces of the files they import, without waiting for up
   large file its own agent, or split it into modules first.
 - Downstream agents can start at once. They rely on upstream statements, which are already
   compiled, and not on upstream proofs.
-- Spawn all agents in one message, in the background, so they run concurrently.
+- Start all agents at once, in the background, so they run concurrently.
 
 ## Agent brief
 
@@ -59,8 +61,8 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
 ## While agents run
 
 - When an agent reports a signature change that affects another agent's files, relay it to that
-  agent at once (with `SendMessage`, using its id). Include the new signature and how to update
-  the call.
+  agent at once, with whatever messaging your platform provides. If it provides none, restart the
+  affected agent with the update. Include the new signature and how to update the call.
 - When an agent reports a false upstream lemma, tell the owner of that file. Fixing it is that
   owner's job.
 - Use the waiting time for work that does not touch the Lean files: the paper audit, document

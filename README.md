@@ -1,7 +1,11 @@
 # formalize-math-paper
 
-A [Claude Code](https://claude.com/claude-code) skill for formalizing a mathematics research paper
-in Lean 4 with Mathlib, in any field of mathematics. It guides the work end to end:
+An [Agent Skill](https://agentskills.io) for formalizing a mathematics research paper in Lean 4
+with Mathlib, in any field of mathematics. It works with any agent that supports the `SKILL.md`
+format: Claude Code, OpenAI Codex, Gemini CLI, Google Antigravity, GitHub Copilot, Cursor,
+OpenCode, Amp and others.
+
+The skill guides the work end to end:
 
 - read the paper and record its results, constants, citations and suspected typos;
 - set up a Lean project on current Mathlib, using the module system;
@@ -18,19 +22,50 @@ It also covers turning an existing, never-compiled Lean draft into a project tha
 
 ## Install
 
+With the [`skills`](https://github.com/vercel-labs/skills) installer, which detects your agents
+and links the skill into each of them:
+
 ```sh
-git clone https://github.com/vltanh/formalize-math-paper ~/.claude/skills/formalize-math-paper
+npx skills add vltanh/formalize-math-paper -g      # for your user; omit -g to install into the current project
 ```
 
-Claude Code picks the skill up on its own. Ask it to formalize a paper (an arXiv link is
-enough), to make a Lean draft compile, or to prepare a Lean project for Palomar.
+Or copy the repository into your agent's skills directory by hand:
+
+```sh
+git clone https://github.com/vltanh/formalize-math-paper <skills-dir>/formalize-math-paper
+```
+
+| Agent | User skills directory | Project skills directory |
+| --- | --- | --- |
+| Claude Code | `~/.claude/skills/` | `.claude/skills/` |
+| OpenAI Codex | `~/.agents/skills/` (older versions: `~/.codex/skills/`) | `.agents/skills/` |
+| Gemini CLI | `~/.gemini/skills/` or `~/.agents/skills/` | `.gemini/skills/` or `.agents/skills/` |
+| Google Antigravity | `~/.gemini/config/skills/` (IDE), `~/.gemini/antigravity-cli/skills/` (CLI) | `.agents/skills/` |
+| GitHub Copilot (VS Code) | `~/.copilot/skills/`, `~/.agents/skills/` or `~/.claude/skills/` | `.github/skills/`, `.agents/skills/` or `.claude/skills/` |
+| Cursor | `~/.cursor/skills/` or `~/.agents/skills/` | `.cursor/skills/` or `.agents/skills/` |
+| Other agents | their skills directory; many read `~/.agents/skills/` | `.agents/skills/` |
+
+Start a new session afterwards. The agent then uses the skill when you ask it to formalize a
+paper (an arXiv link is enough), to make a Lean draft compile, or to prepare a Lean project for
+Palomar. In Codex you can also invoke it as `$formalize-math-paper`.
+
+An agent without skill support can still follow it. Add a line such as "To formalize a
+mathematics paper in Lean, follow `~/.agents/skills/formalize-math-paper/SKILL.md`" to its
+instructions file (`AGENTS.md` or the equivalent), or say so in your request.
+
+## Requirements
+
+A shell, git, Python 3, and a Lean 4 toolchain ([elan](https://github.com/leanprover/elan)). The
+GitHub CLI and [bubblewrap](https://github.com/containers/bubblewrap) are needed for publishing
+and for running Comparator locally. Agents that can run sub-agents in parallel finish large
+formalizations faster, but they are not required.
 
 ## Contents
 
 | Path | Contents |
 | --- | --- |
 | `SKILL.md` | The workflow: principles, rules, phases and completion gates |
-| `references/` | Detailed guides: Lean project setup, parallel repair with subagents, the audit report, Palomar packaging, cleanup |
+| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, Palomar packaging, cleanup |
 | `scripts/` | Helpers: checking one file, `sorry`-ing failing proofs, converting to the module system, statement diffs, removing unused hypotheses, linking documentation to the code, checking Markdown tables |
 | `assets/` | Templates: the axiom and dependency audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
 
@@ -39,3 +74,7 @@ enough), to make a Lean draft compile, or to prepare a Lean project for Palomar.
 [lean4-graham-rearrangement-conjecture](https://github.com/vltanh/lean4-graham-rearrangement-conjecture)
 formalizes H. T. Pham and L. Sauermann, *On Graham's rearrangement conjecture*, with this
 workflow. It started from an uncompiled draft and ended with a passing Palomar preflight.
+
+## License
+
+Apache-2.0; see [LICENSE](LICENSE).
