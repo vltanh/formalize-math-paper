@@ -22,7 +22,8 @@ finding:
 | Redundant hypothesis | A statement hypothesis that the proof never uses: start from the hypotheses that the cleanup removed | The hypothesis, and whether the Lean statement drops it |
 | Use of a cited result | Each citation used in a proof: are its hypotheses checked, is it applied in the form it was proved in? | A verdict: correct, applied loosely but correctly, or misstated or misapplied |
 
-Verify every finding before reporting it:
+Verify every finding before reporting it, preferably by a reader other than the one who recorded
+it (a separate agent, if available, working from the TeX source and the inventory):
 
 - Quote the TeX text. Do not report from memory of the PDF.
 - Recompute every arithmetic claim, by script if needed: products and sums of constants,
@@ -94,15 +95,23 @@ unformalized prior work, surveys, remarks, experiments.>
 4. Palomar (if packaged): the files, how to run `lake comparator`, the preflight workflow.
 5. Audit summary: short bullets, using the report's E-numbers. Lead with errors, then gaps,
    missing and redundant hypotheses, and the use of cited results.
-6. Credits: who and what wrote the code. For example: "first written by [AI system] as an
-   uncompiled draft; [AI system] made it compile, checked the statements and wrote the audit".
-   No links to superseded drafts.
-7. Building: `lake exe cache get`, `lake build`, the audit, the toolchain, and how to update the
-   documentation's links.
-8. Layout: a table of every module and the paper content it holds, and the `External/`
+6. Credits: who and what wrote the code, and how it was made. For example: "first written by
+   [AI system] as an uncompiled draft; [AI system] made it compile, checked the statements and
+   wrote the audit". No links to superseded drafts. Report the run log's figures:
+   - the procedure, with a link to this skill's repository and its version or commit;
+   - the agent and harness, and the model(s), with their versions;
+   - the number of sub-agents, how many ran at once at most, and what each kind did;
+   - the elapsed time from the start to the audited formalization, with dates and time zone, and
+     the total working time of the sub-agents;
+   - tokens and tool calls, when the platform reports them.
+7. Related work: the history of the problem, and the earlier formalizations of the paper or its
+   result, with whether this work consulted them.
+8. Building: `lake exe cache get`, `lake build`, the audit, the toolchain, how to regenerate
+   generated files, and how to update the documentation's links.
+9. Layout: a table of every module and the paper content it holds, and the `External/`
    directories.
-9. GitHub configuration: what each workflow does and any settings it needs.
-10. License.
+10. GitHub configuration: what each workflow does and any settings it needs.
+11. License.
 
 ## 4. Style and mechanics
 

@@ -14,9 +14,12 @@ hypotheses often reveal redundant hypotheses of the paper.
      declaration; `--dry-run` only lists them. It skips variables that are not in a binder
      (`fun x`, `∃ x`) and lists them for manual repair: write `_`, or restate (`∃ x, True`
      becomes `Nonempty …`).
-   - Rebuild. The errors now point at call sites that still pass the removed arguments; delete
-     those arguments. Implicit arguments that were inferred from a removed hypothesis may need a
-     named argument (`(x := x)`).
+   - Run `python3 scripts/strip_call_args.py <commit before the cleanup>` once. It deletes, at
+     every call site, the arguments of the removed binders, and lists the call sites it cannot
+     parse, such as an argument on the next line, for manual repair.
+   - Rebuild, and fix what remains. Implicit arguments that only a removed hypothesis determined
+     need a named argument at some call sites (`(x := x)`); a definition that matched on a
+     membership proof (`if h : c ∈ s then … else …`) may now need a plain `if`.
    - Repeat: removing a hypothesis can leave its caller's own hypotheses unused. A few rounds
      usually suffice.
    - Delete `have` steps that only produced a removed argument. The linter does not flag them.
@@ -51,5 +54,13 @@ hypotheses often reveal redundant hypotheses of the paper.
   names alone. Then fix the module docstrings by hand, and rebuild.
 - Delete the draft's notes and checklists once `README.md` and `REPORT.md` supersede them. They
   remain in the history.
+- After moving or renaming modules, delete their old build outputs (`.olean`, `.ilean`, `.trace`
+  and the hashes, under `.lake/build/lib/lean` and `.lake/build/ir`). Stale `.ilean` files make
+  `scripts/linkify_docs.py` link to the old paths.
+- Keep the generator of every generated Lean file in the repository (for example under
+  `scripts/`), check that it reproduces the file byte for byte, and say in the README how to run
+  it. Name template fragments that are not modules `*.lean.in`: Palomar rejects every `.lean`
+  file that is not a module, used or not.
+- Add `__pycache__/` to `.gitignore` when the repository contains Python scripts.
 - Dead code, meaning helper lemmas nothing uses, can stay unless the user asks for a lean
   repository. If it goes, delete it in its own commit.

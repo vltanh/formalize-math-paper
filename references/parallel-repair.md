@@ -13,6 +13,10 @@ against the compiled interfaces of the files they import, without waiting for up
 2. Run a full `lake build`, so that every `.olean` exists. Agents check their files with
    `lake env lean` against those outputs.
 3. Count the `sorry`s per file (`grep -cw sorry`).
+4. Check the free memory. Elaborating one Mathlib-heavy file can take 3–4 GB, other projects on
+   the machine may hold language servers, and a dozen agents each running Lean at once can exhaust
+   memory. Tell every agent to run at most one Lean process at a time, and size the number of
+   concurrent agents to the memory available.
 
 ## Partitioning
 
@@ -23,6 +27,13 @@ against the compiled interfaces of the files they import, without waiting for up
 - Downstream agents can start at once. They rely on upstream statements, which are already
   compiled, and not on upstream proofs.
 - Start all agents at once, in the background, so they run concurrently.
+- When several agents need the same infrastructure (for example the derivatives of a family of
+  curves that many later results use), ask the agent that builds it to publish it first, as a
+  separate module whose docstring lists its API. Then point the other agents to that module, and
+  have them only add to it after that, never rename.
+- Assign a result that the paper does not prove, or proves with a gap, only after working out a
+  plan for it (see SKILL.md, Phase 4). An agent given a plan and the numbers that support it
+  finishes; an agent given only the statement may wander or weaken it.
 
 ## Agent brief
 
@@ -52,13 +63,27 @@ cannot clash with other agents' helpers.
 
 Builds: do not run a full `lake build`. If you must rebuild an upstream module, build only that
 module. If another build is running you may see "object file … does not exist": wait and retry,
-and do not edit around it.
+and do not edit around it. If other agents' rebuilds keep breaking your imports, work against a
+private copy of the build outputs:
+  python3 [skill-dir]/scripts/snapshot_check.py take [your scratch dir]/snap      (once the build is fresh)
+  python3 [skill-dir]/scripts/snapshot_check.py check [your scratch dir]/snap FILE [--emit]
+Run at most one Lean process at a time: memory is shared with the other agents.
 
 Report: sorries remaining per file; every statement change with its counterexample; every
 upstream lemma you found false; new public helpers; anything the coordinator must relay.
 ```
 
 ## While agents run
+
+- Record each agent in the run log: what it works on, when it started, and when it finished with
+  the effort it reported.
+- When an agent finishes, diff its files' statements at once
+  (`python3 scripts/stmt_diff.py <statement-first commit> <its files>`), compare with its report,
+  and commit its files. Errors found early, such as a statement that elaborated with a variable of
+  the wrong type, are cheaper to fix, and every later agent builds on committed work.
+- Resume a finished agent, if your platform allows it, for follow-up work in its own area: wiring
+  its results into another file, or a related lemma. It keeps its context, so it is faster and
+  makes fewer mistakes than a new agent.
 
 - When an agent reports a signature change that affects another agent's files, relay it to that
   agent at once, with whatever messaging your platform provides. If it provides none, restart the
@@ -71,7 +96,8 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
 ## Integrating
 
 1. Run a full `lake build` and fix integration errors. They usually come from signature changes
-   that did not reach a caller, or from stale `.olean`s.
+   that did not reach a caller, or from stale `.olean`s. Wait until no agent is building: two
+   builds in one checkout delete each other's outputs.
 2. Check the axioms of the main theorems (`#print axioms`), then run the full
    `scripts/Audit.lean`.
 3. Run `python3 scripts/stmt_diff.py <statement-first commit>`. It lists every declaration whose

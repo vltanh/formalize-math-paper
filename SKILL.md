@@ -18,7 +18,7 @@ compatibility: >-
   but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "1.0.0"
+  version: "1.1.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -31,8 +31,10 @@ The deliverable is a Lean project, plus documents about it, in which:
 - the statements say what the paper says, and every deviation is documented;
 - `lake build` succeeds with no `sorry`, no `admit`, and no project `axiom`, and every declaration
   depends only on `propext`, `Classical.choice` and `Quot.sound`;
-- `REPORT.md` audits the paper against the formalization, and `README.md` summarizes it;
-- optionally, the project is packaged and preflighted for Palomar.
+- `REPORT.md` audits the paper against the formalization, and `README.md` summarizes it and
+  reports how it was made: the procedure, the agents and models, and the time and effort (the run
+  log);
+- the project is packaged for Palomar and, once the user allows publishing, preflighted.
 
 The work runs in two stages. In Stage 1, formalize everything the paper itself proves; results it
 imports from the literature may be temporary axioms. In Stage 2, discharge those axioms. Around
@@ -63,12 +65,26 @@ These explain the rules below. Apply them when a situation is not covered.
   true.
 - **Report faithfully.** If a step was skipped, a proof fails, or a statement had to change, say
   so. The audit is only useful if it can be trusted.
+- **A gap in a proof is not a false statement.** When the paper's proof uses a fact that its
+  hypotheses do not give, the statement may still be true. Look for a correct argument before
+  concluding anything about the statement.
+- **Measure the work.** Readers and registries ask how a formalization was made, and the answer is
+  cheap to record as you go and impossible to reconstruct afterwards.
 
 ## Rules
 
 - **Never weaken or change the statement of a paper result to make a proof go through.** If the
-  paper's statement is false, stop and tell the user. If they agree, formalize the minimal
-  correct version and document it as an error in the report.
+  paper's statement is false, stop work on it and tell the user at once, with the counterexample;
+  other work can continue meanwhile. If they agree, formalize the minimal correct version and
+  document it as an error in the report.
+- **Never add a hypothesis to a paper result because its proof seems to need it.** Adding one is a
+  weakening. Do it only with a counterexample to the statement itself, never merely to the proof,
+  and then under the previous rule. Otherwise prove the statement as printed, by a corrected
+  argument, and record the gap in the proof as an E-item.
+- **Slips in statements.** A statement that is false only through an evident misprint (a wrong
+  index, a swapped name, a missing `- 1`) whose intended reading is unambiguous is formalized in
+  the intended form at once. List each such correction in the report and in the next status
+  report to the user. When the fix is not unique, treat the statement as false.
 - **A false helper lemma** (one you or a draft introduced) gets a concrete counterexample,
   checked in Lean (`decide`, `norm_num` or `#eval`) when that is possible. Then add the minimal
   hypothesis, update its callers, and record the change in the commit message.
@@ -89,6 +105,8 @@ These explain the rules below. Apply them when a situation is not covered.
   registering. Permission for one of these is not permission for the others.
 - **Authors are people.** AI systems are credited in the README and in the `automation` section of
   `formalization.yaml`, never as authors or maintainers.
+- **Keep a run log** from the start (see "Run log" below), and report it in the README's credits,
+  in `formalization.yaml` and in status reports.
 
 ## Workflow
 
@@ -103,7 +121,7 @@ These explain the rules below. Apply them when a situation is not covered.
 | 6. Verify | axiom audit, dependency table, Comparator | `scripts/Audit.lean` passes |
 | 7. Cleanup | no warnings, no unused hypotheses, no stale files | build shows only Challenge's `sorry`s |
 | 8. Audit | `REPORT.md`, `README.md` | every finding checked against the TeX source |
-| 9. Package | CI, Palomar files and checks, publication with permission | preflight reports `status: pass` |
+| 9. Package | CI, Palomar files and checks; publication and preflight with permission | Palomar's local checks pass; after publishing, preflight reports `status: pass` |
 
 Commit at each milestone, with a message that says what changed and why.
 
@@ -118,12 +136,23 @@ starting point:   from scratch, or an existing draft (where?)
 Lean / Mathlib:   current Mathlib master unless the user pins a version
 compile allowed:  yes (default whenever a toolchain exists)
 publishing:       push? create repo? public? (default: ask each time)
-target:           Palomar packaging? (default yes when the user mentions Palomar or a registry)
+target:           Palomar packaging (default yes; skip it only if the user declines)
 authors:          the human author(s) and maintainer(s), and the license (Apache-2.0 if unspecified)
+run log:          the start time with its time zone, the agent, model and procedure (this skill, with
+                  its repository and version), recorded now
+earlier work:     earlier formalizations of the same paper or result, found by searching now
 ```
 
 Get the paper's TeX source (on arXiv, the "e-print" download), not only the PDF. Exact
 statements, constants and cross-references are much easier to check in TeX.
+
+Search for earlier formalizations of the paper, or of its main result, before starting: GitHub
+(code and repositories), the Lean Zulip, Palomar's registry
+(`https://data.palomar-registry.org/recent.json` and the search at
+`https://palomar-registry.org`), and collections of formal statements such as
+`google-deepmind/formal-conjectures`. Tell the user what you find. An earlier formalization changes
+what a new one should add, the README and `formalization.yaml` must cite it, and Palomar's review
+asks whether a submission duplicates existing work.
 
 **Starting from an existing draft.** Import it verbatim as the first commit. Make the commit's
 author whoever wrote the draft (for an AI draft, for example `ChatGPT <noreply@openai.com>`),
@@ -155,7 +184,10 @@ Read the whole paper before writing Lean. Keep a working checklist, outside the 
 Read `references/lean-project.md` for the details: versions, `lakefile.toml`, the module system
 (Palomar requires it in every `.lean` file, scripts included), and the build discipline.
 
-Arrange the files by the mathematical dependency graph, not by size:
+Arrange the files by the mathematical dependency graph, not by size. Each module imports only
+what it uses: a linear chain in which every chapter imports the previous one makes every edit
+rebuild everything downstream, and in parallel work it lets one agent's half-finished file stall
+all the others.
 
 ```text
 PaperName/                     -- the library
@@ -165,7 +197,7 @@ PaperName/                     -- the library
     Definitions.lean           -- the section's notation
     Auxiliary.lean             -- lemmas that are not results of the paper
     Lemma34.lean               -- one file per result, or per small group of results
-  External/Topic/              -- one directory per cited result
+  External/Topic/              -- one directory per cited result, with a README.md, from the start
   Main.lean                    -- the main theorem
 Challenge.lean                 -- the main results in Mathlib-only vocabulary
 Solution.lean                  -- their proofs from the library (may double as the root module)
@@ -190,9 +222,22 @@ division, `Nat.floor`); indexing from 0 versus 1; "max over z" versus "for every
 "positive integer" became `ℕ`; and implicit standing assumptions. Prove a bridge lemma for each
 representation choice.
 
+Check the type of every bound variable that only meets a numeral or a scalar multiplication. In
+`∃ c < 0, P (c • v)` nothing fixes the type of `c`, so the numeral makes it `ℕ` (which acts on any
+additive group), and the statement silently changes meaning; write `∃ c < (0 : ℝ), …`. Hover over
+the binder, or `#check` the statement with `set_option pp.numericTypes true`.
+
+Have the statements reviewed against the TeX source by a reader other than their writer: a
+separate agent, if your environment provides them, or a separate pass. Statements change only by
+documented decision after this review.
+
 Write `Challenge.lean` now: the paper's main results, restated with Mathlib's vocabulary only and
 with `sorry` proofs. It is the statement of record. A reader can audit it without reading the
-development, and Palomar trusts it because it imports nothing but Mathlib.
+development, and Palomar trusts it because it imports nothing but Mathlib. When the Challenge has
+to define an object that a reader cannot recognize at a glance (a shape built from a system of
+equations, a constant defined by an optimization), add a compared theorem that ties the definition
+to the literature, such as the object's known numerical value. Otherwise neither a reader nor
+Palomar's review can tell that the definition is the intended one.
 
 ### Phase 4: Stage 1, the paper's own results
 
@@ -201,6 +246,13 @@ is mathematically equivalent; mention it in the report. When a proof step has a 
 formalize the intended argument and record the slip as an E-item; the statement does not change.
 Results the paper imports from the literature may be stated as axioms in `External/Topic/`, each
 with its citation, theorem or equation number, the exact specialization used, and a stable name.
+Also put there, from the start, any cited fact that the paper needs only in a special case; moving
+files into `External/` at the end means renaming modules and rewriting imports.
+
+When a result needs an argument that the paper does not supply (an unproved theorem, a proof gap,
+a numerical claim), work out the mathematics before assigning it: reduce it to checkable steps,
+test the steps numerically, and give the agent the plan and the numbers.
+`references/numerics.md` covers rigorous numerics in Lean.
 
 For more than a handful of `sorry`s, split the work by file group, following the dependency
 order, among parallel sub-agents if your environment provides them, or work through the groups
@@ -244,8 +296,9 @@ End with zero axioms in the project.
 ### Phase 7: Cleanup
 
 Read `references/cleanup.md`. In short: remove unused hypotheses with `scripts/strip_unused.py`,
-over several rounds because each removal can leave others unused. Fix the remaining linter
-warnings, and rename files or namespaces whose names mislead (for example, helper files called
+then the arguments that call sites still pass for them with `scripts/strip_call_args.py`, over
+several rounds because each removal can leave others unused. Fix the remaining linter warnings,
+and rename files or namespaces whose names mislead (for example, helper files called
 `External`). Delete stale notes. An unused hypothesis of a paper result is one that the paper's
 statement does not need: remove it, which makes the Lean statement more general than the
 paper's, and record it for the audit. Challenge statements stay exactly the paper's.
@@ -254,7 +307,11 @@ paper's, and record it for the audit. Challenge statements stay exactly the pape
 
 Read `references/audit-report.md` for the structure of `REPORT.md` and `README.md` and how to
 check findings. Start from what the earlier phases recorded: the slips and gaps noted while
-reading and proving, and the hypotheses that the cleanup removed. Two things users care about:
+reading and proving, and the hypotheses that the cleanup removed. Have every finding verified
+against the TeX source by a reader other than the one who recorded it, a separate agent if
+available. In practice this overturns some of the inventory's own claims, and can show that a
+statement was changed without need; feed such results back into the statements. Two things users
+care about:
 
 - The report analyzes the paper and the current formalization. It is not a history of the
   repair, and it does not point to superseded drafts or pull requests.
@@ -268,11 +325,13 @@ inside backticks.
 
 ### Phase 9: Package and publish
 
-Read `references/palomar.md`. It covers the required files, `formalization.yaml`, Palomar's own
-validation scripts, CI (`assets/lean_action_ci.yml`), the preflight workflow
-(`assets/palomar_preflight.yml`), and the submission protocol. Push, publish and submit only with
-the user's explicit go-ahead for each step. Submit only a commit whose preflight report says
-`status: pass`, and never register on the user's behalf.
+Package for Palomar unless the user declined in Phase 0. Read `references/palomar.md`. It covers
+the required files, `formalization.yaml`, Palomar's own validation scripts, CI
+(`assets/lean_action_ci.yml`), the preflight workflow (`assets/palomar_preflight.yml`), and the
+submission protocol. Everything up to Palomar's local checks needs no permission. Push, publish
+and submit only with the user's explicit go-ahead for each step. Once publishing is allowed, run
+the preflight. Submit only a commit whose preflight report says `status: pass`, and never register
+on the user's behalf.
 
 ## Bundled tools
 
@@ -286,11 +345,34 @@ that CI runs into the project's `scripts/` directory.
 | `scripts/to_module.py FILE…` | convert files to the module system |
 | `scripts/stmt_diff.py REV [PATH…]` | list the declarations whose statements or definitions changed since `REV` |
 | `scripts/strip_unused.py LOG [--dry-run]` | delete the binders that the unused-variables linter reports |
+| `scripts/strip_call_args.py REV [--dry-run]` | delete, at every call site, the arguments of binders removed since `REV`; run it once, right after `strip_unused.py` |
+| `scripts/snapshot_check.py take DIR` / `check DIR FILE [--emit]` | check files against a private copy of the build outputs, so that parallel agents do not break each other's imports |
+| `scripts/session_stats.py [TRANSCRIPT] [--until TIME]` | the run log's figures (elapsed time, models, sub-agents, peak concurrency, agent time, tokens, tool calls) from a Claude Code session transcript |
 | `scripts/linkify_docs.py [--check]` | link the Lean names in the documents to their lines; copy it into the project and configure its first block |
 | `scripts/check_md_tables.py FILE… [--fix]` | find, or fix, Markdown table rows broken by a `\|` inside a cell; copy it into the project |
 | `assets/Audit.lean` | the axiom and dependency audit; copy it to `scripts/Audit.lean` and fill in its lists |
 | `assets/lean_action_ci.yml` | CI: build, audit, links, tables |
 | `assets/palomar_preflight.yml` | Palomar's mechanical preflight, run on demand |
+
+## Run log
+
+Keep an untracked log (for example `notes/runlog.md`) from Phase 0, and report from it:
+
+- the start time with its time zone, and the time each phase is done (the milestone commits
+  record the latter);
+- the agent and harness with their versions, the model(s), and this skill with its repository and
+  version or commit;
+- each sub-agent: what it worked on, when it started and finished, and the effort that the
+  platform reports when it finishes (working time, tokens, tool calls); and how often finished
+  agents were resumed for follow-up work.
+
+From the log, report the elapsed time to the audited formalization (from the start to the commit
+that completes Phase 8), the number of sub-agents and the most that ran at once, their total
+working time, and tokens and tool calls when the platform reports them. Put these figures in the
+README's credits and in `formalization.yaml` (`automation.methods`: `models`, `framework`,
+`tool_setup`, `cost`), and the elapsed time and the number of running agents in status reports.
+For Claude Code, `scripts/session_stats.py` computes them from the session transcript. Use
+`--until` with the time of the Phase 8 commit to stop the count there.
 
 ## Status reports
 
@@ -299,6 +381,7 @@ When reporting progress, use this shape, filling in only what applies:
 ```text
 repository / branch / head:
 phase:
+elapsed:          time since the start; sub-agents running / finished
 build:            passes / fails (first error)
 sorry / axiom:    counts (excluding Challenge.lean)
 statements:       changes to paper results (should be none), helper lemmas found false
@@ -319,7 +402,9 @@ needs from user:  decisions or permissions
 - **Cleanup:** the build prints only Challenge's `sorry` warnings; unused hypotheses removed, and
   those of paper results recorded; misleading names fixed; stale draft notes deleted.
 - **Documentation:** `REPORT.md` and `README.md` written, links current, tables valid, findings
-  checked against the source.
-- **Packaging (if wanted):** CI green; Palomar's metadata and source checks pass; preflight
-  `status: pass` on the exact commit to submit; the user decides about submission and
-  registration.
+  checked against the source; the README's credits report the procedure, the agents and models,
+  the elapsed time and the effort from the run log; earlier formalizations cited.
+- **Packaging (unless declined):** `formalization.yaml` and `comparator.json` written; Palomar's
+  metadata and source checks pass on a clean clone; after the user allows publishing, CI green
+  and preflight `status: pass` on the exact commit to submit; the user decides about submission
+  and registration.

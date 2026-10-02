@@ -17,7 +17,9 @@ The skill guides the work end to end:
 - write `REPORT.md`, an audit of the paper against the formalization (errors and gaps, missing
   and redundant hypotheses, how the paper uses each cited result), and `README.md`;
 - package the project for the [Palomar](https://palomar-registry.org) registry
-  (Challenge/Solution, `comparator.json`, `formalization.yaml`, preflight).
+  (Challenge/Solution, `comparator.json`, `formalization.yaml`, preflight), by default;
+- keep a run log, and report how the formalization was made: the procedure, the agents and models,
+  the elapsed time and the effort.
 
 It also covers turning an existing, never-compiled Lean draft into a project that builds.
 
@@ -74,8 +76,8 @@ formalizations faster, but they are not required.
 | Path | Contents |
 | --- | --- |
 | `SKILL.md` | The workflow: principles, rules, phases and completion gates |
-| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, Palomar packaging, cleanup |
-| `scripts/` | Helpers: checking one file, `sorry`-ing failing proofs, converting to the module system, statement diffs, removing unused hypotheses, linking documentation to the code, checking Markdown tables |
+| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, Palomar packaging, cleanup, rigorous numerics |
+| `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; `sorry`-ing failing proofs; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; linking documentation to the code; checking Markdown tables; summarizing a Claude Code session for the run log |
 | `assets/` | Templates: the axiom and dependency audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
 
 ## License

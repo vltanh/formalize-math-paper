@@ -22,7 +22,9 @@ lake exe cache get                                    # download Mathlib's compi
 ```
 
 Commit `lean-toolchain`, `lakefile.toml` and `lake-manifest.json`, and put `/.lake` in
-`.gitignore`. Never commit `.olean`, `.ilean` or other build outputs.
+`.gitignore`, with `/notes` if the working notes live in the repository directory and
+`__pycache__/` if it holds Python scripts. Never commit `.olean`, `.ilean` or other build
+outputs.
 
 ## 2. `lakefile.toml`
 
@@ -122,6 +124,9 @@ end PaperName
   minutes, even with Mathlib's cache.
 - Before spawning repair agents, build once, so that every module's `.olean` exists, with
   `sorry`s, and agents can check their files independently.
+- When parallel agents' rebuilds interfere, each agent can check its files against a private
+  copy of the build outputs with `scripts/snapshot_check.py` (`take`, then `check FILE [--emit]`).
+  Nothing in `.lake` changes.
 
 ## 5. Common errors when repairing a draft
 
