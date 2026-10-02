@@ -3,17 +3,18 @@
 
 usage: strip_unused.py BUILD_LOG [--dry-run]
 
-BUILD_LOG is the output of `lake build` (or `lake env lean`), with warnings such as
-  warning: Pkg/File.lean:12:5: Variable name `hx` is not explicitly referenced.
+BUILD_LOG is the output of `lake build` (warnings such as
+  warning: Pkg/File.lean:12:5: Variable name `hx` is not explicitly referenced.)
+or of `lake env lean` (the same warning as `Pkg/File.lean:12:5: warning: Variable name …`).
 
-For each such variable bound in a declaration's signature, its binder is removed: `(hx : P)`
-disappears, and in a group such as `(a b : T)` only the name goes. Variables that are not in a
-signature (for example `fun x =>` or `∃ x,` in a body, or a pattern variable) are listed for manual
-repair and left alone.
+For each such variable bound before the colon of a declaration's signature, its binder is
+removed: `(hx : P)` disappears, and in a group such as `(a b : T)` only the name goes. Variables
+bound elsewhere (after the colon, as in `∀ (h : P), Q`, which is part of the statement; `fun x =>`
+or `∃ x,` in a body; a pattern variable) are listed for manual repair and left alone.
 
-After running it: rebuild; the errors point at call sites that still pass the removed arguments;
-delete those arguments; repeat while new warnings appear, because a removal can leave the caller's
-hypotheses unused in turn.
+After running it, run strip_call_args.py to delete the arguments that call sites still pass for
+the removed binders, then rebuild. Repeat while new warnings appear, committing before each round,
+because a removal can leave the caller's hypotheses unused in turn.
 """
 import argparse
 import re
@@ -37,10 +38,24 @@ def signature_end(text, start):
         elif ch in CLOSE:
             depth -= 1
         elif depth == 0 and (text.startswith(':=', i) or text.startswith(' where', i)
-                             or (ch == '|' and text[i - 1] == '\n')):
+                             or (ch == '|' and text[text.rfind('\n', 0, i) + 1:i].strip() == '')):
             return i
         i += 1
     return len(text)
+
+
+def binders_end(text, start):
+    """Offset of the top-level `:` that ends the binders of the declaration at `start`."""
+    depth, i, end = 0, start, signature_end(text, start)
+    while i < end:
+        if text[i] in OPEN:
+            depth += 1
+        elif text[i] in CLOSE:
+            depth -= 1
+        elif depth == 0 and text[i] == ':' and not text.startswith(':=', i):
+            return i
+        i += 1
+    return end
 
 
 def main():
@@ -48,7 +63,9 @@ def main():
     ap.add_argument('log')
     ap.add_argument('--dry-run', action='store_true')
     args = ap.parse_args()
-    warnings = sorted(set(WARN.findall(Path(args.log).read_text(encoding='utf-8'))))
+    log = re.sub(r'^(\S+\.lean):(\d+):(\d+): warning: ', r'warning: \1:\2:\3: ',
+                 Path(args.log).read_text(encoding='utf-8'), flags=re.M)
+    warnings = sorted(set(WARN.findall(log)))
     by_file = defaultdict(list)
     for f, l, c, var in warnings:
         by_file[f].append((int(l), int(c), var))
@@ -69,6 +86,10 @@ def main():
             decl_line = next((i for i in range(l - 1, -1, -1) if DECL.match(lines[i])), None)
             if decl_line is None or pos >= signature_end(text, starts[decl_line]):
                 manual.append(f'{f}:{l}:{c} `{var}`: not in a signature; rename it `_` or restate')
+                continue
+            if pos >= binders_end(text, starts[decl_line]):
+                manual.append(f'{f}:{l}:{c} `{var}`: bound after the colon, in the statement; '
+                              'rename it `_` or restate')
                 continue
             # The innermost bracket group around the variable.
             depth, i = 0, pos - 1

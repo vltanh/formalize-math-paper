@@ -9,26 +9,33 @@ hypotheses often reveal redundant hypotheses of the paper.
 1. Capture the warnings: `lake build > build.log 2>&1`. Lake replays the warnings of up-to-date
    modules. Classify them:
    `grep -o 'warning: [^:]*\.lean:[0-9]*:[0-9]*: .*' build.log | sort -u`.
-2. Remove unused hypotheses (the "Variable name `h` is not explicitly referenced" warnings):
-   - `python3 scripts/strip_unused.py build.log` deletes each unused binder from its
+2. Remove unused hypotheses (the "Variable name `h` is not explicitly referenced" warnings), in
+   rounds, because removing a hypothesis can leave its caller's own hypotheses unused. A few
+   rounds usually suffice. Each round:
+   - Starts from a commit, with a fresh `build.log`.
+   - `python3 <skill-dir>/scripts/strip_unused.py build.log` deletes each unused binder from its
      declaration; `--dry-run` only lists them. It skips variables that are not in a binder
      (`fun x`, `∃ x`) and lists them for manual repair: write `_`, or restate (`∃ x, True`
      becomes `Nonempty …`).
-   - Run `python3 scripts/strip_call_args.py <commit before the cleanup>` once. It deletes, at
-     every call site, the arguments of the removed binders, and lists the call sites it cannot
-     parse, such as an argument on the next line, for manual repair.
+   - `python3 <skill-dir>/scripts/strip_call_args.py` then deletes, at every call site, the
+     arguments of the binders removed since the last commit, named arguments included. It lists
+     the call sites that it cannot edit safely for manual repair (an argument on the next line,
+     `@`, dot notation on a variable, a declaration passed as a value, a local name that may
+     shadow it), and leaves those it cannot resolve at all to the rebuild. It refuses an older
+     commit, and a second run against the same one, either of which would delete further,
+     correct arguments.
    - Rebuild, and fix what remains. Implicit arguments that only a removed hypothesis determined
-     need a named argument at some call sites (`(x := x)`); a definition that matched on a
-     membership proof (`if h : c ∈ s then … else …`) may now need a plain `if`.
-   - Repeat: removing a hypothesis can leave its caller's own hypotheses unused. A few rounds
-     usually suffice.
-   - Delete `have` steps that only produced a removed argument. The linter does not flag them.
-   - Delete the binder rather than renaming it `_h`, unless the user wants the statement to
-     match the paper character for character.
+     need a named argument at some call sites (`(x := x)`), and a dependent `if h : …` whose `h`
+     is no longer used becomes a plain `if`.
+   - Ends with a commit.
+
+   Delete `have` steps that only produced a removed argument; the linter does not flag them.
+   Delete the binder rather than renaming it `_h`, unless the user wants the statement to match
+   the paper character for character.
 3. Fix the other warnings:
-   - `letI` in proofs, with the hint "The goal is a proposition, so `let` is preferred": use
-     `let`. This is always safe when the class is a `Prop`, and usually safe otherwise. Leave
-     `letI` in statements alone.
+   - `haveI` or `letI` in proofs, with the hint "The goal is a proposition, so `let` is
+     preferred": use `have` or `let`. The linter fires only when the goal is a proposition, where
+     the change is always safe, since proofs are irrelevant. Leave `letI` in statements alone.
    - "This simp argument is unused": delete it.
    - "automatically included section variable(s) unused": add `omit [Inst] in` before the
      theorem.
@@ -36,13 +43,13 @@ hypotheses often reveal redundant hypotheses of the paper.
 4. Rerun the checks: `lake build`, `scripts/Audit.lean` and `lake comparator`, and, if
    documents already link to the code, `scripts/linkify_docs.py`, since line numbers move.
 5. Record, and commit:
-   - Run `python3 scripts/stmt_diff.py <commit before cleanup>`.
+   - Run `python3 <skill-dir>/scripts/stmt_diff.py <commit before the cleanup>`.
    - For each paper result that lost a hypothesis, the Lean statement is now more general than
      the paper's. Record the result, the hypothesis and why it is not needed. The audit lists
      them in the report's redundant-hypotheses table and the README summary.
    - Definitions that lost an unused parameter change how readers see them. Mention it under
      "How the formalization reads the paper" if they are paper notions.
-   - The Challenge statements stay exactly the paper's.
+   - The Challenge statements keep the paper's hypotheses.
    - The commit message lists the removals.
 
 ## Names and stale files
@@ -52,11 +59,11 @@ hypotheses often reveal redundant hypotheses of the paper.
   with a script that moves the files (`git mv`), rewrites the imports, rewrites qualified
   references to the declarations of the renamed namespace, and leaves the genuinely external
   names alone. Then fix the module docstrings by hand, and rebuild.
-- Delete the draft's notes and checklists once `README.md` and `REPORT.md` supersede them. They
-  remain in the history.
-- After moving or renaming modules, delete their old build outputs (`.olean`, `.ilean`, `.trace`
-  and the hashes, under `.lake/build/lib/lean` and `.lake/build/ir`). Stale `.ilean` files make
-  `scripts/linkify_docs.py` link to the old paths.
+- Delete the draft's notes and checklists once `README.md` and `REPORT.md` supersede them, in
+  Phase 8. They remain in the history. Your own working notes (the inventory, the run log) are
+  untracked and stay until the end.
+- After moving or renaming modules, delete their old build outputs under `.lake/build`: stale
+  `.ilean` files make `scripts/linkify_docs.py` link to the old paths.
 - Keep the generator of every generated Lean file in the repository (for example under
   `scripts/`), check that it reproduces the file byte for byte, and say in the README how to run
   it. Name template fragments that are not modules `*.lean.in`: Palomar rejects every `.lean`

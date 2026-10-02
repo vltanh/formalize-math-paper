@@ -9,8 +9,9 @@ of them rebuilds, and meanwhile deletes, the `.olean` files that the others impo
 does not exist"), and a module rebuilt from a half-edited file breaks everyone downstream. Each
 agent can work against its own copy of the build outputs instead:
 
-- `take` copies `.lake/build/lib/lean` to SNAPDIR. It refuses when `lake build --no-build` says
-  the build is out of date, because the copy would mix versions; rebuild first, or pass --force.
+- `take` copies `.lake/build/lib/lean` to SNAPDIR, which must be new, empty, or an earlier
+  snapshot. It refuses when `lake build --no-build` says the build is out of date, because the copy
+  would mix versions; rebuild first, or pass --force.
 - `check` runs `lean` on FILE with the lakefile's `[leanOptions]`. The snapshot replaces the
   project's own build directory; Mathlib and the other packages come from `.lake/packages`.
 - `--emit` also writes the file's `.olean` and `.ilean` into the snapshot, so that the agent's
@@ -30,6 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check_file import lean_options  # noqa: E402
 
 BUILD = Path('.lake/build/lib/lean')
+MARKER = '.snapshot_check'
 
 
 def lean_path(snap):
@@ -45,6 +47,11 @@ def lean_path(snap):
 def take(snap, force):
     if not BUILD.is_dir():
         sys.exit('no .lake/build/lib/lean: run `lake build` first')
+    here = Path.cwd().resolve()
+    if snap == here or snap in here.parents or (here / '.lake') in [snap, *snap.parents]:
+        sys.exit(f'refusing to use {snap} as a snapshot directory')
+    if snap.exists() and any(snap.iterdir()) and not (snap / MARKER).is_file():
+        sys.exit(f'{snap} exists and is not a snapshot: choose a new directory')
     fresh = subprocess.run(['lake', 'build', '--no-build'], capture_output=True, text=True)
     if fresh.returncode != 0 and not force:
         sys.exit('the build is not up to date (rebuild first, or --force):\n' +
@@ -52,6 +59,7 @@ def take(snap, force):
     if snap.exists():
         shutil.rmtree(snap)
     shutil.copytree(BUILD, snap, symlinks=True)
+    (snap / MARKER).write_text('snapshot of .lake/build/lib/lean, made by snapshot_check.py\n')
     print(f'snapshot of {sum(1 for _ in snap.rglob("*.olean"))} modules in {snap}')
 
 
@@ -61,7 +69,11 @@ def check(snap, file, emit):
     env = dict(os.environ, LEAN_PATH=lean_path(snap))
     cmd = ['lean', *lean_options(), '-R', '.']
     if emit:
-        stem = snap / Path(file).with_suffix('')
+        try:
+            rel = Path(file).resolve().relative_to(Path.cwd().resolve())
+        except ValueError:
+            sys.exit(f'--emit needs a file inside the project: {file}')
+        stem = snap / rel.with_suffix('')
         stem.parent.mkdir(parents=True, exist_ok=True)
         cmd += ['-o', f'{stem}.olean', '-i', f'{stem}.ilean']
     result = subprocess.run(cmd + [file], env=env, capture_output=True, text=True)
@@ -80,6 +92,8 @@ def main():
     c.add_argument('file')
     c.add_argument('--emit', action='store_true')
     args = ap.parse_args()
+    if not (Path('lakefile.toml').is_file() or Path('lakefile.lean').is_file()):
+        sys.exit('run from the project root, the directory of the lakefile')
     snap = Path(args.snapdir).resolve()
     if args.cmd == 'take':
         take(snap, args.force)

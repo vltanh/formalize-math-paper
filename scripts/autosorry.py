@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Replace the proofs of declarations that contain errors by `sorry`.
 
-usage: autosorry.py FILE.lean ERRORS.txt [--log LOG]
+usage: autosorry.py FILE.lean ERRORS.txt
 
 ERRORS.txt holds Lean output; lines `FILE:LINE:COL: error: ...` are used.
 Errors inside a theorem/lemma/example/instance body (after its top-level `:=`)

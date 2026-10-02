@@ -10,12 +10,17 @@
 
 ## 1. Versions
 
-Use current Mathlib `master` unless the user pins a version. The project's `lean-toolchain` must
-equal the `lean-toolchain` of the pinned Mathlib commit exactly, release-candidate suffix included;
-Palomar rejects any mismatch.
+Unless the user pins a version, use the newest Lean release or release candidate that Palomar
+accepts (at least the minimum in PalomarSubmission's `toolchains.json`), and pin Mathlib to its
+release tag for that toolchain rather than to `master`. Palomar renders the Challenge with the
+release of the documentation tool Verso for the same toolchain, and the packages that Verso and
+Mathlib share must then be pinned at the same revisions. Mathlib's release tag satisfies this;
+later `master` commits soon stop doing so (`palomar.md`, Section 1). The project's
+`lean-toolchain` must equal the pinned Mathlib commit's exactly, release-candidate suffix
+included.
 
 ```sh
-lake +leanprover/lean4:<version> new PaperName math   # or copy lakefile/manifest from a known-good project
+lake +leanprover/lean4:<version> new PaperName math   # then set Mathlib's rev to the release tag
 lake update                                           # writes lake-manifest.json with the exact Mathlib commit
 cat .lake/packages/mathlib/lean-toolchain             # must equal ./lean-toolchain
 lake exe cache get                                    # download Mathlib's compiled files
@@ -42,7 +47,7 @@ maxSynthPendingDepth = 3      # Mathlib's own setting
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "master"                # the exact commit is pinned in lake-manifest.json
+rev = "v4.35.0-rc3"           # for example: Mathlib's release tag for lean-toolchain
 
 [[lean_lib]]
 name = "PaperName"
@@ -55,9 +60,11 @@ name = "Challenge"
 name = "Solution"
 ```
 
-`Solution.lean` can import the whole development and serve as the library's entry point. Then no
-separate umbrella file `PaperName.lean` is needed, and the `globs` line keeps every module in the
-build.
+Create `Challenge.lean` and `Solution.lean` with the project, as modules that are empty except for
+their imports, so that `lake build` works from the start; Phase 3 fills in the Challenge and
+Phase 6 the Solution. `Solution.lean` can import the whole development and serve as the library's
+entry point. Then no separate umbrella file `PaperName.lean` is needed, and the `globs` line keeps
+every module in the build.
 
 ## 3. The module system
 
@@ -125,8 +132,9 @@ end PaperName
 - Before spawning repair agents, build once, so that every module's `.olean` exists, with
   `sorry`s, and agents can check their files independently.
 - When parallel agents' rebuilds interfere, each agent can check its files against a private
-  copy of the build outputs with `scripts/snapshot_check.py` (`take`, then `check FILE [--emit]`).
-  Nothing in `.lake` changes.
+  copy of the build outputs with `scripts/snapshot_check.py` (`take SNAPDIR` while the build is
+  fresh, then `check SNAPDIR FILE [--emit]`; see `parallel-repair.md`). Nothing in `.lake`
+  changes.
 
 ## 5. Common errors when repairing a draft
 

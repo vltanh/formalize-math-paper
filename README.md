@@ -8,7 +8,7 @@ OpenCode, Amp and others.
 The skill guides the work end to end:
 
 - read the paper and record its results, constants, citations and suspected typos;
-- set up a Lean project on current Mathlib, using the module system;
+- set up a Lean project on a Mathlib release, using the module system;
 - state every result first, and check each statement against the paper's TeX source;
 - prove everything the paper proves (Stage 1), then every result it cites (Stage 2), until the
   project has no `sorry` and no `axiom`;
@@ -16,8 +16,9 @@ The skill guides the work end to end:
 - clean up: remove unused hypotheses and other warnings;
 - write `REPORT.md`, an audit of the paper against the formalization (errors and gaps, missing
   and redundant hypotheses, how the paper uses each cited result), and `README.md`;
-- package the project for the [Palomar](https://palomar-registry.org) registry
-  (Challenge/Solution, `comparator.json`, `formalization.yaml`, preflight), by default;
+- package the project for the [Palomar](https://palomar-registry.org) registry by default
+  (Challenge/Solution, `comparator.json`, `formalization.yaml`), and, with your permission,
+  publish it and run Palomar's preflight;
 - keep a run log, and report how the formalization was made: the procedure, the agents and models,
   the elapsed time and the effort.
 

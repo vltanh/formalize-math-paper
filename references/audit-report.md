@@ -16,14 +16,15 @@ finding:
 | Kind | How to find it | What to record |
 | --- | --- | --- |
 | Error | A step or claim that is false as written: wrong inequality, wrong constant, wrong index range, a product that counts a factor twice, a misapplied theorem | Location and TeX line; why it is false (a counterexample or the computation); the correct version; whether the result survives |
-| Gap | A claim used without justification: "clearly", "it is easy to see", an omitted case, an implicit condition | What is missing and why it holds, or does not |
+| Gap | A claim used without justification: "clearly", "it is easy to see", an omitted case, a step that needs a condition the statement does not give | What is missing and why it holds, or does not; if the statement holds anyway, the corrected argument |
 | Typo | Wrong cross-reference ("Theorem 1.2" for 1.3), self-citation, a variable name slip | Location and correction |
-| Missing hypothesis | A statement whose proof needs a condition the statement does not have | The condition, and where the formalization states it |
+| Missing hypothesis | A statement that is false without a condition that the paper leaves implicit | The condition, a counterexample without it, and where the formalization states it (a correction agreed with the user) |
 | Redundant hypothesis | A statement hypothesis that the proof never uses: start from the hypotheses that the cleanup removed | The hypothesis, and whether the Lean statement drops it |
 | Use of a cited result | Each citation used in a proof: are its hypotheses checked, is it applied in the form it was proved in? | A verdict: correct, applied loosely but correctly, or misstated or misapplied |
 
-Verify every finding before reporting it, preferably by a reader other than the one who recorded
-it (a separate agent, if available, working from the TeX source and the inventory):
+Verify every finding before reporting it, by a reader other than the one who recorded it (a
+separate agent if available, working from the TeX source and the inventory; otherwise a separate
+pass):
 
 - Quote the TeX text. Do not report from memory of the PDF.
 - Recompute every arithmetic claim, by script if needed: products and sums of constants,
@@ -67,7 +68,10 @@ statement of the paper had to change>
 the Lean handles it> … **En. Typos.** …
 
 ## 4. Missing hypotheses
-<Hypotheses that the arguments need but the statements lack.> | Where | Missing hypothesis | In the formalization |
+<Conditions without which a statement is false, each with a counterexample, and where the
+formalization states them. A proof that uses an unstated condition while the statement holds
+without it has a gap (Section 3), and its statement stays as printed.>
+| Where | Missing hypothesis | Counterexample without it | In the formalization |
 
 ## 5. Redundant hypotheses
 <Hypotheses that the statements include but the proofs do not use; say whether the Lean
@@ -91,7 +95,8 @@ unformalized prior work, surveys, remarks, experiments.>
 1. Title, CI badge, and one paragraph on the paper and its main result, for a mathematician.
 2. What is proved: every result the paper proves; the cited results and where they are proved;
    build, `sorry` and `axiom` status; the audit script and how to run it.
-3. The main results: each Challenge theorem, linked, with a plain-language statement.
+3. The main results: each Challenge theorem, linked, with a plain-language statement. For a
+   well-known problem, compare the Challenge's formulation with the standard one.
 4. Palomar (if packaged): the files, how to run `lake comparator`, the preflight workflow.
 5. Audit summary: short bullets, using the report's E-numbers. Lead with errors, then gaps,
    missing and redundant hypotheses, and the use of cited results.
@@ -103,7 +108,8 @@ unformalized prior work, surveys, remarks, experiments.>
    - the number of sub-agents, how many ran at once at most, and what each kind did;
    - the elapsed time from the start to the audited formalization, with dates and time zone, and
      the total working time of the sub-agents;
-   - tokens and tool calls, when the platform reports them.
+   - tool calls and tokens, when the platform records them, with output, input and cache reads
+     counted separately: they differ by orders of magnitude.
 7. Related work: the history of the problem, and the earlier formalizations of the paper or its
    result, with whether this work consulted them.
 8. Building: `lake exe cache get`, `lake build`, the audit, the toolchain, how to regenerate
@@ -127,10 +133,11 @@ unformalized prior work, surveys, remarks, experiments.>
 - Tables: in GitHub's Markdown, every `|` in a table row ends a cell, even inside backticks.
   Write `\|` for absolute values and cardinalities in tables (`` `\|S\| ≥ 2` ``).
   `scripts/check_md_tables.py --fix` escapes them, and without `--fix` it reports broken rows.
-- Before publishing, render each document with GitHub's own renderer and check that every table
-  has the same number of cells in every row:
+- Before publishing, render each document with GitHub's own renderer and read its tables. The
+  renderer pads or truncates every row to the header's number of cells, so a broken row does not
+  change the count: it shows as text in the wrong cell, or missing.
 
   ```sh
   python3 -c 'import json,sys; print(json.dumps({"text": open(sys.argv[1]).read(), "mode": "markdown"}))' REPORT.md \
-    | gh api -X POST markdown --input - > /tmp/REPORT.html
+    | gh api -X POST markdown --input - > <scratch dir>/REPORT.html
   ```

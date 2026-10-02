@@ -29,8 +29,9 @@ to.
 4. `formalization.yaml`
 5. Local checks
 6. CI
-7. The preflight
-8. Publishing and submitting
+7. Publishing
+8. The preflight
+9. Submitting and registering
 
 ## 1. Repository requirements
 
@@ -38,9 +39,22 @@ to.
   `toolchains.json`, and identical to the pinned Mathlib commit's `lean-toolchain`.
 - `lakefile.toml` (or `lakefile.lean`) and `lake-manifest.json` are committed. Dependencies are
   public GitHub repositories pinned to full commit hashes; the manifest provides the pins.
-  Mathlib's pinned commit must be on Mathlib's `master` branch: check it with
-  `gh api repos/leanprover-community/mathlib4/compare/<sha>...master --jq .status`, which should
-  print `ahead` or `identical`.
+  Mathlib must be pinned to a commit on its `master` branch or to an exact release tag. Use the
+  release tag for the toolchain, because of the next point.
+- The Challenge must render. After verification, Palomar renders it with the release of Verso
+  (Lean's documentation tool) for the project's toolchain, and merges Verso's Lake manifest into
+  the project's. A package that both pin at different revisions stops the render, and the
+  submission stalls at the Challenge renderability check. The preflight does not render, so
+  compare the pins yourself: every package that appears in both
+  `lake-manifest.json` and Verso's manifest for the toolchain's tag must have the same `rev`.
+
+  ```sh
+  gh api 'repos/leanprover/verso/contents/lake-manifest.json?ref=<toolchain tag>' --jq .content | base64 -d
+  ```
+
+  Mathlib's release tag for the toolchain usually pins the same revisions as Verso; a later
+  `master` commit soon does not. Moving Mathlib to the tag means rebuilding and rechecking
+  everything.
 - Every `.lean` file, scripts and unused files included, uses the module system and has at most
   10,000 lines. The Challenge has at most 1,000 lines and 100 KiB, and over 300 lines or 32 KiB it
   draws a warning. Template fragments that generators assemble are not modules: name them
@@ -56,7 +70,7 @@ to.
   constructions; for example, a probability over a finite set becomes a count divided by a
   cardinality. Write the module docstring as a plain-language account of each theorem, with
   every convention it uses. State the results exactly as the paper does, quantifiers and
-  constants included.
+  constants included, except for evident misprints, corrected and documented (SKILL.md, Rules).
 - The solution module repeats each Challenge theorem verbatim, with the same names and types, and
   proves it from the development. Bridge lemmas translate between the project's definitions and
   the Challenge's vocabulary. `Solution.lean` can import the whole development and serve as the
@@ -73,7 +87,7 @@ to.
 {
   "challenge_module": "Challenge",
   "solution_module": "Solution",
-  "theorem_names": ["PaperNamespace.theorem_1_1", "PaperNamespace.theorem_1_2"],
+  "theorem_names": ["PaperNamespace.theorem1_1", "PaperNamespace.theorem1_2"],
   "definition_names": [],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": true
@@ -112,74 +126,87 @@ PalomarSubmission (format v0.4), and replace every `TEMPLATE` value. The rules t
   report.
 - `review.status`: honest. `agent-reviewed` if only AI systems reviewed it; never imply a human
   review that did not happen.
-- The README carries the literature account the review checks: the history of the problem, the
-  sources, and the earlier formalizations. For a famous problem, Palomar also expects a careful
-  comparison of the Challenge with the standard formulation of the problem.
 - `alignment.statements`: one entry for each Comparator theorem, giving its source, Lean name,
   module and status.
 
+The editorial review also reads the README, which carries the literature account: the history of
+the problem, the sources, and the earlier formalizations. For a well-known problem, Palomar also
+expects a careful comparison of the Challenge with the standard formulation of the problem.
+
 ## 5. Local checks
 
+Palomar's metadata and source checks, run from a clone of PalomarSubmission. Point `R` at a fresh
+clone of the project (`git clone <project> <scratch dir>/check`), so that untracked files in your
+working directory, such as notes, do not count:
+
 ```sh
-# Palomar's metadata and source checks (from a clone of PalomarSubmission). Point R at a clean
-# clone of the project (`git clone <project> /tmp/check`), so that untracked files in your working
-# directory, such as notes, do not count:
 python3 -c "
 import sys; sys.path.insert(0, '.')
 from pathlib import Path
 from scripts import submission_contract as sc, source_requirements as sr
-R = Path('/path/to/project')
+R = Path('<scratch dir>/check')
 sc.load_formalization_metadata(R / 'formalization.yaml'); print('metadata OK')
 summary, issues = sr.inspect_lean_sources(R); print(summary['files_checked'], 'files', issues)"
-
-# Comparator, in a bubblewrap sandbox (Lake's built-in command). If NanoDa is not installed
-# locally, run a copy of the configuration with NanoDa disabled; Palomar supplies NanoDa itself.
-sed 's/"enable_nanoda": true/"enable_nanoda": false/' comparator.json > /tmp/comparator-local.json
-lake comparator --config=/tmp/comparator-local.json     # expect "Your solution is okay!"
 ```
 
-The licence detector is the `licensee` gem. A byte-for-byte copy of Mathlib's `LICENSE` is
-detected as Apache-2.0. After publishing, `gh api repos/<owner>/<name>/license --jq .license.spdx_id`
-shows what GitHub detects; it may take a minute after the first push.
+Comparator, from the project root, in a bubblewrap sandbox (Lake's built-in command). `lake env`
+puts the toolchain's `bin/` directory, which holds the NanoDa kernel (`nanoda_bin`), on the path:
+
+```sh
+lake env lake comparator --config=comparator.json    # expect "Your solution is okay!"
+```
+
+If the toolchain has no `nanoda_bin`, run a copy of the configuration with
+`"enable_nanoda": false`. Palomar runs its independent kernels (NanoDa and con-ron) whatever the
+file says.
 
 ## 6. CI
 
 `assets/lean_action_ci.yml` builds the project on every push, runs the axiom audit, and checks
-that the documentation's links are current. The Lake `math` template's documentation workflow
-(`docs.yml`, using `docgen-action`) generates documentation for every imported module, all of
-Mathlib included. It runs for hours on a GitHub runner and typically fails, so leave it out
-unless the user wants API documentation and accepts the cost.
+that the documentation's links and tables are current. The CI workflow of the Lake `math`
+template also generates API documentation for every imported module, Mathlib included, which can
+run for hours: use the asset instead, unless the user wants that documentation.
 
-## 7. The preflight
+## 7. Publishing
+
+Each of these steps needs the user's explicit permission: creating the GitHub repository, pushing,
+making it public, running the preflight, submitting, registering. Permission for one is not
+permission for another.
+
+- After the repository is created, add the CI badge to the top of the README, before the commit
+  that will be preflighted and submitted.
+- The verifier fetches the repository anonymously, so the repository must be public before the
+  preflight.
+- Palomar and GitHub detect the license with the `licensee` gem, which recognizes only the
+  standard text. After the first push, `gh api repos/<owner>/<name>/license --jq .license.spdx_id`
+  shows what GitHub detects.
+
+## 8. The preflight
 
 Palomar asks that you run its complete verification workflow on the exact commit before
-submitting, and submit only when the report says `status: pass`.
+submitting, and submit only when the report says `status: pass`. The preflight does not render the
+Challenge or run the editorial review (Section 1).
 
 1. Copy `assets/palomar_preflight.yml` to `.github/workflows/`. Pin both the `uses:` reference
    and `pipeline_commit` to the same full PalomarSubmission commit
    (`git ls-remote https://github.com/PalomarRegistry/PalomarSubmission.git HEAD`). `request_id`
    must be exactly 12 lowercase letters or digits.
-2. The verifier fetches the repository anonymously, so the repository must be public. Ask the
-   user before making it public. The workflow's `options` declare the authorization relationship,
-   which the public report records: check with the user that it is accurate.
+2. The workflow's `options` declare the authorization relationship, which the public report
+   records: check with the user that it is accurate, and ask before running the workflow.
 3. Run it on the commit to submit (`gh workflow run palomar_preflight.yml --ref main`). If you push
    again, run it again: the submitted commit must be the one that passed.
-4. Download the report and read it:
+4. Download the report, whose artifact is named after the `request_id`, and read it:
 
    ```sh
-   gh run download <run-id> -n mechanical-report-preflight001 -D /tmp/preflight
-   python3 -c "import json; d = json.load(open('/tmp/preflight/mechanical-report.json')); print(d['status'], d['errors'], d['warnings'])"
+   gh run download <run-id> -n mechanical-report-preflight001 -D <scratch dir>/preflight
+   python3 -c "import json, sys; d = json.load(open(sys.argv[1])); print(d['status'], d['errors'], d['warnings'])" <scratch dir>/preflight/mechanical-report.json
    ```
 
    Only `status: pass` counts. If it is anything else, read `errors`, `build_log_tail` and
-   `comparator_log_tail`, fix the problem, push, and run the preflight again.
+   `comparator_log_tail`, and fix the problem. Then, with the user's permission, push and run
+   the preflight again.
 
-## 8. Publishing and submitting
-
-After the repository is created, add the CI badge to the top of the README.
-
-Each of these steps needs the user's explicit permission: creating the GitHub repository, pushing,
-making it public, submitting, registering. Permission for one is not permission for another.
+## 9. Submitting and registering
 
 Submissions go to https://submit.palomar-registry.org only. Before submitting, show the user:
 
@@ -196,7 +223,10 @@ Then offer the two ways to submit:
   then delete both). Palomar records that this route proves less than the browser sign-in: tell
   the user that it is not equivalent. Never drive the browser sign-in yourself.
 
-After submission, Palomar verifies again and runs its editorial review. Treat the access token as
-a credential, and do not post the review publicly. Registration publishes the review and is
-permanent. Show the user the review and what registering would publish, and register only when
-they decide to.
+After submission, Palomar verifies again, renders the Challenge, and runs its editorial review.
+Follow it on the status page, or with `GET /api/submission` and the access token as described in
+`llms.txt`. When a submission stays at the Challenge renderability check, check the pins of
+Section 1: a conflict there does not go away on retry. Fix it, and, with the user's permission,
+submit the corrected commit anew. Treat the access token as a credential, and do not post the
+review publicly. Registration publishes the review and is permanent. Show the user the review and
+what registering would publish, and register only when they decide to.

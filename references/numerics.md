@@ -3,7 +3,7 @@
 Papers often rest on numbers: a constant enclosed to a few digits, an inequality checked "by
 computer", a system of equations "solved numerically", a figure that shows a curve stays on one
 side of another. Each of these is a claim to prove. This guide collects methods that work without
-`native_decide` (Comparator rejects the axiom it adds) and without trusting floating point.
+`native_decide` (Comparator rejects the axioms it adds) and without trusting floating point.
 
 ## Contents
 
@@ -35,6 +35,7 @@ Write each quantity as `x ∈ Set.Icc lo hi` with rational (or decimal) endpoint
 enclosures through small lemmas, one per operation:
 
 ```lean
+open Set in
 lemma iv_add {x y a b c d : ℝ} (hx : x ∈ Icc a b) (hy : y ∈ Icc c d) : x + y ∈ Icc (a + c) (b + d) :=
   ⟨add_le_add hx.1 hy.1, add_le_add hx.2 hy.2⟩
 ```
@@ -48,18 +49,13 @@ structure so that hypotheses stay short.
 
 ## 3. Elementary functions
 
-- π: Mathlib has decimal bounds (grep `pi_gt_d` and `pi_lt_d` in
-  `Mathlib/Analysis/Real/Pi/Bounds.lean`).
-- sin and cos: `Real.sin_bound` and `Real.cos_bound` (in
-  `Mathlib/Analysis/Complex/Trigonometric.lean`) hold only for `|x| ≤ 1`, with errors `|x|^5/100`
-  and `5|x|^4/96`. Higher-order alternating bounds, such as
-  `sin x ≤ x - x^3/6 + x^5/120` and `1 - x^2/2 + x^4/24 - x^6/720 ≤ cos x` for `x ≥ 0`, follow by
-  integrating a known bound several times, or from the monotonicity of the difference. Prove them
-  once and reuse them. For larger arguments, reduce with `sin (π/2 - x) = cos x` and the like.
-- exp and log: `Real.exp_bound` and `Real.add_one_le_exp` (in
-  `Mathlib/Analysis/Complex/Exponential.lean`) give enclosures of `exp`;
-  `Real.log_le_sub_one_of_pos` and monotonicity give those of `log`.
-- Check every name with `#check` before relying on it: these lemmas are renamed often.
+Mathlib has explicit bounds for π (decimal bounds such as `Real.pi_gt_d6`), sin and cos
+(`Real.sin_bound`, `Real.cos_bound`, for `|x| ≤ 1`), exp (`Real.exp_bound`, `Real.add_one_le_exp`)
+and log (`Real.log_le_sub_one_of_pos`). They hold on limited ranges, with crude errors. Reduce the
+arguments by symmetries or functional equations, derive the sharper bounds the problem needs once
+(higher-order Taylor bounds follow by integrating a known bound, or from the monotonicity of a
+difference), and reuse them. Check every name with `#check` before relying on it: these lemmas are
+renamed often.
 
 ## 4. Generated proofs
 
@@ -77,11 +73,11 @@ inequality checked by `norm_num`), and:
 ## 5. Integrals in closed form
 
 When an area or another integral has an elementary antiderivative, obtain it from `sympy`, prove
-`HasDerivAt F f t` with the `HasDerivAt` combinators followed by `ring`, apply
+`HasDerivAt F (f t) t` with the `HasDerivAt` combinators followed by `ring`, apply
 `intervalIntegral.integral_eq_sub_of_hasDerivAt`, and evaluate `F b - F a` by interval
-arithmetic. A function given piecewise is integrated piece by piece. One generic structure, such
-as "polynomial coefficients times `1`, `cos t`, `sin t`" together with a lemma computing its
-integral, covers many pieces at once.
+arithmetic. A function given piecewise is integrated piece by piece. When many pieces share one
+form (for example polynomials times `cos t` and `sin t`, or times exponentials), one structure for
+that form, with a lemma computing its integral, covers them all at once.
 
 ## 6. Existence and uniqueness of a solution
 
@@ -92,33 +88,34 @@ of an explicit construction that a paper takes from a numerical solution):
 2. Choose a matrix `M` close to the inverse of the derivative `DH` at the approximate solution, and
    consider `G(z) = z - M·H(z)`.
 3. Bound the entries of `I - M·DH(z)` on `B` by interval arithmetic (Section 2). A sum of
-   absolute values per row below `q < 1` makes `G` a contraction for the sup norm.
-4. Show that `G` maps a small box around the approximate solution into itself. Banach's theorem
-   (`ContractingWith.exists_fixedPoint'`) then gives a zero there, and the contraction on all of
-   `B` gives that it is the only zero in `B`.
-5. Derive enclosures of every parameter from the small box. Later numerical lemmas assume these
+   absolute values per row below `q < 1` makes `G` a contraction for the sup norm (`B` is convex,
+   so the mean value inequality applies).
+4. Check that `M` is invertible, for example by its determinant, an explicit rational. Then the
+   fixed points of `G` are exactly the zeros of `H`.
+5. Show that `G` maps a small box `B'` around the approximate solution `z₀` into itself. For the
+   ball of radius `r` around `z₀` in the sup norm, inside `B`, it is enough that
+   `‖M·H(z₀)‖ ≤ (1 - q)·r`.
+   Banach's theorem (`ContractingWith.exists_fixedPoint'`) then gives a zero in `B'`, and the
+   contraction on all of `B` makes it the only zero in `B`.
+6. Derive enclosures of every parameter from `B'`. Later numerical lemmas assume these
    enclosures.
 
 ## 7. Inequalities over two or more parameters
 
-A family of inequalities `F(s, τ) ≥ 0` over a rectangle (a point on one curve against a line
-through another, for every pair of parameters) is expensive by brute force, and fails outright
-where `F` vanishes. Reduce the dimension first:
+A family of inequalities `F(s, τ) ≥ 0` over a rectangle is expensive by brute force, and fails
+outright where `F` vanishes. Reduce the dimension first:
 
-- **Monotonicity in one variable.** If `∂F/∂τ` has a sign, or changes sign at most once (for
-  example because it is the sign of `g(τ) - h(s - τ)` with `g` increasing and `h` decreasing), then
-  `F` is monotone or unimodal in `τ`. So `F(s, τ) ≥ min(F(s, a), F(s, b))`, and only the edges
-  remain: one-variable inequalities.
-- **Convexity and envelopes.** For a family of lines, or of half-planes, with a smooth envelope,
-  each line is tangent to the envelope, and a convex envelope lies on one side of all its tangent
-  lines. Points of the envelope then satisfy the inequality for the whole range of parameters
-  where the envelope is convex, with no computation.
-- **Witness directions.** To show that a point is outside an intersection of half-planes, it is
-  enough to find one direction that separates it. A covering argument can often choose that
-  direction as a fixed parameter value for a whole region, which turns a two-parameter claim into
-  a one-parameter one.
-- **Algebraic identities.** Writing the quantity as an integral of a signed density, as with
-  `F(τ) = ∫ ρ(r) sin(r - s) dr`, makes its sign visible on whole intervals.
+- **Monotonicity in one variable.** If `∂F/∂τ` has a sign, `F` is monotone in `τ`. If it is first
+  `≥ 0` and then `≤ 0` (for example because it has the sign of a function that decreases in `τ`,
+  such as `h(s - τ) - g(τ)` with `g` and `h` increasing), `F` has no interior minimum in `τ`. In
+  both cases `F(s, τ) ≥ min(F(s, a), F(s, b))`, and only the edges remain: one-variable
+  inequalities. A change of sign from `-` to `+` gives an interior minimum, which needs its own
+  argument.
+- **Integral representations.** Writing the quantity as an integral whose integrand has a known
+  sign, as with `F(s) = ∫ ρ(r) sin(r - s) dr` with `ρ ≥ 0` over a range where `sin(r - s) ≥ 0`,
+  proves its sign on whole intervals at once.
+- **The structure of the problem.** Convexity, or a covering of the parameter region by finitely
+  many pieces with one witness on each, often turns a two-parameter claim into one-parameter ones.
 
 Explore numerically (Section 1) to see which variable is monotone where, then write the reduction
 as a short mathematical plan before the Lean.
@@ -131,8 +128,7 @@ An inequality `f ≥ 0` that is tight somewhere cannot be proved by enclosures n
   dividing out the factor symbolically, or show `f' > 0` on `[a, a + δ]` and use enclosures
   beyond.
 - **A tangency** (`f(c) = f'(c) = 0` inside the interval): find the reason for it, which is usually
-  an identity of the construction (two curves meeting at a point, a line tangent to its envelope).
-  Prove that identity exactly, and use a second-order argument (convexity, or the sign of `f''`)
-  near `c`.
+  an identity of the construction. Prove that identity exactly, and use a second-order argument
+  (convexity, or the sign of `f''`) near `c`.
 - **A margin that is tiny but positive:** prove it at its own scale, with a reduction that
   isolates the small quantity. Do not try to refine a global grid until it passes.
