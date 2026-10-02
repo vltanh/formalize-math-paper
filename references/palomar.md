@@ -41,6 +41,12 @@ to.
   public GitHub repositories pinned to full commit hashes; the manifest provides the pins.
   Mathlib must be pinned to a commit on its `master` branch or to an exact release tag. Use the
   release tag for the toolchain, because of the next point.
+- The Challenge's transitive imports must resolve to Lean core, Mathlib or Tau Ceti, at
+  allowlisted pins, and to nothing else. Importing Tau Ceti is allowed but marks the entry as
+  having qualified statement dependencies. A project that Palomar has registered cannot be
+  imported. Dependencies used only by the Solution may be any public Git repository pinned to a
+  commit. A library that tracks Mathlib's `master`, as Tau Ceti does, fixes the Mathlib commit:
+  use the commit its manifest pins, and compare the resulting manifest with Verso's as below.
 - The Challenge must render. After verification, Palomar renders it with the release of Verso
   (Lean's documentation tool) for the project's toolchain, and merges Verso's Lake manifest into
   the project's. A package that both pin at different revisions stops the render, and the
@@ -54,7 +60,8 @@ to.
 
   Mathlib's release tag for the toolchain usually pins the same revisions as Verso; a later
   `master` commit soon does not. Moving Mathlib to the tag means rebuilding and rechecking
-  everything.
+  everything. When a dependency forces a `master` commit, compare anyway: on the same toolchain
+  the shared packages often still match.
 - Every `.lean` file, scripts and unused files included, uses the module system and has at most
   10,000 lines. The Challenge has at most 1,000 lines and 100 KiB, and over 300 lines or 32 KiB it
   draws a warning. Template fragments that generators assemble are not modules: name them
@@ -65,12 +72,26 @@ to.
 
 ## 2. Challenge and Solution
 
-- `Challenge.lean` contains only the statements of record, with `sorry` proofs, in Mathlib's
-  vocabulary: no imports from the project. Restate project definitions inline with Mathlib
-  constructions; for example, a probability over a finite set becomes a count divided by a
-  cardinality. Write the module docstring as a plain-language account of each theorem, with
-  every convention it uses. State the results exactly as the paper does, quantifiers and
-  constants included, except for evident misprints, corrected and documented (SKILL.md, Rules).
+- `Challenge.lean` contains only the statements of record, the paper's main results, with `sorry`
+  proofs, in Mathlib's vocabulary: no imports from the project. Use Tau Ceti's vocabulary only
+  when restating its definitions would cost more than the qualified mark (Section 1). Restate
+  project definitions inline with Mathlib constructions; for example, a probability over a finite
+  set becomes a count divided by a cardinality. Write the module docstring as a plain-language
+  account of each theorem, with every convention it uses. State the results exactly as the paper
+  does, quantifiers and constants included, except for evident misprints, corrected and
+  documented (SKILL.md, Rules).
+- A conditional result states each assumed result as a hypothesis, never as an axiom. Several
+  may be bundled in a class of hypotheses, named for what it is, written in the signature of each
+  theorem that needs it rather than declared with `variable`, which obscures which theorems use
+  it. Keep data and assumptions apart: the class takes the data as parameters. The module
+  docstring lists the assumed results, with their sources.
+- When the statements need definitions too large to restate inline, keep them in one module of
+  the library, between two marker comments, and copy that block verbatim into the Challenge with
+  `scripts/sync_challenge_defs.py`; CI runs it with `--check`. Comparator requires the constants
+  that the statements use to be the same in the Challenge and in the Solution's environment, and
+  the verbatim copy makes them so without bridge lemmas. Put the Challenge's theorems in a
+  namespace of their own, so that the Solution, which imports the library, can restate them
+  without clashing with the library's names.
 - The solution module repeats each Challenge theorem verbatim, with the same names and types, and
   proves it from the development. Bridge lemmas translate between the project's definitions and
   the Challenge's vocabulary. `Solution.lean` can import the whole development and serve as the
@@ -110,7 +131,7 @@ PalomarSubmission (format v0.4), and replace every `TEMPLATE` value. The rules t
   Check them.
 - `sources`: the paper with `relationship: formalizes`, and with `author_endorsement:
   not-contacted` unless the authors were contacted. Cited works that the formalization proves go
-  under `background`, with a note.
+  under `background`, with a note; so do cited works that it assumes, with a note saying so.
 - `related_formalizations`: earlier, independent formalizations, as found in Phase 0, each with
   `relationship: independent` (or another honest value) and a note saying whether this work
   consulted it. A superseded draft of this same project does not belong here. Palomar does not
@@ -121,7 +142,8 @@ PalomarSubmission (format v0.4), and replace every `TEMPLATE` value. The rules t
   and the number of agents, `cost.wall_time` with the elapsed time and the total agent time, and
   `spend_usd` if known, otherwise "not tracked".
 - `status`: `sorry_count: 0`, `sorry_in_definitions: 0`, `axioms: []`. `scope` says exactly what
-  is and is not formalized.
+  is and is not formalized. A conditional formalization says so at the start of `scope` and of
+  `project.description`, and names the assumed results; `fidelity.divergences` lists them.
 - `fidelity.divergences`: every reading or deviation from the paper. They must agree with the
   report.
 - `review.status`: honest. `agent-reviewed` if only AI systems reviewed it; never imply a human
@@ -163,9 +185,10 @@ file says.
 ## 6. CI
 
 `assets/lean_action_ci.yml` builds the project on every push, runs the axiom audit, and checks
-that the documentation's links and tables are current. The CI workflow of the Lake `math`
-template also generates API documentation for every imported module, Mathlib included, which can
-run for hours: use the asset instead, unless the user wants that documentation.
+that the Challenge's copy of the shared definitions, if any, and the documentation's links and
+tables are current. The CI workflow of the Lake `math` template also generates API documentation
+for every imported module, Mathlib included, which can run for hours: use the asset instead,
+unless the user wants that documentation.
 
 ## 7. Publishing
 

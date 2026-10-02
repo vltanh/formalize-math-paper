@@ -18,7 +18,7 @@ compatibility: >-
   but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "1.2.0"
+  version: "1.3.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -27,7 +27,10 @@ metadata:
 The deliverable is a Lean project, plus documents about it, in which:
 
 - every result the paper proves is proved, following the paper's argument;
-- every result the paper cites in its proofs is proved too, in Mathlib or in `External/`;
+- every result the paper cites in its proofs is proved too, in Mathlib, in another public library
+  or in `External/`. A cited result that no Lean library can yet support, and that the project
+  cannot reasonably build, becomes a named hypothesis of each statement that uses it, and the
+  formalization then says plainly that it is conditional;
 - the statements say what the paper says, and every deviation is documented;
 - `lake build` succeeds with no `sorry` (except the statements of `Challenge.lean`, by design), no
   `admit`, and no project `axiom`, and every declaration of the library depends only on `propext`,
@@ -38,8 +41,9 @@ The deliverable is a Lean project, plus documents about it, in which:
 - the project is packaged for Palomar and, with the user's permission, published and preflighted.
 
 The work runs in two stages. In Stage 1, formalize everything the paper itself proves; results it
-imports from the literature may be temporary axioms. In Stage 2, discharge those axioms. Around
-the two stages come setup, verification, cleanup, the audit and packaging.
+imports from the literature may be temporary axioms. In Stage 2, discharge those axioms: prove
+them, or turn the ones out of reach into stated hypotheses. Around the two stages come setup,
+verification, cleanup, the audit and packaging.
 
 ## Principles
 
@@ -56,6 +60,15 @@ These explain the rules below. Apply them when a situation is not covered.
   fact; otherwise prove it. Axiomatize only what the paper itself imports from another source.
 - **External means provenance, not trust.** A cited result lives in `External/` because of where it
   comes from. It is proved like everything else.
+- **An assumption is an assumption, whatever its form.** A cited result that is not proved is
+  assumed, whether it is written as an axiom, a hypothesis or a field of a structure. Axioms are
+  not allowed. Hypotheses are, when a reader of the statement can see each one, under the name of
+  the result it assumes. A structure that mixes data with assumed theorems hides what a result
+  depends on, and so does a parameter whose type looks like data but holds a theorem.
+- **Data carries its defining property.** When a statement takes an object of the paper as a
+  parameter instead of constructing it, it also requires the property that defines the object.
+  Otherwise the theorem is about every object that satisfies the other hypotheses, which is a
+  different statement.
 - **Representation choices need bridges.** When Lean's objects differ from the paper's (indices
   from 0 instead of 1, lists instead of indexed families, a bundled Mathlib structure instead of
   an informal object, a concrete model instead of a description "up to isomorphism"), prove the
@@ -84,6 +97,17 @@ These explain the rules below. Apply them when a situation is not covered.
   corrected argument, and record the gap in the proof as an E-item. If you find neither a proof
   nor a counterexample, tell the user what is missing: whether to keep working or to formalize a
   weaker statement, documented as a deviation, is their decision.
+- **Cited results out of reach.** A cited result may rest on mathematics that no Lean library
+  has. If building that mathematics in the project is a moderate effort, build it. Otherwise the
+  default is a conditional formalization: the result becomes a named hypothesis of every
+  statement whose proof uses it. Apply the default without asking, and report it in the next
+  status report. Ask the user only when building the missing mathematics would be a significant
+  but feasible effort, since whether to invest it is their decision, and continue the other work
+  under the default meanwhile. If they choose to build it, plan the work in layers, each of which
+  replaces some hypotheses by constructions and proofs from more basic ones and ends in a
+  releasable state. These hypotheses are the only ones that may be added to a paper result
+  without a counterexample. Never present a conditional formalization as complete: its README,
+  `formalization.yaml` and report say that it is conditional and list what it assumes.
 - **Slips in statements.** A statement that is false only through an evident misprint (a wrong
   index, a swapped name, a missing `- 1`) whose intended reading is unambiguous is formalized in
   the intended form at once, in the library and in the Challenge. List each such correction in
@@ -118,11 +142,11 @@ These explain the rules below. Apply them when a situation is not covered.
 | Phase | Goal | Done when |
 | --- | --- | --- |
 | 0. Configure | record the task, ask the open questions | configuration recorded |
-| 1. Inventory | know the paper: results, definitions, constants, citations, suspected typos | working checklist complete |
+| 1. Inventory | know the paper: results, definitions, constants, citations and where their proofs can come from, suspected typos | working checklist complete |
 | 2. Project | a Lean project on a Mathlib release, module system, layout by paper section | `lake build` runs |
 | 3. Statements | every definition and numbered result stated, proofs `sorry`; the Challenge | statements elaborate and pass an independent fidelity review; baseline committed |
 | 4. Stage 1 | prove everything the paper proves | only cited results remain, as axioms in `External/` |
-| 5. Stage 2 | prove the cited results | zero axioms |
+| 5. Stage 2 | prove the cited results | zero axioms; every result still assumed is a named hypothesis |
 | 6. Verify | axiom audit, dependency table, Solution and Comparator | `scripts/Audit.lean` passes; Comparator accepts |
 | 7. Cleanup | no warnings, no unused hypotheses, no misleading names | build shows only Challenge's `sorry`s |
 | 8. Audit | `REPORT.md`, `README.md` | every finding checked against the TeX source |
@@ -139,24 +163,30 @@ paper:            arXiv id and version (or DOI); source TeX if available
 repository:       new or existing; work on a branch and commit in small coherent steps
 starting point:   from scratch, or an existing draft (where?)
 Lean / Mathlib:   the newest Lean release or release candidate (at least Palomar's minimum), and
-                  Mathlib's release tag for it, unless the user pins a version
+                  Mathlib's release tag for it, unless the user pins a version or a library the
+                  project needs fixes the Mathlib commit
+libraries:        the public libraries beyond Mathlib that prove results the paper cites
+                  (references/palomar.md, Section 1, says which may appear in statements)
+out of reach:     cited results that no library supports and the project cannot build, and how
+                  each is handled (Rules)
 compile allowed:  yes (default whenever a toolchain exists)
 publishing:       push? create repo? public? (default: ask each time)
 target:           Palomar packaging (default yes; skip it only if the user declines)
 authors:          the human author(s) and maintainer(s), and the license (Apache-2.0 if unspecified)
 run log:          the start time with its time zone, the agent, model and procedure (this skill, with
                   its repository and version), recorded now
-earlier work:     earlier formalizations of the same paper or result, found by searching now
+earlier work:     earlier formalizations of the same paper or result, and of the results it cites,
+                  found by searching now
 ```
 
 Get the paper's TeX source (on arXiv, the "TeX Source" link), not only the PDF. Exact statements,
 constants and cross-references are much easier to check in TeX.
 
 Before starting, search for earlier formalizations of the paper or of its main result (GitHub,
-the Lean Zulip, the Palomar registry, collections of formal statements), and tell the user what
-you find. An earlier formalization changes what a new one should add, the README and
-`formalization.yaml` must cite it, and Palomar's review asks whether a submission duplicates
-existing work.
+the Lean Zulip, the Palomar registry, collections of formal statements, and the roadmaps of the
+large libraries), and tell the user what you find. An earlier formalization changes what a new
+one should add, the README and `formalization.yaml` must cite it, and Palomar's review asks
+whether a submission duplicates existing work.
 
 **Starting from an existing draft.** Import it verbatim as the first commit. Make the commit's
 author whoever wrote the draft (for an AI draft, for example `ChatGPT <noreply@openai.com>`),
@@ -179,7 +209,10 @@ Read the whole paper before writing Lean. Keep a working checklist, outside the 
   is chosen (does `∃ C` come before or after `∀ p`?);
 - which result each proof uses: this dependency graph drives the file layout and the parallel
   work in Phase 4;
-- each citation, marked as used in a proof or only for context;
+- each citation, marked as used in a proof or only for context, and for each one used in a proof,
+  where its proof can come from: Mathlib, another public library, the project itself, or nowhere
+  yet, because the mathematics it rests on is missing from Lean. Survey the libraries before you
+  decide, and settle the last kind now (Rules): it decides the scope;
 - suspected typos, inconsistencies and gaps, with the TeX line. These become the audit's
   E-items, so record them as you go.
 
@@ -202,7 +235,7 @@ PaperName/                     -- the library
     Lemma34.lean               -- one file per result, or per small group of results
   External/Topic/              -- one directory per cited result, with a README.md, from the start
   Main.lean                    -- the main theorem
-Challenge.lean                 -- the main results in Mathlib-only vocabulary
+Challenge.lean                 -- the main results, in the vocabulary of Mathlib
 Solution.lean                  -- their proofs from the library (may double as the root module)
 ```
 
@@ -219,18 +252,24 @@ For an existing draft, `scripts/autosorry.py` replaces each proof that fails to 
 `sorry`. Fix statement errors by hand. Repeat until every file elaborates, then commit ("Make
 every statement elaborate").
 
-Write `Challenge.lean`: the paper's main results, restated with Mathlib's vocabulary only and
-with `sorry` proofs. It is the statement of record. A reader can audit it without reading the
-development, and Palomar trusts it because it imports nothing but Mathlib. When the Challenge
-defines an object that a reader cannot recognize at a glance, add a compared theorem that ties it
-to something known about it, such as a known numerical value, so that readers and Palomar's review
-can tell that the definition is the intended one.
+Write `Challenge.lean`: the paper's main results, and only those, restated with `sorry` proofs in
+Mathlib's vocabulary (Palomar also allows Tau Ceti's, but then marks the entry as having
+qualified statement dependencies; `references/palomar.md`, Sections 1 and 2). It is the statement
+of record. A reader can audit it without reading the
+development, and Palomar trusts it because it imports nothing beyond the libraries it allows.
+Intermediate results stay proved in the library, linked from the README. Budget its size from the
+start: Palomar caps it at 1,000 lines and prefers 300, and the definitions the statements need
+count too. When the Challenge defines an object that a reader cannot recognize at a glance, add a
+compared theorem that ties it to something known about it, such as a known numerical value, so
+that readers and Palomar's review can tell that the definition is the intended one. A conditional
+result shows every assumed result in the signature of each theorem that uses it (Phase 5).
 
 Then review every statement, the Challenge's included, against the TeX source. Check the
 quantifier order and where constants are chosen; strict versus weak inequalities and ranges; casts
 and truncation (`ℕ` subtraction and division, `Nat.floor`); indexing from 0 versus 1; "max over z"
 versus "for every z"; whether "positive integer" became `ℕ`; the types Lean inferred where the
-statement does not give them; and implicit standing assumptions. Prove a bridge lemma for each
+statement does not give them; implicit standing assumptions; and whether every hypothesis of a
+statement is either the paper's or a declared assumption. Prove a bridge lemma for each
 representation choice.
 
 Have the statements and the Challenge reviewed against the TeX source by a reader other than their
@@ -264,14 +303,26 @@ without reporting it.
 
 For each cited result:
 
-1. Search Mathlib, at the pinned version, and other public Lean libraries.
-2. If it exists, prove that Mathlib's form implies exactly what the paper uses (parameters,
+1. Search Mathlib, at the pinned version, and the other public Lean libraries. A library used
+   only in proofs may be any pinned public repository; one whose definitions the Challenge needs
+   must be one that Palomar allows in statements (`references/palomar.md`, Section 1). Depending
+   on a library can fix the Mathlib commit: settle that before building on it.
+2. If it exists, prove that the library's form implies exactly what the paper uses (parameters,
    notation, finite versus infinite, bundled versus unbundled).
 3. Otherwise, formalize it under `External/Topic/`, with a `README.md` giving the source, the
    statement and how its Lean forms relate to the paper's use. Proving a different standard form
    is fine if it yields exactly the estimates the paper needs; say so.
+4. If neither is feasible, because the mathematics it rests on is missing from Lean and beyond
+   the project, follow the rule on cited results out of reach. By default, define the result in
+   `External/Topic/` as a proposition named after its source, with no proof, and make it a
+   hypothesis of every statement whose proof uses it, the Challenge's included. Several such
+   hypotheses may be bundled in a class of hypotheses, named for what it is, that takes the data
+   as parameters and is written in the signature of each theorem that needs it. The `README.md`
+   of the topic says what Lean lacks. If the user chose to build the missing mathematics, write
+   the layers down before starting the first, and keep every layer's end state releasable.
 
-End with zero axioms in the project.
+End with zero axioms in the project, and with every cited result either proved or, when out of
+reach, a declared hypothesis.
 
 ### Phase 6: Verify
 
@@ -288,7 +339,14 @@ End with zero axioms in the project.
   - Does a helper lemma hide half a proof, through a hypothesis that assumes what should be shown?
   - Is a hypothesis stronger than the paper's?
   - Could a statement be vacuous: contradictory hypotheses, an empty range, a definition that is
-    never satisfied?
+    never satisfied? Construct an instance of each structure or class of hypotheses that a
+    statement takes, or say in the report why that is not yet possible.
+  - Does a parameter hide an assumption? For every structure, class or subtype that a Challenge
+    theorem takes, list its propositional content, recursively, and classify each item: a
+    hypothesis of the paper, a law that defines the object, a fact proved in the project, or an
+    assumed result. Every assumed result must be a declared hypothesis, named after its source
+    and listed in the report.
+  - Is every object that a statement takes as a parameter tied to its defining property?
   - Is each result in `External/` really cited by the paper, rather than proved in it?
   - Does each library theorem used for a cited result imply exactly the paper's form?
   - Are sums, counts and unions taken over exactly the paper's index sets?
@@ -302,7 +360,9 @@ rounds, each starting from a commit, because each removal can leave others unuse
 remaining linter warnings, and rename files or namespaces whose names mislead (for example,
 helper files called `External`). An unused hypothesis of a paper result is one that the paper's
 statement does not need: remove it, which makes the Lean statement more general than the
-paper's, and record it for the audit. Challenge statements keep the paper's hypotheses.
+paper's, and record it for the audit. Challenge statements keep the paper's hypotheses. An
+assumed result that no proof uses is not a hypothesis of the paper: remove it everywhere, the
+Challenge included.
 
 ### Phase 8: Audit report and documentation
 
@@ -312,7 +372,8 @@ reading and proving, and the hypotheses that the cleanup removed. Have every fin
 against the TeX source by a reader other than the one who recorded it, a separate agent if
 available. In practice this overturns some of the inventory's own claims, and can show that a
 statement was changed without need. When it does, restore the paper's statement, rerun the Phase 6
-checks, and update the Challenge and the report to match. Once `README.md`
+checks, and update the Challenge and the report to match. A conditional formalization says so
+in the README's first paragraph, and the report lists every assumed result. Once `README.md`
 and `REPORT.md` exist, delete a draft's own notes (Phase 0). Two things users care about:
 
 - The report analyzes the paper and the current formalization. It is not a history of the
@@ -356,8 +417,9 @@ that CI runs into the project's `scripts/` directory.
 | `scripts/session_stats.py [TRANSCRIPT…] [--until TIME]` | the run log's figures (elapsed time, models, sub-agents, peak concurrency, agent time, tokens, tool calls) from Claude Code session transcripts |
 | `scripts/linkify_docs.py [--check]` | link the Lean names in the documents to their lines; copy it into the project and configure its first block |
 | `scripts/check_md_tables.py FILE… [--fix]` | find, or fix, Markdown table rows broken by a `\|` inside a cell; copy it into the project |
+| `scripts/sync_challenge_defs.py [--check]` | copy the block of shared definitions from a library module into `Challenge.lean`, or check that the copy is current (`references/palomar.md`, Section 2); copy it into the project and configure its first block |
 | `assets/Audit.lean` | the axiom and dependency audit; copy it to `scripts/Audit.lean` and fill in its lists |
-| `assets/lean_action_ci.yml` | CI: build, audit, links, tables |
+| `assets/lean_action_ci.yml` | CI: build, audit, the Challenge's copy of shared definitions, links, tables |
 | `assets/palomar_preflight.yml` | Palomar's mechanical preflight, run on demand |
 
 ## Run log
@@ -391,7 +453,7 @@ elapsed:          time since the start; sub-agents running / finished
 build:            passes / fails (first error)
 sorry / axiom:    counts (excluding Challenge.lean)
 statements:       changes to paper results (only documented ones), helper lemmas found false
-stage 1 / 2:      remaining internal / cited results
+stage 1 / 2:      remaining internal / cited results; results assumed as hypotheses
 audit:            findings so far (E-items)
 packaging:        Comparator, Palomar checks, preflight
 needs from user:  decisions or permissions
@@ -399,18 +461,23 @@ needs from user:  decisions or permissions
 
 ## Completion gates
 
-- **Statements:** every numbered result stated; Challenge written; independent fidelity review
-  done; representation bridges proved; baseline committed.
+- **Statements:** every numbered result stated; Challenge written, with the main results only and
+  within Palomar's size limits; independent fidelity review done; representation bridges proved;
+  baseline committed.
 - **Stage 1:** every internal result proved; cited results isolated in `External/` with citations.
-- **Stage 2:** every cited result proved or derived from Mathlib; zero project axioms.
+- **Stage 2:** every cited result proved or derived from a library, or, when out of reach, a
+  declared hypothesis named after its source; zero project axioms.
 - **Verification:** clean build; `scripts/Audit.lean` passes for every declaration; `Solution.lean`
-  and `comparator.json` written, and Comparator accepts the solution.
+  and `comparator.json` written, and Comparator accepts the solution; no assumption hidden in a
+  parameter; every structure or class of hypotheses inhabited, or the reason it cannot yet be
+  recorded.
 - **Cleanup:** the build prints only Challenge's `sorry` warnings; unused hypotheses removed, and
   those of paper results recorded; misleading names fixed.
 - **Documentation:** `REPORT.md` and `README.md` written, links current, tables valid, findings
   checked against the source; the README's credits report the procedure, the agents and models,
   the elapsed time and the effort from the run log; earlier formalizations cited; a draft's own
-  notes deleted.
+  notes deleted; a conditional formalization says so in the README's first paragraph, in
+  `formalization.yaml` and in the report, which lists what it assumes.
 - **Packaging (unless declined):** `formalization.yaml` written; Palomar's metadata and source
   checks pass on a clean clone; the dependencies shared with Verso pinned at Verso's revisions for
   the toolchain; with the user's permission for each step, the repository

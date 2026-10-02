@@ -46,9 +46,10 @@ item. If you insert a finding later, renumber, and update every reference in `RE
 Paper: <authors>, *<title>*, <arXiv id with version>. The audit was made against the arXiv
 LaTeX source of that version. Section, result and equation numbers are the paper's.
 
-Status of the formalization: <bullets: what is proved; cited results proved where; build, sorry
-and axiom status and how the audit script checks it; Challenge and Comparator; whether any
-statement of the paper had to change>
+Status of the formalization: <bullets: what is proved; cited results proved where; what is
+assumed, if anything, so that the result is conditional; build, sorry and axiom status and how
+the audit script checks it; Challenge and Comparator; whether any statement of the paper had to
+change>
 
 ## 1. Summary
 - **Errors.** … - **Gaps.** … - **Missing hypotheses.** … - **Redundant hypotheses.** …
@@ -57,6 +58,10 @@ statement of the paper had to change>
 ## 2. Results from prior work and how the paper uses them
 ### Proved in `External/`
 | Result | Where the paper uses it | Source | Theorem in `External/` |
+### Assumed (a conditional formalization only)
+| Result | Where the paper uses it | Source | Hypothesis in the formalization | What Lean lacks | Plan, if any |
+<Check each hypothesis against its source as carefully as a statement: an assumption stated more
+strongly than its source proves can make a theorem vacuous.>
 ### Standard facts used without citation
 | Fact | Where | In the formalization (Mathlib name or local proof) |
 ### Does the paper use each cited result correctly?
@@ -92,9 +97,11 @@ unformalized prior work, surveys, remarks, experiments.>
 
 ## 3. `README.md` structure
 
-1. Title, CI badge, and one paragraph on the paper and its main result, for a mathematician.
+1. Title, CI badge, and one paragraph on the paper and its main result, for a mathematician. If
+   the formalization is conditional, this paragraph says so and names what it assumes.
 2. What is proved: every result the paper proves; the cited results and where they are proved;
-   build, `sorry` and `axiom` status; the audit script and how to run it.
+   the assumed results, if any, with a link to the report's table; build, `sorry` and `axiom`
+   status; the audit script and how to run it.
 3. The main results: each Challenge theorem, linked, with a plain-language statement. For a
    well-known problem, compare the Challenge's formulation with the standard one.
 4. Palomar (if packaged): the files, how to run `lake comparator`, the preflight workflow.

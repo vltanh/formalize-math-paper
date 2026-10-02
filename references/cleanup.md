@@ -49,7 +49,8 @@ hypotheses often reveal redundant hypotheses of the paper.
      them in the report's redundant-hypotheses table and the README summary.
    - Definitions that lost an unused parameter change how readers see them. Mention it under
      "How the formalization reads the paper" if they are paper notions.
-   - The Challenge statements keep the paper's hypotheses.
+   - The Challenge statements keep the paper's hypotheses. An assumed result (SKILL.md, Rules)
+     that no proof uses is not one of them: remove it everywhere, the Challenge included.
    - The commit message lists the removals.
 
 ## Names and stale files

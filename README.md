@@ -11,7 +11,10 @@ The skill guides the work end to end:
 - set up a Lean project on a Mathlib release, using the module system;
 - state every result first, and check each statement against the paper's TeX source;
 - prove everything the paper proves (Stage 1), then every result it cites (Stage 2), until the
-  project has no `sorry` and no `axiom`;
+  project has no `sorry` and no `axiom`. A cited result that no Lean library can yet support
+  becomes a visible hypothesis of the statements that use it, and the result is reported as
+  conditional; the skill asks you only when building the missing theory would be a significant
+  but feasible effort;
 - verify: the axioms of every declaration, and Comparator;
 - clean up: remove unused hypotheses and other warnings;
 - write `REPORT.md`, an audit of the paper against the formalization (errors and gaps, missing
@@ -78,7 +81,7 @@ formalizations faster, but they are not required.
 | --- | --- |
 | `SKILL.md` | The workflow: principles, rules, phases and completion gates |
 | `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, Palomar packaging, cleanup, rigorous numerics |
-| `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; `sorry`-ing failing proofs; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; linking documentation to the code; checking Markdown tables; summarizing a Claude Code session for the run log |
+| `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; `sorry`-ing failing proofs; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; copying shared definitions into the Challenge; linking documentation to the code; checking Markdown tables; summarizing a Claude Code session for the run log |
 | `assets/` | Templates: the axiom and dependency audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
 
 ## License

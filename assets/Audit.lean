@@ -13,7 +13,8 @@ import all Solution
 Run with `lake env lean scripts/Audit.lean` after `lake build`.
 
 For every numbered result of the paper, this prints the axioms it depends on and the results from
-prior work (`PaperName/External/`) that its proof uses. It then checks every declaration
+prior work (`PaperName/External/`) that it uses, whether proved there or, in a conditional
+formalization, assumed as hypotheses of its statement. It then checks every declaration
 of the library and the theorems that Palomar's comparator checks. The run fails if any of them
 depends on an axiom other than Lean's standard `propext`, `Classical.choice` and `Quot.sound` (a
 `sorry` shows up as the axiom `sorryAx`). Its table of results is the source of the report's
@@ -32,8 +33,9 @@ open Lean Elab Command
 
 namespace Audit
 
-/-- The results from prior work, proved in `PaperName/External/`, with a short label. Their
-proofs are not searched: the traversal stops at them. -/
+/-- The results from prior work in `PaperName/External/`, with a short label: the theorems proved
+there and, in a conditional formalization, the propositions assumed as hypotheses. The traversal
+stops at them. -/
 meta def externalResults : List (String × Name) :=
   [("<cited theorem, short label>", ``PaperName.External.citedTheorem)]
 
