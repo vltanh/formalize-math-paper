@@ -47,7 +47,10 @@ DOCS_URL = 'https://leanprover-community.github.io/mathlib4_docs/'
 # Lean's standard axioms, and the core modules that declare them.
 CORE = {'propext': 'Init.Core', 'Classical.choice': 'Init.Prelude', 'Quot.sound': 'Init.Prelude'}
 
-IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_'!?.₀-₉]*$")
+# Lean's identifiers may also use Greek letters, letter-like symbols such as `ℝ`, mathematical
+# script letters, and subscripts.
+LETTER = 'A-Za-z_\u0391-\u03a9\u03b1-\u03c9\u1f00-\u1ffe\u2100-\u214f\U0001d49c-\U0001d59f'
+IDENT = re.compile("^[%s][%s0-9'!?.\u2080-\u2089\u2090-\u209c\u1d62-\u1d6a\u2c7c]*$" % (LETTER, LETTER))
 TOKEN = re.compile(r'\[`([^`\n]+)`\]\(([^)\s]+)\)'  # a link whose text is a code span
                    r'|\[[^\]\n]*\]\([^)\s]*\)'       # any other link
                    r'|`([^`\n]+)`')                  # a code span
@@ -68,6 +71,9 @@ def load_locations():
     locations, preferred = {}, {}
     for ilean in sorted(BUILD.rglob('*.ilean')):
         data = json.loads(ilean.read_text(encoding='utf-8'))
+        # A restored build cache keeps the outputs of deleted modules; skip them.
+        if not (ROOT / module_file(data['module'])).is_file():
+            continue
         # The preferred module's declarations win over restatements elsewhere.
         target = preferred if data['module'] == PREFERRED_MODULE else locations
         for name, ranges in data.get('decls', {}).items():

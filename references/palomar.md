@@ -125,13 +125,19 @@ PalomarSubmission (format v0.4), and replace every `TEMPLATE` value. The rules t
   agent` (or `manual`, `copilot`, `autonomous`, `other`), `models`, `framework`, `tool_setup`,
   and costs, or "not tracked".
 - `project.description` is the public abstract: the subject and the principal results, for a
-  mathematically literate reader.
+  mathematically literate reader. Keep it short, and state what is proved. Palomar shows it as
+  plain text that keeps line breaks: separate paragraphs by an empty line, which a folded block
+  (`>-`) writes as two empty lines.
 - `classification.arxiv` takes 1–8 codes and `classification.msc2020` up to 8. Each must exist in
   PalomarSubmission's `taxonomies/arxiv-categories.json` or `taxonomies/msc2020-codes.json`.
   Check them.
 - `sources`: the paper with `relationship: formalizes`, and with `author_endorsement:
   not-contacted` unless the authors were contacted. Cited works that the formalization proves go
-  under `background`, with a note; so do cited works that it assumes, with a note saying so.
+  under `background`, with a note; so do cited works that it assumes, with a note saying so. A
+  source of `type: original-proof` declares that the formalization first presents its result, and
+  Palomar then requires every source to be `background` or `other`. A project that formalizes a
+  paper and adds a new result keeps the paper as `formalizes` and records the new argument's
+  document with `type: other`, its location pinned to a commit.
 - `related_formalizations`: earlier, independent formalizations, as found in Phase 0, each with
   `relationship: independent` (or another honest value) and a note saying whether this work
   consulted it. A superseded draft of this same project does not belong here. Palomar does not
