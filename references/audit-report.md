@@ -41,6 +41,12 @@ pass):
 Number the findings E1, E2, … in the order they occur in the paper. Group typos into one final
 item. If you insert a finding later, renumber, and update every reference in `README.md`.
 
+Check the report's "What's next" section (Section 10) the same way: every summary of a later
+paper against that paper's abstract and statements, every claim that a result has been extended
+or improved against the source that proves it, and every suggestion against the literature (a
+suggestion that turns out to be known becomes a line of "Since the paper", or of the paper's own
+background) and against the audit that it relies on.
+
 ## 2. `REPORT.md` structure
 
 ```markdown
@@ -107,6 +113,22 @@ except the differences recorded in docs/route_differences.tsv, each with its rea
 ## 9. Not formalized
 <Everything in the paper that is not formalized: deductions that combine the paper with
 unformalized prior work, surveys, remarks, experiments.>
+
+## 10. What's next
+<How the subject has moved since the paper, and how its results could be improved. Say when and
+where the search for later work was made (citation indexes, arXiv), and link every source.>
+### Since the paper
+<What later work has proved: extensions, generalizations, strengthenings, new proofs,
+corrections, counterexamples. One sentence each, taken from the source, with a link. If the
+search found nothing, say so, and name the closest earlier or concurrent work.>
+### Extensions, generalizations and strengthenings
+<Directions from the paper's remarks and open questions, from the audit (unused hypotheses, gaps
+whose repair gives more, steps that hold more generally), from the formalization, and from the
+later work. For each: the statement to aim for, what would have to be proved, and what stands in
+the way. Keep these apart from what is already proved.>
+### The formalization
+<What would extend the formalization itself: the assumed results to prove, the generality to
+reach, and the contributions to Mathlib or other libraries that would make them feasible.>
 ```
 
 ## 3. `README.md` structure
@@ -134,12 +156,13 @@ unformalized prior work, surveys, remarks, experiments.>
      counted separately: they differ by orders of magnitude.
 7. Related work: the history of the problem, and the earlier formalizations of the paper or its
    result, with whether this work consulted them.
-8. Building: `lake exe cache get`, `lake build`, the audit, the toolchain, how to regenerate
+8. What's next: two or three sentences from the report's Section 10, with a link to it.
+9. Building: `lake exe cache get`, `lake build`, the audit, the toolchain, how to regenerate
    generated files, and how to update the documentation's links.
-9. Layout: a table of every module and the paper content it holds, and the `External/`
-   directories.
-10. GitHub configuration: what each workflow does and any settings it needs.
-11. License.
+10. Layout: a table of every module and the paper content it holds, and the `External/`
+    directories.
+11. GitHub configuration: what each workflow does and any settings it needs.
+12. License.
 
 ## 4. Style and mechanics
 

@@ -24,7 +24,8 @@ The skill guides the work end to end:
 - clean up: remove unused hypotheses and other warnings, without changing any proof's argument;
 - write `REPORT.md`, an audit of the paper against the formalization (errors and gaps, missing
   and redundant hypotheses, how the paper uses each cited result, every departure from the
-  paper's proofs), and `README.md`;
+  paper's proofs) that ends with what comes next: the work that has followed the paper, and ways
+  to extend, generalize or strengthen its results; and `README.md`;
 - package the project for the [Palomar](https://palomar-registry.org) registry by default
   (Challenge/Solution, `comparator.json`, `formalization.yaml`), and, with your permission,
   publish it and run Palomar's preflight;
