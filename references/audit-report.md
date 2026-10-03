@@ -34,6 +34,9 @@ pass):
 - A finding about the paper must hold for the paper's own statement. A step that only fails
   after a formalization choice, such as rounding to `ℕ`, is a reading, recorded in Section 6 of
   the report, not an error of the paper.
+- Check every departure of Section 7 against the paper's proof in the TeX: the paper's argument
+  must be described as the paper gives it, and the reason must be one of the three. A departure
+  that the reason does not force is a proof to rewrite, not a line of the report.
 
 Number the findings E1, E2, … in the order they occur in the paper. Group typos into one final
 item. If you insert a finding later, renumber, and update every reference in `README.md`.
@@ -49,7 +52,7 @@ LaTeX source of that version. Section, result and equation numbers are the paper
 Status of the formalization: <bullets: what is proved; cited results proved where; what is
 assumed, if anything, so that the result is conditional; build, sorry and axiom status and how
 the audit script checks it; Challenge and Comparator; whether any statement of the paper had to
-change>
+change; whether every proof follows the paper's, and how many depart from it (Section 7)>
 
 ## 1. Summary
 - **Errors.** … - **Gaps.** … - **Missing hypotheses.** … - **Redundant hypotheses.** …
@@ -87,10 +90,21 @@ statements omit them.> | Result | Hypothesis that is not needed | Lean |
 indexing, types of quantities, "max" as "for all", explicit constants, how cited results were
 proved. If a paper statement had to be corrected, a second list: the corrections.>
 
-## 7. What each result depends on
-<Generated from scripts/Audit.lean.> | Result | Lean | Results from prior work used |
+## 7. Departures from the paper's proofs
+<Every result whose formal proof does not follow the paper's argument, at any step, and why the
+departure is necessary: one of the three reasons of SKILL.md's Rules (the paper's step is wrong or
+has a gap that cannot be repaired along its lines; it needs mathematics that Lean lacks and the
+project cannot build; it has no meaning in the formalization's representation). Agree with the
+docstrings, `formalization.yaml` and `docs/route_differences.tsv`. If there is none, say that
+every proof follows the paper's.>
+| Result | The paper's argument | The formalization's | Why it is necessary | E-item |
 
-## 8. Not formalized
+## 8. What each result depends on
+<Generated from scripts/Audit.lean.> | Result | Lean | Results from prior work used |
+<One sentence on the route check: every proof uses the results that the paper's proof cites,
+except the differences recorded in docs/route_differences.tsv, each with its reason.>
+
+## 9. Not formalized
 <Everything in the paper that is not formalized: deductions that combine the paper with
 unformalized prior work, surveys, remarks, experiments.>
 ```
@@ -106,7 +120,8 @@ unformalized prior work, surveys, remarks, experiments.>
    well-known problem, compare the Challenge's formulation with the standard one.
 4. Palomar (if packaged): the files, how to run `lake comparator`, the preflight workflow.
 5. Audit summary: short bullets, using the report's E-numbers. Lead with errors, then gaps,
-   missing and redundant hypotheses, and the use of cited results.
+   missing and redundant hypotheses, and the use of cited results. Then the proofs: that they
+   follow the paper's arguments, and every departure, with its reason.
 6. Credits: who and what wrote the code, and how it was made. For example: "first written by
    [AI system] as an uncompiled draft; [AI system] made it compile, checked the statements and
    wrote the audit". No links to superseded drafts. Report the run log's figures:

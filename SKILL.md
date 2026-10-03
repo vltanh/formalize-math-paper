@@ -18,7 +18,7 @@ compatibility: >-
   but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "1.3.1"
+  version: "1.4.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -26,7 +26,9 @@ metadata:
 
 The deliverable is a Lean project, plus documents about it, in which:
 
-- every result the paper proves is proved, following the paper's argument;
+- every result the paper proves is proved by the paper's own argument. A proof departs from the
+  paper's only when that is necessary, and every departure is reported (Rules, "Faithful
+  proofs");
 - every result the paper cites in its proofs is proved too, in Mathlib, in another public library
   or in `External/`. A cited result that no Lean library can yet support, and that the project
   cannot reasonably build, becomes a named hypothesis of each statement that uses it, and the
@@ -49,10 +51,12 @@ verification, cleanup, the audit and packaging.
 
 These explain the rules below. Apply them when a situation is not covered.
 
-- **The paper is the source of truth for statements; Lean is the source of truth for proofs.** A
-  statement that drifts from the paper is a wrong formalization, however clean its proof. So
-  statements get reviewed against the TeX source before anyone proves them, and never change
-  silently afterwards.
+- **The paper is the source of truth for statements and for arguments; Lean judges
+  correctness.** A statement that drifts from the paper is a wrong formalization, however clean
+  its proof, and so is a proof that reaches the paper's statement by another argument: the
+  formalization certifies the paper's proofs, not only its claims. So statements are reviewed
+  against the TeX source before anyone proves them, proofs are compared with the paper's proofs
+  after they are written, and neither changes silently.
 - **A formalization nobody compiled is a draft.** Uncompiled Lean written from memory routinely has
   guessed lemma names, wrong signatures and false helper lemmas. Compile whenever a Lean toolchain
   is available. If it is not, or the user forbids it, say plainly that the result is unverified.
@@ -77,8 +81,9 @@ These explain the rules below. Apply them when a situation is not covered.
 - **Constants and ranges are mathematics.** Powers, factors, floors, ceilings, strict versus weak
   inequalities, endpoint ranges and truncated subtraction on `ℕ` decide whether a statement is
   true.
-- **Report faithfully.** If a step was skipped, a proof fails, or a statement had to change, say
-  so. The audit is only useful if it can be trusted.
+- **Report faithfully.** If a step was skipped, a proof fails, a statement had to change, or a
+  proof had to depart from the paper's, say so, with the reason. The audit is only useful if it
+  can be trusted.
 - **A gap in a proof is not a false statement.** When the paper's proof uses a fact that its
   hypotheses do not give, the statement may still be true. Look for a correct argument before
   concluding anything about the statement.
@@ -97,6 +102,34 @@ These explain the rules below. Apply them when a situation is not covered.
   corrected argument, and record the gap in the proof as an E-item. If you find neither a proof
   nor a counterexample, tell the user what is missing: whether to keep working or to formalize a
   weaker statement, documented as a deviation, is their decision.
+- **Faithful proofs.** Prove every result by the paper's proof: the same intermediate claims, the
+  same constructions and case distinctions, and the same earlier results where the paper cites
+  them. The formal proof of a result then uses the results that the paper's proof cites, its
+  *route*, and the route check (Phase 6) verifies this. Only the mechanics may differ: tactics,
+  the Mathlib lemma that closes a routine step, the order of independent steps, and helper lemmas
+  that package a step of the paper. A numbered result that Mathlib happens to prove is still
+  proved by the paper's argument, unless the paper itself treats it as known (it cites it, or
+  calls it standard).
+- **Depart from the paper's proof only when it is necessary**, that is, for one of these reasons
+  and no other:
+  1. the paper's argument is wrong, or has a gap, at that step, and cannot be repaired along its
+     own lines (the step is also an E-item);
+  2. the step rests on mathematics that Lean lacks and that the project cannot reasonably build
+     (as for cited results out of reach, below), and another argument avoids it;
+  3. the step has no meaning in a representation that the formalization must use (Principles), so
+     that its faithful transcription is a different argument.
+
+  A shorter, more elegant, more general or more automatic proof is not a reason; neither is a
+  proof that is easier to formalize or faster to build. Depart as little as the reason requires:
+  repair the step, not the proof. A departure that replaces the whole argument of a numbered
+  result, not one step, is proposed to the user before it is made, with the reason; other work
+  continues meanwhile.
+- **Report every departure, always.** Record each one, with what the paper does, what the
+  formalization does instead, and which reason forces it: in the docstring of the declaration
+  ("Departure from the paper: …"), in the report's table of departures, in `formalization.yaml`
+  (`fidelity.divergences`), in any companion text, in the route check's file of recorded
+  differences when the route changes, and in the next status report. A departure missing from any
+  of these is a defect, found and fixed like a silently changed statement.
 - **Cited results out of reach.** A cited result may rest on mathematics that no Lean library
   has. If building that mathematics in the project is a moderate effort, build it. Otherwise the
   default is a conditional formalization: the result becomes a named hypothesis of every
@@ -145,10 +178,10 @@ These explain the rules below. Apply them when a situation is not covered.
 | 1. Inventory | know the paper: results, definitions, constants, citations and where their proofs can come from, suspected typos | working checklist complete |
 | 2. Project | a Lean project on a Mathlib release, module system, layout by paper section | `lake build` runs |
 | 3. Statements | every definition and numbered result stated, proofs `sorry`; the Challenge | statements elaborate and pass an independent fidelity review; baseline committed |
-| 4. Stage 1 | prove everything the paper proves | only cited results remain, as axioms in `External/` |
+| 4. Stage 1 | prove everything the paper proves, by the paper's proofs | only cited results remain, as axioms in `External/`; every departure reported |
 | 5. Stage 2 | prove the cited results | zero axioms; every result still assumed is a named hypothesis |
-| 6. Verify | axiom audit, dependency table, Solution and Comparator | `scripts/Audit.lean` passes; Comparator accepts |
-| 7. Cleanup | no warnings, no unused hypotheses, no misleading names | build shows only Challenge's `sorry`s |
+| 6. Verify | axiom audit, dependency table, route check, Solution and Comparator | `scripts/Audit.lean` and the route check pass; proofs compared with the paper's; Comparator accepts |
+| 7. Cleanup | no warnings, no unused hypotheses, no misleading names, routes unchanged | build shows only Challenge's `sorry`s; route check still passes |
 | 8. Audit | `REPORT.md`, `README.md` | every finding checked against the TeX source |
 | 9. Package | CI, Palomar files and checks; publication and preflight with permission | Palomar's local checks pass; after publishing, preflight reports `status: pass` |
 
@@ -208,7 +241,11 @@ Read the whole paper before writing Lean. Keep a working checklist, outside the 
 - constants, parameter regimes, "without loss of generality" reductions, and where each constant
   is chosen (does `∃ C` come before or after `∀ p`?);
 - which result each proof uses: this dependency graph drives the file layout and the parallel
-  work in Phase 4;
+  work in Phase 4, and it is the route that each formal proof must follow. Record it from the
+  TeX source with `python3 <skill-dir>/scripts/route_check.py extract main.tex >
+  docs/paper_routes.tsv`, and commit it as extracted. Compare it with your reading: a proof may
+  cite a result only in passing, which the route check's file of recorded differences says
+  later;
 - each citation, marked as used in a proof or only for context, and for each one used in a proof,
   where its proof can come from: Mathlib, another public library, the project itself, or nowhere
   yet, because the mathematics it rests on is missing from Lean. Survey the libraries before you
@@ -240,7 +277,9 @@ Solution.lean                  -- their proofs from the library (may double as t
 ```
 
 Name declarations after the paper's numbering (`theorem1_2`, `lemma3_4`, `equation3_1`) so that
-readers and scripts can find them. Keep every file under 10,000 lines.
+readers and scripts can find them. Begin the docstring of every numbered result with its number
+and its TeX label in backticks (``**Theorem 1.2** (`thm:main`).``): the route check finds the
+paper's results in the Lean code by their labels. Keep every file under 10,000 lines.
 
 ### Phase 3: Statements first
 
@@ -279,9 +318,11 @@ statements change after it only by documented decision.
 
 ### Phase 4: Stage 1, the paper's own results
 
-Prove everything the paper proves, following its proof. A Lean-friendly refactoring is fine if it
-is mathematically equivalent; mention it in the report. When a proof step has a typo or a slip,
-formalize the intended argument and record the slip as an E-item; the statement does not change.
+Prove everything the paper proves by the paper's proof (Rules, "Faithful proofs"). Lean's
+mechanics may differ from the paper's text; the argument may not. When a proof step has a typo or
+a slip, formalize the intended argument and record the slip as an E-item. When a step fails,
+repair that step, keep the rest of the paper's argument, and report the departure. The statement
+does not change in either case.
 Results the paper imports from the literature may be stated as axioms in `External/Topic/`, each
 with its citation, theorem or equation number, the exact specialization used, and a stable name.
 Put cited results there from the start, including facts the paper uses only in a special case:
@@ -295,9 +336,10 @@ test the steps numerically, and give the agent the plan and the numbers.
 For more than a handful of `sorry`s, split the work by file group, following the dependency
 order, among parallel sub-agents if your environment provides them, or work through the groups
 one at a time. `references/parallel-repair.md` has the procedure, an agent brief
-to copy, and the integration checklist. In particular, compare every declaration's statement with
-the baseline commit (`scripts/stmt_diff.py`), because agents sometimes change statements
-without reporting it.
+to copy, and the integration checklist. Give each agent the TeX of the paper's proofs of its
+results, to follow. Compare every declaration's statement with the baseline commit
+(`scripts/stmt_diff.py`), and every route with the paper's (the route check, Phase 6), because
+agents sometimes change statements, or argue differently from the paper, without reporting it.
 
 ### Phase 5: Stage 2, cited results
 
@@ -332,6 +374,17 @@ reach, a declared hypothesis.
   of the paper's results and of the Challenge theorems, and lists which cited results each paper
   result uses (the dependency table for the report). Under the module system it needs
   `import all` for every module; the template explains why.
+- Run the route check: the audit writes the routes of the formal proofs to
+  `.lake/route_deps.tsv`, and `python3 scripts/route_check.py check docs/paper_routes.tsv --accept
+  docs/route_differences.tsv` compares them with the routes of the paper's proofs. It reports a
+  result whose proof avoids a result that the paper's proof cites, or uses one that the paper's
+  argument never reaches. Settle every difference: change the Lean proof to follow the paper, or,
+  if the difference is a necessary departure (Rules) or a use that the paper leaves implicit,
+  record it with its reason in `docs/route_differences.tsv`, and report a departure everywhere
+  the rules say. The check sees which results a proof uses, not how it argues, so also have a
+  reader other than the provers compare the formal proofs with the paper's, against the TeX: at
+  least every proof that is long, that was written in parallel, or that changed since the last
+  comparison.
 - Complete `Solution.lean`, which restates each Challenge theorem verbatim and proves it from the
   library, and write `comparator.json` (`references/palomar.md`, Sections 2 and 3). Then run
   `lake comparator` (needs bubblewrap; see `references/palomar.md`, Section 5).
@@ -349,6 +402,7 @@ reach, a declared hypothesis.
   - Is every object that a statement takes as a parameter tied to its defining property?
   - Is each result in `External/` really cited by the paper, rather than proved in it?
   - Does each library theorem used for a cited result imply exactly the paper's form?
+  - Does each proof make the paper's argument, and is every departure necessary and reported?
   - Are sums, counts and unions taken over exactly the paper's index sets?
   - Are the constants exact?
 
@@ -364,6 +418,13 @@ paper's, and record it for the audit. Challenge statements keep the paper's hypo
 assumed result that no proof uses is not a hypothesis of the paper: remove it everywhere, the
 Challenge included.
 
+Cleanup changes how proofs are written, never which argument they make. Merging duplicate
+helpers, shortening proofs and splitting files can change a proof's route without changing any
+statement: a step that the paper justifies by a numbered result ends up going through the lemma
+underneath that result, or a shorter argument replaces the paper's. Of two copies of a fact, keep
+the one that follows the paper's citations, and rerun the route check after every round. A new
+difference after a cleanup is a regression to undo, not a departure to record.
+
 ### Phase 8: Audit report and documentation
 
 Read `references/audit-report.md` for the structure of `REPORT.md` and `README.md` and how to
@@ -374,10 +435,12 @@ available. In practice this overturns some of the inventory's own claims, and ca
 statement was changed without need. When it does, restore the paper's statement, rerun the Phase 6
 checks, and update the Challenge and the report to match. A conditional formalization says so
 in the README's first paragraph, and the report lists every assumed result. Once `README.md`
-and `REPORT.md` exist, delete a draft's own notes (Phase 0). Two things users care about:
+and `REPORT.md` exist, delete a draft's own notes (Phase 0). Three things users care about:
 
 - The report analyzes the paper and the current formalization. It is not a history of the
   repair, and it does not point to superseded drafts or pull requests.
+- The report lists every departure from the paper's proofs, with its reason, and so does the
+  README's summary. A formalization whose proofs all follow the paper says so.
 - Every claim about the paper is checked against the TeX source, and every arithmetic claim is
   recomputed. A wrong error report costs more credibility than a missed typo.
 
@@ -417,9 +480,10 @@ that CI runs into the project's `scripts/` directory.
 | `scripts/session_stats.py [TRANSCRIPT…] [--until TIME]` | the run log's figures (elapsed time, models, sub-agents, peak concurrency, agent time, tokens, tool calls) from Claude Code session transcripts |
 | `scripts/linkify_docs.py [--check]` | link the Lean names in the documents to their lines; copy it into the project and configure its first block |
 | `scripts/check_md_tables.py FILE… [--fix]` | find, or fix, Markdown table rows broken by a `\|` inside a cell; copy it into the project |
+| `scripts/route_check.py extract TEX…` / `check ROUTES [--accept FILE]` | record which results each of the paper's proofs cites; compare with the routes of the formal proofs that the audit writes, and fail on a difference not recorded with its reason; copy it into the project |
 | `scripts/sync_challenge_defs.py [--check]` | copy the block of shared definitions from a library module into `Challenge.lean`, or check that the copy is current (`references/palomar.md`, Section 2); copy it into the project and configure its first block |
-| `assets/Audit.lean` | the axiom and dependency audit; copy it to `scripts/Audit.lean` and fill in its lists |
-| `assets/lean_action_ci.yml` | CI: build, audit, the Challenge's copy of shared definitions, links, tables |
+| `assets/Audit.lean` | the axiom and dependency audit, which also writes the route of every numbered result for `route_check.py`; copy it to `scripts/Audit.lean` and fill in its lists |
+| `assets/lean_action_ci.yml` | CI: build, the audit's imports, audit, route check, the Challenge's copy of shared definitions, links, tables |
 | `assets/palomar_preflight.yml` | Palomar's mechanical preflight, run on demand |
 
 ## Run log
@@ -453,6 +517,8 @@ elapsed:          time since the start; sub-agents running / finished
 build:            passes / fails (first error)
 sorry / axiom:    counts (excluding Challenge.lean)
 statements:       changes to paper results (only documented ones), helper lemmas found false
+proofs:           departures from the paper's proofs, each with its reason (reported every time
+                  until the user has seen it); route-check differences still open
 stage 1 / 2:      remaining internal / cited results; results assumed as hypotheses
 audit:            findings so far (E-items)
 packaging:        Comparator, Palomar checks, preflight
@@ -464,17 +530,24 @@ needs from user:  decisions or permissions
 - **Statements:** every numbered result stated; Challenge written, with the main results only and
   within Palomar's size limits; independent fidelity review done; representation bridges proved;
   baseline committed.
-- **Stage 1:** every internal result proved; cited results isolated in `External/` with citations.
+- **Stage 1:** every internal result proved by the paper's argument; cited results isolated in
+  `External/` with citations.
 - **Stage 2:** every cited result proved or derived from a library, or, when out of reach, a
   declared hypothesis named after its source; zero project axioms.
+- **Proof routes:** `docs/paper_routes.tsv` committed and checked against the paper; the route
+  check passes on the final commit, and every difference it records has its reason; every
+  departure from the paper's proofs is necessary (Rules) and reported in its docstring, in the
+  report's table of departures, in `formalization.yaml` and to the user; a reader other than the
+  provers compared the formal proofs with the paper's.
 - **Verification:** clean build; `scripts/Audit.lean` passes for every declaration; `Solution.lean`
   and `comparator.json` written, and Comparator accepts the solution; no assumption hidden in a
   parameter; every structure or class of hypotheses inhabited, or the reason it cannot yet be
   recorded.
 - **Cleanup:** the build prints only Challenge's `sorry` warnings; unused hypotheses removed, and
-  those of paper results recorded; misleading names fixed.
+  those of paper results recorded; misleading names fixed; the route check passes as before.
 - **Documentation:** `REPORT.md` and `README.md` written, links current, tables valid, findings
-  checked against the source; the README's credits report the procedure, the agents and models,
+  checked against the source; every departure from the paper's proofs listed in the report and
+  the README's summary; the README's credits report the procedure, the agents and models,
   the elapsed time and the effort from the run log; earlier formalizations cited; a draft's own
   notes deleted; a conditional formalization says so in the README's first paragraph, in
   `formalization.yaml` and in the report, which lists what it assumes.

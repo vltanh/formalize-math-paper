@@ -150,8 +150,10 @@ PalomarSubmission (format v0.4), and replace every `TEMPLATE` value. The rules t
 - `status`: `sorry_count: 0`, `sorry_in_definitions: 0`, `axioms: []`. `scope` says exactly what
   is and is not formalized. A conditional formalization says so at the start of `scope` and of
   `project.description`, and names the assumed results; `fidelity.divergences` lists them.
-- `fidelity.divergences`: every reading or deviation from the paper. They must agree with the
-  report.
+- `fidelity.divergences`: every reading or deviation from the paper, in the statements and in
+  the proofs: the corrections of statements, the readings, and every departure from the paper's
+  proofs with its reason (or a sentence saying that every proof follows the paper's). They must
+  agree with the report.
 - `review.status`: honest. `agent-reviewed` if only AI systems reviewed it; never imply a human
   review that did not happen.
 - `alignment.statements`: one entry for each Comparator theorem, giving its source, Lean name,

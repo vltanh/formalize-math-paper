@@ -10,15 +10,21 @@ The skill guides the work end to end:
 - read the paper and record its results, constants, citations and suspected typos;
 - set up a Lean project on a Mathlib release, using the module system;
 - state every result first, and check each statement against the paper's TeX source;
-- prove everything the paper proves (Stage 1), then every result it cites (Stage 2), until the
-  project has no `sorry` and no `axiom`. A cited result that no Lean library can yet support
+- prove everything the paper proves (Stage 1), by the paper's own arguments, then every result it
+  cites (Stage 2), until the project has no `sorry` and no `axiom`. A proof departs from the
+  paper's only when that is necessary (the paper's step is wrong, needs mathematics that Lean
+  lacks, or has no meaning in the formalization's representation), and every departure is
+  reported, with its reason, in the code, the report, the metadata and to you. A cited result that no Lean library can yet support
   becomes a visible hypothesis of the statements that use it, and the result is reported as
   conditional; the skill asks you only when building the missing theory would be a significant
   but feasible effort;
-- verify: the axioms of every declaration, and Comparator;
-- clean up: remove unused hypotheses and other warnings;
+- verify: the axioms of every declaration; the route of every proof, meaning the paper's results
+  it uses, against those that the paper's proof cites, extracted from the TeX source; and
+  Comparator;
+- clean up: remove unused hypotheses and other warnings, without changing any proof's argument;
 - write `REPORT.md`, an audit of the paper against the formalization (errors and gaps, missing
-  and redundant hypotheses, how the paper uses each cited result), and `README.md`;
+  and redundant hypotheses, how the paper uses each cited result, every departure from the
+  paper's proofs), and `README.md`;
 - package the project for the [Palomar](https://palomar-registry.org) registry by default
   (Challenge/Solution, `comparator.json`, `formalization.yaml`), and, with your permission,
   publish it and run Palomar's preflight;
@@ -81,8 +87,8 @@ formalizations faster, but they are not required.
 | --- | --- |
 | `SKILL.md` | The workflow: principles, rules, phases and completion gates |
 | `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, Palomar packaging, cleanup, rigorous numerics |
-| `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; `sorry`-ing failing proofs; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; copying shared definitions into the Challenge; linking documentation to the code; checking Markdown tables; summarizing a Claude Code session for the run log |
-| `assets/` | Templates: the axiom and dependency audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
+| `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; `sorry`-ing failing proofs; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; checking that each proof follows the route of the paper's proof; copying shared definitions into the Challenge; linking documentation to the code; checking Markdown tables; summarizing a Claude Code session for the run log |
+| `assets/` | Templates: the axiom, dependency and route audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
 
 ## License
 

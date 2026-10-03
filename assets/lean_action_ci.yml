@@ -15,8 +15,20 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: leanprover/lean-action@v1
+      # The audit sees a module's proofs only through its own `import all` line. Replace PaperName
+      # by the library's root directory (list several if the project has several libraries).
+      - name: Check that the audit imports every module of the library
+        run: >-
+          diff <(find PaperName -name '*.lean' | sed 's/\.lean$//; s#/#.#g' | sort)
+          <(grep '^import all PaperName' scripts/Audit.lean | sed 's/^import all //' | sort)
       - name: Audit axioms and dependencies
         run: lake env lean scripts/Audit.lean
+      # The routes of the paper's proofs (docs/paper_routes.tsv, from route_check.py extract) and the
+      # reviewed differences (docs/route_differences.tsv); see SKILL.md, "Faithful proofs".
+      - name: Check that the proofs follow the routes of the paper's proofs
+        run: >-
+          python3 scripts/route_check.py check docs/paper_routes.tsv
+          --accept docs/route_differences.tsv
       # Delete this step if the Challenge carries no copy of shared definitions.
       - name: Check that the Challenge's copy of the shared definitions is current
         run: python3 scripts/sync_challenge_defs.py --check

@@ -15,7 +15,9 @@ against the compiled interfaces of the files they import, without waiting for up
    for agents that will need one (see the brief):
    `python3 <skill-dir>/scripts/snapshot_check.py take <scratch dir>/snap-base`.
 3. Count the `sorry`s per file (`grep -cw sorry`).
-4. Check the free memory. Elaborating a Mathlib-heavy file can take several GB, so many agents
+4. For each agent, collect the TeX of the paper's proofs of its results (with the TeX line
+   numbers), and the routes from `docs/paper_routes.tsv`: the agent follows these proofs.
+5. Check the free memory. Elaborating a Mathlib-heavy file can take several GB, so many agents
    running Lean at once can exhaust it. Tell every agent to run at most one Lean process at a
    time, and size the number of concurrent agents to the memory available.
 
@@ -28,7 +30,7 @@ against the compiled interfaces of the files they import, without waiting for up
 - Downstream agents can start at once. They rely on upstream statements, which are already
   compiled, and not on upstream proofs.
 - Start the agents in the background, so they run concurrently, as many at once as memory allows
-  (step 4 above).
+  (step 5 above).
 - When several agents need the same infrastructure (shared definitions and their basic lemmas),
   have one agent build it first, as a separate module whose
   docstring lists its API, and commit it. That agent stays its owner: it may add to the module,
@@ -53,6 +55,16 @@ Check a file with: [lake env lean -D... <file>]   (upstream .oleans are built)
 Goal: replace every `sorry` in your files with a proof. No `sorry`, `admit`, `axiom`,
 `native_decide` or `implemented_by` in the result. Do not raise `maxHeartbeats`; if a raise is
 unavoidable, make it local to one declaration and report it.
+
+Proofs: prove each result by the paper's proof, given below, step by step: the same
+intermediate claims and constructions, and the same earlier results where the paper cites them
+(they are compiled; use them by name, do not re-prove their content). Tactics, Mathlib lemmas for
+routine steps and helper lemmas that package a step of the paper are yours to choose; another
+argument is not, even a shorter or easier one. Depart from the paper's proof only if its step is
+wrong or has a gap you cannot repair along its lines, or needs mathematics that Lean lacks; then
+change as little as the step requires, say so in the docstring ("Departure from the paper: …"),
+and report it. If a whole proof would have to be replaced, stop and report instead.
+[For each result: its Lean name, its TeX label, the TeX of its proof, the results it cites.]
 
 Statements: keep every existing statement exactly as it is. The paper's results, listed here,
 must never change: [names]. Never add a hypothesis to one of them. If one looks false, or its
@@ -79,7 +91,9 @@ directory may be shared with other agents, so the copy's name carries your prefi
 Run at most one Lean process at a time: memory is shared with the other agents.
 
 Report: sorries remaining per file; every statement change with its counterexample; every
-upstream lemma you found false; new public helpers; anything the coordinator must relay.
+departure from the paper's proof, with what the paper does, what you did and why it was
+necessary; every upstream lemma you found false; new public helpers; anything the coordinator
+must relay.
 ```
 
 ## While agents run
@@ -88,7 +102,9 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
   its effort from the transcripts afterwards (SKILL.md, Run log).
 - When an agent finishes, diff its files' statements at once
   (`python3 <skill-dir>/scripts/stmt_diff.py <baseline commit> <its files>`), compare with its
-  report, and commit its files. Errors found early are cheaper to fix, and every later agent
+  report, and read its proofs of the results that the paper proves at length against the
+  paper's proofs. Reject an unreported departure, or one that no reason forces: the agent (or
+  its resumption) rewrites the proof along the paper. Then commit its files. Errors found early are cheaper to fix, and every later agent
   builds on committed work.
 - Resume a finished agent, if your platform allows it, for follow-up work in its own area: wiring
   its results into another file, or a related lemma. It keeps its context, so it is faster and
@@ -109,13 +125,17 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
 2. Check the axioms of the main theorems (`#print axioms`): during Stage 1, only the cited
    results' axioms in `External/` may appear. Once `scripts/Audit.lean` exists (Phase 6), run it
    in full.
-3. Run `python3 <skill-dir>/scripts/stmt_diff.py <baseline commit>`. It lists every declaration
+3. Run `lake env lean scripts/Audit.lean` and the route check (SKILL.md, Phase 6) once the
+   audit exists, or, before that, read the routes of the integrated results against
+   `docs/paper_routes.tsv`. Every difference is a proof to rewrite or a departure to report.
+4. Run `python3 <skill-dir>/scripts/stmt_diff.py <baseline commit>`. It lists every declaration
    whose statement or definition body changed. Compare the list with the agents' reports.
    - An unreported change is either a false statement that was fixed silently (find the
      counterexample) or an unjustified weakening (revert it).
    - A paper result appears in the list only through a documented decision: an evident misprint
      corrected, or a correction the user agreed to.
-4. Commit. The message lists every helper lemma found false, the hypothesis added, and why.
+5. Commit. The message lists every helper lemma found false, the hypothesis added, and why, and
+   every departure from the paper's proofs with its reason.
    Commit messages are where the repair's history belongs; the report describes only the final
    formalization.
 
@@ -133,6 +153,7 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
   list of corrections under "How the formalization reads the paper", and in
   `formalization.yaml`'s `fidelity`. An evident misprint with a unique correction needs no
   agreement (SKILL.md, Rules), only the same records.
-- **Paper result whose proof has a gap.** Do not add a hypothesis. Find a correct argument, and
-  record the gap as an E-item. If neither a proof nor a counterexample turns up, tell the user
+- **Paper result whose proof has a gap.** Do not add a hypothesis. Find a correct argument that
+  repairs the step and keeps the rest of the paper's proof, record the gap as an E-item and the
+  repair as a departure. If neither a proof nor a counterexample turns up, tell the user
   (SKILL.md, Rules).

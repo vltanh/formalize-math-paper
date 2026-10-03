@@ -2,7 +2,9 @@
 
 The goal is a build that prints nothing but the deliberate `sorry` warnings of `Challenge.lean`.
 Warnings are harmless to correctness, but a clean build is easier to review, and unused
-hypotheses often reveal redundant hypotheses of the paper.
+hypotheses often reveal redundant hypotheses of the paper. Cleanup changes how proofs are
+written, never which argument they make: every proof still follows the paper's afterwards
+(SKILL.md, Rules, "Faithful proofs").
 
 ## Procedure
 
@@ -40,8 +42,11 @@ hypotheses often reveal redundant hypotheses of the paper.
    - "automatically included section variable(s) unused": add `omit [Inst] in` before the
      theorem.
    - Deprecations: use the replacement that the warning names.
-4. Rerun the checks: `lake build`, `scripts/Audit.lean` and `lake comparator`, and, if
-   documents already link to the code, `scripts/linkify_docs.py`, since line numbers move.
+4. Rerun the checks: `lake build`, `scripts/Audit.lean`, the route check
+   (`scripts/route_check.py check docs/paper_routes.tsv --accept docs/route_differences.tsv`)
+   and `lake comparator`, and, if documents already link to the code, `scripts/linkify_docs.py`,
+   since line numbers move. A route difference that appears during the cleanup is a regression:
+   undo the change that caused it.
 5. Record, and commit:
    - Run `python3 <skill-dir>/scripts/stmt_diff.py <commit before the cleanup>`.
    - For each paper result that lost a hypothesis, the Lean statement is now more general than
@@ -52,6 +57,26 @@ hypotheses often reveal redundant hypotheses of the paper.
    - The Challenge statements keep the paper's hypotheses. An assumed result (SKILL.md, Rules)
      that no proof uses is not one of them: remove it everywhere, the Challenge included.
    - The commit message lists the removals.
+
+## Simplifying proofs and merging duplicates
+
+Shortening proofs, merging duplicate helper lemmas, moving shared facts into a common module and
+splitting long files make a formalization easier to read, and are worth doing. They are also how
+proofs drift from the paper without any statement changing:
+
+- When two copies of a fact are merged, keep the one whose proof follows the paper. A step that
+  the paper justifies by a numbered result must still go through that result, not through the
+  lemma underneath it: if the result is proved from a private lemma that you make public, prove
+  the public lemma from the result instead (a corollary after it), and keep the step's lemma
+  private.
+- A shorter proof of a paper result is acceptable only if it makes the same argument. Replacing
+  the paper's argument by another one, even a better one, is a departure, and convenience is not
+  a reason for one (SKILL.md, Rules).
+- Delete a `have` that nothing uses, even when it names a result that the paper cites: the route
+  check then reports the difference, which is the truth about the proof. Then decide whether the
+  proof should use that result after all.
+- Work in rounds that end with the route check, and compare each round's report with the
+  previous one: a route difference that a round introduced is undone in that round.
 
 ## Names and stale files
 
