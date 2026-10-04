@@ -18,7 +18,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "2.0.0"
+  version: "2.1.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -37,9 +37,10 @@ You deliver a Lean project, with documents about it, in which:
   no `admit` and no project `axiom`. Every declaration of the library depends only on `propext`,
   `Classical.choice` and `Quot.sound`;
 - `REPORT.md` audits the paper against the formalization. It ends with what comes next: how the
-  subject has developed since the paper, and how its results could be extended, generalized or
-  strengthened. `README.md` summarizes the formalization, and `CREDITS.md` says how it was made:
-  the procedure, the agents and models, and the time and effort (the run log);
+  subject has developed since the paper, how its results could be extended, generalized or
+  strengthened, and how its proofs could be simpler. `README.md` summarizes the formalization, and
+  `CREDITS.md` says how it was made: the procedure, the agents and models, and the time and effort
+  (the run log);
 - the project is packaged for Palomar and, with the user's permission, published and run through
   Palomar's preflight.
 
@@ -121,7 +122,9 @@ These explain the rules below. Use them when no rule covers a situation.
      a faithful translation of it is a different argument.
 
   A shorter, more elegant, more general or more automatic proof is not a reason. Neither is a proof
-  that is easier to formalize or faster to build. Depart as little as the reason requires: repair
+  that is easier to formalize or faster to build. A simpler argument that you find is still worth
+  keeping: record it, with a sketch, for the report's "What's next" section (Phase 8), and prove
+  the result by the paper's argument. Depart as little as the reason requires: repair
   the step, not the proof. If a departure would replace the whole argument of a numbered result,
   not just one step, propose it to the user first, with the reason. Other work continues meanwhile.
 - **Report every departure, always.** For each one, record what the paper does, what the
@@ -348,7 +351,8 @@ at a time.
 integrating the results. Give each agent the TeX of the paper's proofs of its results, to follow.
 Compare every declaration's statement with the baseline commit (`scripts/stmt_diff.py`), and every
 route with the paper's (the route check, Phase 6). Agents sometimes change statements, or argue
-differently from the paper, without reporting it.
+differently from the paper, without reporting it. Add the simpler arguments that agents report to
+the checklist, with those you notice yourself.
 
 ### Phase 5: Stage 2, cited results
 
@@ -454,8 +458,9 @@ Users care about three things:
 - Every claim about the paper is checked against the TeX source, and every arithmetic claim is
   recomputed. A wrong error report costs more trust than a missed typo.
 
-End the report with its "What's next" section: how the subject has developed since the paper, and
-how its results could be extended, generalized or strengthened. Write it from a dated search for
+End the report with its "What's next" section: how the subject has developed since the paper, how
+its results could be extended, generalized or strengthened, and how its proofs could be simpler,
+from the simpler arguments recorded during the work. Write it from a dated search for
 the work that followed the paper, including versions of the paper newer than the one formalized,
 and have it checked like the findings (`references/audit-report.md`, Sections 1 and 2). Without
 network access, say so, and write it from the paper and the audit. Later work that corrects the
@@ -573,7 +578,8 @@ needs from user:  decisions or permissions
   `formalization.yaml` and in the report, which lists what it assumes; the report's "What's next"
   section written from a dated search for the work that followed the paper (or, without network
   access, saying that no search could be made), with every source linked and its summary checked
-  against it.
+  against it, and with every simpler argument recorded during the work checked and either listed
+  or set aside as wrong.
 - **Packaging (unless declined):** `formalization.yaml` written; Palomar's metadata and source
   checks pass on a clean clone; the dependencies shared with Verso pinned at Verso's revisions for
   the toolchain; with the user's permission for each step, the repository published, CI passing,

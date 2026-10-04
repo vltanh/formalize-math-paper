@@ -44,10 +44,11 @@ them, in `REPORT.md` and in `README.md`.
 Have someone other than its writer check the report's "What's next" section (Section 10) the same
 way. That reader checks every summary of a later paper against that paper's abstract and
 statements, and against its status (published, preprint, withdrawn or disputed); every claim that a
-result has been extended or improved against the source that proves it; and every suggestion
-against the literature and against the audit that it relies on. A suggestion that turns out to be
-known is not a suggestion: it becomes a line of "Since the paper" if its source is later than the
-paper, and otherwise part of the README's related work (item 7 of Section 3 below).
+result has been extended or improved against the source that proves it; every simpler proof by
+working through it against the paper (a Lean proof of it, if there is one, settles it); and every
+suggestion against the literature and against the audit that it relies on. A suggestion that turns
+out to be known is not a suggestion: it becomes a line of "Since the paper" if its source is later
+than the paper, and otherwise part of the README's related work (item 7 of Section 3 below).
 
 Later work that corrects the paper is a finding of the audit: an erratum, a later version that
 fixes a slip, a counterexample to one of its results, or a gap that the audit missed. Add it to the
@@ -124,9 +125,9 @@ except the differences recorded in docs/route_differences.tsv, each with its rea
 unformalized prior work, surveys, remarks, experiments.>
 
 ## 10. What's next
-<How the subject has developed since the paper, and how its results could be improved. Search
-citation indexes and arXiv listings for the papers that cite it, for later results on the same
-questions, and for errata and versions of the paper newer than the one formalized. Screen every
+<How the subject has developed since the paper, and how its results and proofs could be improved.
+Search citation indexes and arXiv listings for the papers that cite it, for later results on the
+same questions, and for errata and versions of the paper newer than the one formalized. Screen every
 work you find by its abstract, and read the main statements, not only the titles, of those that
 prove or claim something about the paper's results or questions. If there are many, keep the
 closest ones and every correction or counterexample, and say how you chose them. Say when and where
@@ -146,6 +147,17 @@ Phase 1); the audit (hypotheses that the proofs do not use, gaps whose repair gi
 that hold more generally); the formalization (assumptions isolated as hypotheses, results proved
 more generally than the paper states them); and the later work. For each: the statement to aim
 for, what would have to be proved, and what stands in the way.>
+### Simpler proofs
+<Where the paper's proofs could be simpler for a reader of the paper, from the work itself: the
+simpler arguments recorded while proving, which the formal proofs could not use (SKILL.md, Rules);
+departures whose argument is simpler than the paper's (Section 7); steps that the paper proves at
+length but that are special cases of a standard result; and cited results of which the paper needs
+only a special case with an elementary proof (Section 2). For each: the result or step, the paper's
+argument and the simpler one, in a sentence or a short sketch, what it saves, and whether it was
+checked in Lean (in a scratch file, outside the library) or only on paper. A shorter Lean proof is
+not a simpler argument: a tactic or a Mathlib lemma that closes a routine step does not belong
+here. A simpler proof that later work published belongs in "Since the paper". If there is none,
+say so.>
 ### The formalization
 <What would extend the formalization itself. Point to the assumed results of Section 2 and the
 items of Section 9 instead of repeating them, and add what they lack: the generality to reach, and
