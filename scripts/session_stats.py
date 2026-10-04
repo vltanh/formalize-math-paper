@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Summarize Claude Code sessions for the run log: elapsed time, models, sub-agents and effort.
 
-usage: session_stats.py [TRANSCRIPT.jsonl …] [--until TIME]
+usage: session_stats.py [TRANSCRIPT.jsonl …] [--since TIME] [--until TIME]
 
 Claude Code keeps each session's transcript in
 ~/.claude/projects/<project path, every character but letters and digits replaced by "-">/<id>.jsonl
@@ -25,7 +25,8 @@ the end, and after a resume it may or may not include the earlier run.
 
 With --until (ISO 8601; local time if it has no time zone), only events up to that time count: for
 example the time of the commit that completed the formalization, from
-`git log -1 --format=%cI <commit>`.
+`git log -1 --format=%cI <commit>`. With --since, only events from that time on count: together,
+the two give the figures of one round of work, such as a later round that the user asked for.
 """
 import argparse
 import json
@@ -49,8 +50,8 @@ def default_transcript():
     return files[-1]
 
 
-def records(path, until):
-    """(time, record) for every timestamped record up to `until`, in time order."""
+def records(path, since, until):
+    """(time, record) for every timestamped record from `since` to `until`, in time order."""
     out = []
     for line in path.open(encoding='utf-8'):
         try:
@@ -60,7 +61,7 @@ def records(path, until):
         if not isinstance(r, dict) or not r.get('timestamp'):
             continue
         t = parse_time(r['timestamp'])
-        if until is None or t <= until:
+        if (since is None or t >= since) and (until is None or t <= until):
             out.append((t, r))
     out.sort(key=lambda x: x[0])
     return out
@@ -120,19 +121,21 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter,
                                  epilog='\n\n'.join(__doc__.split('\n\n')[1:]))
     ap.add_argument('transcripts', nargs='*', metavar='TRANSCRIPT')
+    ap.add_argument('--since', help='ignore events before this ISO 8601 time')
     ap.add_argument('--until', help='ignore events after this ISO 8601 time')
     args = ap.parse_args()
     paths = list(dict.fromkeys(Path(p).resolve() for p in args.transcripts)) or [default_transcript()]
     for p in paths:
         if not p.is_file():
             sys.exit(f'no such transcript: {p}')
+    since = parse_time(args.since) if args.since else None
     until = parse_time(args.until) if args.until else None
 
     first = last = None
     versions, main_usage, agent_usage = set(), Usage(), Usage()
     launched, resumed, runs, agents = set(), set(), [], 0
     for path in paths:
-        recs = records(path, until)
+        recs = records(path, since, until)
         if not recs:
             continue
         first = min(first or recs[0][0], recs[0][0])
@@ -148,7 +151,7 @@ def main():
                 if res.get('resumedAgentId'):
                     resumed.add(r.get('uuid') or (t, res['resumedAgentId']))
         for f in sorted(path.with_suffix('').glob('subagents/**/agent-*.jsonl')):
-            recs = records(f, until)
+            recs = records(f, since, until)
             if not recs:
                 continue
             agents += 1
