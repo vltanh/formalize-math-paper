@@ -59,7 +59,8 @@ Proofs: prove each result by the paper's proof, given below, step by step: the s
 claims and constructions, and the same earlier results where the paper cites them (they are
 compiled; use them by name, and do not prove their content again). You choose the tactics, the
 Mathlib lemmas for routine steps, and the helper lemmas that package a step of the paper. You do
-not choose the argument: use the paper's, not another one, even a shorter or easier one. Depart
+not choose the argument: use the paper's, not another one, even a shorter or easier one. If you
+see a simpler argument, still use the paper's, and describe the simpler one in your report. Depart
 from the paper's proof only if its step is wrong or has a gap you cannot repair along its lines,
 or if the step needs mathematics that Lean lacks. Then change as little as the step requires, say
 so in the docstring ("Departure from the paper: …"), and report it. If a whole proof would have to
@@ -92,8 +93,8 @@ Run at most one Lean process at a time: you share memory with the other agents.
 
 Report: the sorries left in each file; every statement change, with its counterexample; every
 departure from the paper's proof, with what the paper does, what you did and why it was
-necessary; every upstream lemma you found false; new public helpers; anything the coordinator
-must pass on.
+necessary; every simpler argument than the paper's that you noticed, with a sketch; every
+upstream lemma you found false; new public helpers; anything the coordinator must pass on.
 ```
 
 ## While agents run
