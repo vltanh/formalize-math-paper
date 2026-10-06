@@ -72,7 +72,10 @@ must never change: [names]. Never add a hypothesis to one of them. If one looks 
 proof in the paper has a gap you cannot fill, stop work on it and report the counterexample,
 or the gap and what you tried. If a helper lemma is false as stated, find a concrete counterexample
 (checked in Lean when possible), add the minimal hypothesis, fix its callers in your files, and
-report it. Never change a statement just to make a proof easier.
+report it. A lemma can also be false because a hypothesis declared with `variable` never reached
+its statement (Lean leaves out the section variables that a statement does not mention): then the
+fix is `include`, not a new hypothesis; report it the same way. Never change a statement just to
+make a proof easier.
 
 Upstream lemmas you may use as stated (some are still `sorry` and other agents are proving them):
 [list or "anything in imported modules"]. If one of them looks false, report it and do not rely

@@ -158,10 +158,21 @@ particular, do not change a statement to make an error go away.
 - **Indices with side conditions.** Definitions such as "the block containing x" may need a
   hypothesis like `0 < m`. An auto-param binder `(h : 0 < m := by assumption)` keeps call sites
   clean. Arithmetic on `Fin` usually needs `have := i.isLt` before `omega`.
-- **Section variables.** Typeclass `variable`s are included automatically when the statement
-  mentions their type. An included variable that the theorem does not need triggers a linter
-  warning. Fix it with `omit [Inst] in theorem …`, or by moving the `variable` later.
-- **Reserved words.** Identifiers such as `given`, `at` or `from` clash with keywords. Rename them.
+- **Section variables.** A `variable` enters a theorem only when the statement mentions it or an
+  `include` names it.
+  - Typeclass `variable`s are included automatically when the statement mentions their type. An
+    included variable that the theorem does not need triggers a linter warning. Fix it with
+    `omit [Inst] in theorem …`, or by moving the `variable` later.
+  - A hypothesis declared as `variable (h : P x)` and mentioned by no statement is the dangerous
+    case, and drafts produce it often. Lean leaves `h` out of every statement without a warning,
+    so each statement claims more than the draft meant, often something false. The draft's proofs
+    that use `h` fail, and its callers that pass `h` get an argument too many; a lemma whose
+    proof never used `h` compiles with the stronger statement. Check with `#check` that each
+    statement has the hypotheses its proof uses. Add `include h` after the `variable` (or
+    `include h in` before a single theorem): this restores the statement the draft meant, so it
+    corrects a slip. Record it, with a counterexample to the statement as compiled.
+- **Reserved words.** Identifiers such as `given`, `at` or `from` clash with keywords, `λ` is
+  `fun`, and characters such as `₋` and `₊` cannot appear in identifiers. Rename them.
 - **Order of declarations.** A draft may use a definition before declaring it. Reorder, or move
   the definition to the module that needs it first.
 - **Heavy proofs.** Before raising `maxHeartbeats`, split the proof or give `simp` or `ring` a
