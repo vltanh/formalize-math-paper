@@ -18,7 +18,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "2.1.0"
+  version: "2.1.1"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -318,8 +318,10 @@ Then review every statement, including the Challenge's, against the TeX source. 
 quantifiers and where constants are chosen; strict versus weak inequalities, and ranges; casts and
 truncation (`ℕ` subtraction and division, `Nat.floor`); indexing from 0 versus 1; "max over z"
 versus "for every z"; whether "positive integer" became `ℕ`; the types Lean inferred where the
-statement does not give them; implicit standing assumptions; and whether every hypothesis of a
-statement is either the paper's or a declared assumption. Prove a bridge lemma for each
+statement does not give them; implicit standing assumptions; whether the hypotheses that a draft
+declares with `variable` reach the statements whose proofs use them (Lean leaves out of a statement
+every section variable that it does not mention: check with `#check`); and whether every hypothesis
+of a statement is either the paper's or a declared assumption. Prove a bridge lemma for each
 representation choice.
 
 Have the statements and the Challenge reviewed against the TeX source by someone other than their
