@@ -18,7 +18,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "2.1.1"
+  version: "2.2.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -225,9 +225,9 @@ version, errata) and for earlier formalizations of the paper or of its main resu
 Zulip, the Palomar registry, collections of formal statements, and the roadmaps of the large
 libraries). Tell the user what you find, or that you could not search without network access. If the
 version you were given is not the latest, say what the later ones change, and ask which version to
-formalize. An earlier formalization changes what a new one should add. The README and
-`formalization.yaml` must cite it, and Palomar's review asks whether a submission duplicates
-existing work.
+formalize. An earlier formalization changes what a new one should add. The report's literature
+section, the README and `formalization.yaml` must cite it, and Palomar's review asks whether a
+submission duplicates existing work.
 
 **Starting from an existing draft.** Import it unchanged as the first commit. Make the commit's
 author whoever wrote the draft (for an AI draft, for example, `ChatGPT <noreply@openai.com>`).
@@ -260,6 +260,9 @@ Read the whole paper before you write any Lean. Keep a working checklist outside
 - suspected typos, inconsistencies and gaps, with the TeX line, and the corrections that errata or
   later versions make (Phase 0). These become the audit's E-items, so record them as you go. Settle
   a correction that changes a statement before the baseline (Phase 3, Rules);
+- the paper's account of earlier and concurrent work (its introduction and remarks): the history
+  of the problem, the results it builds on or improves, and the work it calls independent. It is
+  the starting point of the report's literature section (Phase 8);
 - the paper's open questions, conjectures and remarks on what its method could give, and the
   hypotheses it says it needs only for its method. They are the starting point of the report's
   "What's next" section (Phase 8).
@@ -460,13 +463,15 @@ Users care about three things:
 - Every claim about the paper is checked against the TeX source, and every arithmetic claim is
   recomputed. A wrong error report costs more trust than a missed typo.
 
-End the report with its "What's next" section: how the subject has developed since the paper, how
-its results could be extended, generalized or strengthened, and how its proofs could be simpler,
-from the simpler arguments recorded during the work. Write it from a dated search for
-the work that followed the paper, including versions of the paper newer than the one formalized,
-and have it checked like the findings (`references/audit-report.md`, Sections 1 and 2). Without
-network access, say so, and write it from the paper and the audit. Later work that corrects the
-paper is also a finding: record it as one, and tell the user at once.
+End the report with two sections. The first places the paper in the literature: the work before
+it, the work that appeared independently at the same time, the work that has followed it, and the
+formalizations of it or its results. Write it from the paper's own account and a dated search,
+including for versions of the paper newer than the one formalized. The second, "What's next", says
+how the paper's results could be extended, generalized or strengthened, and how its proofs could be
+simpler, from the simpler arguments recorded during the work. Have both checked like the findings
+(`references/audit-report.md`, Sections 1 and 2). Without network access, say so, and write them
+from the paper and the audit. Later work that corrects the paper is also a finding: record it as
+one, and tell the user at once.
 
 Keep the documents' links to the code up to date with `scripts/linkify_docs.py`. It reads the
 `.ilean` files, so run it after `lake build`. Check Markdown tables with
@@ -577,11 +582,11 @@ needs from user:  decisions or permissions
   elapsed time and the effort from the run log, round by round, and the README's credits sum it up
   in a few lines with a link; the README kept short; earlier formalizations cited; a draft's own
   notes deleted; a conditional formalization says so in the README's first paragraph, in
-  `formalization.yaml` and in the report, which lists what it assumes; the report's "What's next"
-  section written from a dated search for the work that followed the paper (or, without network
-  access, saying that no search could be made), with every source linked and its summary checked
-  against it, and with every simpler argument recorded during the work checked and either listed
-  or set aside as wrong.
+  `formalization.yaml` and in the report, which lists what it assumes; the report's literature
+  section written from a dated search for the work before, alongside and after the paper (or,
+  without network access, saying that no search could be made), with every source linked and its
+  summary and date checked against it; its "What's next" section with every simpler argument
+  recorded during the work checked and either listed or set aside as wrong.
 - **Packaging (unless declined):** `formalization.yaml` written; Palomar's metadata and source
   checks pass on a clean clone; the dependencies shared with Verso pinned at Verso's revisions for
   the toolchain; with the user's permission for each step, the repository published, CI passing,

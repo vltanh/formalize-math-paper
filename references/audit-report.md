@@ -41,14 +41,15 @@ Number the findings E1, E2, … in the order they occur in the paper. Group typo
 item. If you add or remove a finding later, renumber the findings, and update every reference to
 them, in `REPORT.md` and in `README.md`.
 
-Have someone other than its writer check the report's "What's next" section (Section 10) the same
-way. That reader checks every summary of a later paper against that paper's abstract and
-statements, and against its status (published, preprint, withdrawn or disputed); every claim that a
-result has been extended or improved against the source that proves it; every simpler proof by
-working through it against the paper (a Lean proof of it, if there is one, settles it); and every
-suggestion against the literature and against the audit that it relies on. A suggestion that turns
-out to be known is not a suggestion: it becomes a line of "Since the paper" if its source is later
-than the paper, and otherwise part of the README's related work (item 7 of Section 3 below).
+Have someone other than their writer check the report's sections on the literature and on what's
+next (Sections 10 and 11) the same way. That reader checks every summary of another work against
+that work's abstract and statements, and against its status (published, preprint, withdrawn or
+disputed); every claim about what came before the paper, alongside it or after it against the
+source that proves it, and every date that places a work before, alongside or after the paper;
+every simpler proof by working through it against the paper (a Lean proof of it, if there is one,
+settles it); and every suggestion against the literature and against the audit that it relies on.
+A suggestion that turns out to be known is not a suggestion: it moves to Section 10, under
+"Before the paper", "Concurrent work" or "Since the paper" as its source's date decides.
 
 Later work that corrects the paper is a finding of the audit: an erratum, a later version that
 fixes a slip, a counterexample to one of its results, or a gap that the audit missed. Add it to the
@@ -124,28 +125,53 @@ except the differences recorded in docs/route_differences.tsv, each with its rea
 <Everything in the paper that is not formalized: deductions that combine the paper with
 unformalized prior work, surveys, remarks, experiments.>
 
-## 10. What's next
-<How the subject has developed since the paper, and how its results and proofs could be improved.
-Search citation indexes and arXiv listings for the papers that cite it, for later results on the
-same questions, and for errata and versions of the paper newer than the one formalized. Screen every
-work you find by its abstract, and read the main statements, not only the titles, of those that
-prove or claim something about the paper's results or questions. If there are many, keep the
-closest ones and every correction or counterexample, and say how you chose them. Say when and where
-you searched, and link every source. Without network access, say that no search could be made, and
-write this section from the paper and the audit.>
+## 10. The paper in the literature
+<Where the paper stands in the work on its questions: what came before it, what appeared
+independently at the same time, and what has followed. Start from the paper's own account (its
+introduction and remarks, recorded in Phase 1), then search: citation indexes and arXiv listings
+for the papers it cites and the papers that cite it, for other results on the same questions, and
+for errata and versions of the paper newer than the one formalized. Screen every work you find by
+its abstract, and read the main statements, not only the titles, of those that prove or claim
+something about the paper's results or questions. If there are many, keep the closest ones and
+every correction or counterexample, and say how you chose them. Say when and where you searched,
+and link every source. Without network access, say that no search could be made, and write this
+section from the paper and the audit. In every subsection, give each work's status: published
+(where), preprint, withdrawn or disputed, and report what a preprint, a withdrawn or a disputed
+work claims as claimed, not as proved.>
+### Before the paper
+<The history of the problem and the results the paper builds on, improves or answers: who proved
+what, and what the paper adds. One sentence or a short paragraph each, taken from the sources, not
+only from the paper's description of them. Point to Section 2 for the cited results that the proofs
+use instead of describing them again. If the search finds earlier work that the paper does not
+mention and that bears on its results (an earlier proof of one of them, a stronger known result, a
+result it reproves), say so here, and tell the user if it means a main result was already known.>
+### Concurrent work
+<Work on the same questions that appeared independently around the same time: work that the
+paper or its own authors call independent, or that does not build on the paper, nor the paper on
+it, and appeared within about a year of the paper's first version. Say how the results compare:
+the same result, an overlapping one, or the same question by another method. Date both by their
+first public versions (arXiv submission dates), and do not judge priority beyond what those dates
+and the authors' own statements say. If there is none, say so.>
 ### Since the paper
 <What later work has proved or claims: extensions, generalizations, strengthenings, new proofs,
-corrections, counterexamples. One sentence each, taken from the source, with a link and the
-source's status: published (where), preprint, withdrawn or disputed. Report what a preprint, a
-withdrawn or a disputed work claims as claimed, not as proved. A correction or a counterexample is
-also a finding (Section 3). If the search found nothing, say so; earlier and concurrent work
-belongs in the README's related work.>
+simpler proofs, corrections, counterexamples. One sentence each, taken from the source, with a
+link. A correction or a counterexample is also a finding (Section 3). If the search found nothing,
+say so.>
+### Formalizations
+<Formalizations of the paper, of its main results, or of the results it cites, in Lean or in other
+systems, found in Phase 0 and in this search, whether earlier or later than this one: where, what
+they cover, and whether this work consulted or used them. If there are none, say so.>
+
+## 11. What's next
+<How the paper's results and proofs could be improved, and what the formalization could add. Draw
+on the audit and on the literature in Section 10, and do not repeat its summaries.>
 ### Open directions
 <Ways to extend, generalize or strengthen the paper's results, drawn from: the paper's own remarks,
 open questions and conjectures, and the hypotheses it says it needs only for its method (SKILL.md,
 Phase 1); the audit (hypotheses that the proofs do not use, gaps whose repair gives more, steps
 that hold more generally); the formalization (assumptions isolated as hypotheses, results proved
-more generally than the paper states them); and the later work. For each: the statement to aim
+more generally than the paper states them); and the later work (Section 10). Leave out a direction
+that later work has already taken, or say how far it got there. For each: the statement to aim
 for, what would have to be proved, and what stands in the way.>
 ### Simpler proofs
 <Where the paper's proofs could be simpler for a reader of the paper, from the work itself: the
@@ -156,8 +182,7 @@ only a special case with an elementary proof (Section 2). For each: the result o
 argument and the simpler one, in a sentence or a short sketch, what it saves, and whether it was
 checked in Lean (in a scratch file, outside the library) or only on paper. A shorter Lean proof is
 not a simpler argument: a tactic or a Mathlib lemma that closes a routine step does not belong
-here. A simpler proof that later work published belongs in "Since the paper". If there is none,
-say so.>
+here. A simpler proof that has been published belongs in Section 10. If there is none, say so.>
 ### The formalization
 <What would extend the formalization itself. Point to the assumed results of Section 2 and the
 items of Section 9 instead of repeating them, and add what they lack: the generality to reach, and
@@ -186,10 +211,11 @@ details left to `REPORT.md` and `CREDITS.md`.
    audit"); whether a person has reviewed the proofs; and when it was made, with how many
    sub-agents. Then a link to `CREDITS.md` for the rest (its structure is in `credits.md`). No
    links to old drafts.
-7. Related work: the history of the problem, the closest earlier and concurrent work, and the
-   earlier formalizations of the paper or its result, with whether this work consulted them.
-8. What's next: two or three sentences from the report's Section 10, with a link to it. If later
-   work corrects the paper, start with that.
+7. Related work: a few bullets from the report's Section 10, with a link to it: the history of the
+   problem, the closest earlier, concurrent and later work, and the formalizations of the paper or
+   its results, with whether this work consulted them. If later work corrects the paper, start
+   with that.
+8. What's next: two or three sentences from the report's Section 11, with a link to it.
 9. Building: `lake exe cache get`, `lake build`, the audit, the toolchain, how to regenerate
    generated files, and how to update the documentation's links.
 10. Layout: a table of every module and the paper content it holds, and the `External/`
