@@ -160,8 +160,9 @@ PalomarSubmission (format v0.4), and replace every `TEMPLATE` value. The rules t
 - `alignment.statements`: one entry for each Comparator theorem, giving its source, Lean name,
   module and status.
 
-The editorial review also reads the README, which gives the account of the literature: the
-history of the problem, the sources, and the earlier formalizations. For a well-known problem,
+The editorial review also reads the README, which sums up the report's account of the literature:
+the history of the problem, the sources, the earlier, concurrent and later work, and the other
+formalizations. For a well-known problem,
 Palomar also expects a careful comparison of the Challenge with the standard formulation of the
 problem.
 
