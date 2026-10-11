@@ -69,6 +69,10 @@ decides to.
   `*.lean.in`.
 - Exactly one license file at the root, with the standard SPDX text, matching `project.license`.
   Apache-2.0 is the common choice; copy the text unchanged.
+- Code adapted from another project keeps that project's notice: every file that contains adapted
+  code says so in its header (the source, its commit and its license), and the license text stays
+  in the repository. Check this by comparing the files with the source, not from memory: a file
+  that copied a few dozen lines of a proof is adapted code too.
 - No build outputs, no Git submodules, no Git LFS.
 
 ## 2. Challenge and Solution
@@ -90,9 +94,15 @@ decides to.
   module of the library, between two marker comments. Copy that block word for word into the
   Challenge with `scripts/sync_challenge_defs.py`; CI runs it with `--check`. Comparator requires
   the constants that the statements use to be the same in the Challenge and in the Solution's
-  environment, and the exact copy makes them the same without bridge lemmas. Put the Challenge's
-  theorems in a namespace of their own. Then the Solution, which imports the library, can restate
-  them without clashing with the library's names.
+  environment, and the exact copy makes them the same without bridge lemmas. Keep the block in a
+  module that imports exactly what the Challenge imports, and put in it every definition that the
+  Challenge defines, in the same order. Lean stores some proofs that elaborating a definition needs
+  as auxiliary lemmas, named after the first declaration of the module that needs them and reused
+  by later ones: a numeral such as `(2 : ℝ)` needs a proof of `Nat.AtLeastTwo 2`. A definition
+  elaborated in another module, or after other declarations, can then refer to an auxiliary lemma
+  of another name, and Comparator rejects it with "Const does not match between challenge and
+  target". Put the Challenge's theorems in a namespace of their own. Then the Solution, which
+  imports the library, can restate them without clashing with the library's names.
 - The solution module repeats each Challenge theorem word for word, with the same names and types,
   and proves it from the rest of the project. Bridge lemmas translate between the project's
   definitions and the Challenge's vocabulary. `Solution.lean` can import the whole project and

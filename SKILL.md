@@ -18,7 +18,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "2.2.0"
+  version: "2.3.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -251,8 +251,13 @@ Read the whole paper before you write any Lean. Keep a working checklist outside
 - which results each proof uses. This dependency graph decides the file layout and the parallel
   work in Phase 4, and it is the route that each formal proof must follow. Extract it from the TeX
   source with `python3 <skill-dir>/scripts/route_check.py extract main.tex > docs/paper_routes.tsv`,
-  and commit the file as extracted. Compare it with your own reading: a proof may cite a result
-  only in passing, which the route check's file of recorded differences says later;
+  and read its warnings: they name every proof that it attributed by a heuristic, and every proof
+  that it could not attribute. Then compare the file with your own reading. A result that the
+  paper proves in running text, a labelled equation that states a result, and a result with no
+  label at all (a theorem stated in prose) each need a row added by hand, with a `#` comment line
+  that says why; give an unlabelled result a label of your own, explained in that comment, and
+  name it in the result's docstring. Commit the file. A proof that cites a result only in passing
+  is recorded later, in the route check's file of recorded differences;
 - each citation, marked as used in a proof or only for context. For each one used in a proof, note
   where its proof can come from: Mathlib, another public library, the project itself, or nowhere
   yet, because the mathematics it needs is missing from Lean. Survey the libraries before you
@@ -275,6 +280,10 @@ in every `.lean` file, scripts included), and the rules for building.
 
 Arrange the files by the mathematical dependency graph, not by size. Each module imports only what
 it uses. That way, an edit rebuilds only what depends on it, and parallel work does not stall.
+
+One project may formalize two closely related papers, such as a paper and the one that sharpens
+it. Give each paper its own directory, keep the routes of both in the one `docs/paper_routes.tsv`
+(their labels must not collide), and number the report's findings through both papers in order.
 
 ```text
 PaperName/                     -- the library
@@ -587,7 +596,8 @@ needs from user:  decisions or permissions
   without network access, saying that no search could be made), with every source linked and its
   summary and date checked against it; its "What's next" section with every simpler argument
   recorded during the work checked and either listed or set aside as wrong.
-- **Packaging (unless declined):** `formalization.yaml` written; Palomar's metadata and source
+- **Packaging (unless declined):** every file that adapts code from another project keeps that
+  project's notice; `formalization.yaml` written; Palomar's metadata and source
   checks pass on a clean clone; the dependencies shared with Verso pinned at Verso's revisions for
   the toolchain; with the user's permission for each step, the repository published, CI passing,
   and the preflight reporting `status: pass` on the exact commit to submit; the user decides about

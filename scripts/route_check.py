@@ -15,10 +15,22 @@ either a proof to fix or a departure from the paper to record.
 `extract` reads the TeX source, following `\\input` and `\\include` from each file given (a
 directory stands for its `.tex` files in sorted order), and writes one line per labelled
 statement of a theorem-like environment: its label, its environment, whether the paper proves it
-(1 or 0), and the labels of the statements that its proof cites. A proof belongs to the statement
-named in its optional argument (`\\begin{proof}[Proof of \\Cref{thm:a}]`), and otherwise to the
-closest statement before it. The output contains only labels, so it can be committed even when
-the TeX source cannot be.
+(1 or 0), and the labels of the statements that its proof cites. A proof belongs to:
+
+- the statement named first in its optional argument (`\\begin{proof}[Proof of \\Cref{thm:a}]`,
+  with or without a space before the bracket); the other statements named there (`[Proof of
+  Theorem~\\ref{a} using Lemma~\\ref{b}]`) count as cited;
+- otherwise, the statement that the sentence just before it names as the one being proved
+  ("We now finish the proof of Lemma~\\ref{a}.");
+- otherwise, the closest statement before it, unless a section heading separates them. An
+  unlabelled statement that restates a labelled one, numbered after it
+  (`\\def\\thetheorem{\\ref{a}}` before it, or `\\ref{a}` in its title), stands for that one.
+
+The two heuristics, and every proof that cannot be attributed, are reported on standard error:
+check them against the paper. The output contains only labels, so it can be committed even when
+the TeX source cannot be. It covers statements and their proof environments only: a result
+proved in running text, or a labelled equation that the paper treats as a result, needs a row
+added by hand, with a `#` comment line that says why.
 
 `check` maps each Lean result to the first code span of its docstring that is a label of the
 paper (write the label in backticks in the docstring of every numbered result), and compares the
@@ -47,8 +59,15 @@ import signal
 import sys
 
 STATEMENT_ENVS = ('theorem', 'lemma', 'proposition', 'corollary', 'claim', 'fact', 'observation',
-                  'conjecture')
+                  'conjecture', 'example')
 REF = re.compile(r'\\(?:[cC]ref|ref|autoref|labelcref|namecref|nameCref)\*?\{([^}]*)\}')
+# A restatement numbered after its original: `\def\thetheorem{\ref{a}}`, `\renewcommand{\thetheorem}{…}`.
+RESTATE = re.compile(r'\\(?:def|renewcommand\*?)\s*\{?\\the[A-Za-z]+\}?\s*\{[^{}]*?'
+                     r'\\(?:[cC]ref|ref|autoref)\*?\{([^}]*)\}')
+# A sectioning command: a proof after one is not attributed to a statement before it.
+SECTION = re.compile(r'\\(?:chapter|section|subsection|subsubsection)\*?\s*[\[{]')
+# A sentence that introduces a proof by naming the result it proves.
+PROOF_OF = re.compile(r'[Pp]roof\s+of\s+[^.;:\n]{0,60}?\\(?:[cC]ref|ref|autoref)\*?\{([^},]*)')
 INPUT = re.compile(r'\\(?:input|include)\{([^}]*)\}')
 
 
@@ -89,53 +108,85 @@ def gather(paths):
     return '\n'.join(out)
 
 
-def extract(text):
-    """For each labelled statement: its environment, whether it is proved, and what the proof cites."""
+def extract(text, warn=lambda msg: None):
+    """For each labelled statement: its environment, whether it is proved, and what the proof cites.
+    `warn` receives a message for every heuristic attribution and every proof left unattributed."""
     envs = '|'.join(STATEMENT_ENVS)
-    token = re.compile(r'\\begin\{(%s)\*?\}|\\end\{(%s)\*?\}|\\begin\{proof\}(\[[^\]]*\])?|\\end\{proof\}'
-                       % (envs, envs))
+    token = re.compile(r'\\begin\{(%s)\*?\}|\\end\{(%s)\*?\}|\\begin\{proof\}(\s*\[[^\]]*\])?'
+                       r'|\\end\{proof\}' % (envs, envs))
     statements = {}            # label -> [env, proved, set of cited labels]
     order = []
     current = None             # label of the last statement seen
-    in_statement = None        # (env, start index) while inside a statement
-    proof_owner, proof_start, depth = None, None, 0
+    current_end = 0            # where that statement ends
+    in_statement = None        # (env, start of its body, start of its \begin) while inside a statement
+    proof_owner, proof_start, proof_cited, depth = None, None, set(), 0
+    last_end = 0               # end of the last statement or proof: the text after it introduces a proof
+
+    def snippet(i):
+        return ' '.join(text[i:i + 60].split())
+
     for m in token.finditer(text):
         if m.group(1):                                   # \begin{theorem}
             if depth == 0:
-                in_statement = (m.group(1), m.end())
+                in_statement = (m.group(1), m.end(), m.start())
         elif m.group(2):                                 # \end{theorem}
             if in_statement and depth == 0:
                 body = text[in_statement[1]:m.start()]
                 lab = re.search(r'\\label\{([^}]*)\}', body)
+                current_end = m.end()
                 if lab:
                     current = lab.group(1).strip()
                     if current not in statements:
                         statements[current] = [in_statement[0], 0, set()]
                         order.append(current)
+                    elif statements[current][0] == '?':      # first seen through a restatement
+                        statements[current][0] = in_statement[0]
                 else:
-                    current = None
+                    # an unlabelled restatement of a labelled statement, numbered after it
+                    before = text[max(last_end, in_statement[2] - 300):in_statement[2]]
+                    title = re.match(r'\s*\[([^\]]*)\]', body)
+                    refs = (REF.findall(title.group(1)) if title else []) or RESTATE.findall(before)
+                    current = refs[-1].split(',')[0].strip() if refs else None
+                    if current:
+                        warn(f'an unlabelled {in_statement[0]} is read as a restatement of {current}: '
+                             f'{snippet(in_statement[1])}')
+                last_end = m.end()
             in_statement = None
         elif m.group(0).startswith('\\begin{proof}'):
             depth += 1
             if depth == 1:
-                owner = current
+                owner, cited = current, set()
                 opt = m.group(3)
-                if opt:
-                    refs = [r.strip() for g in REF.findall(opt) for r in g.split(',')]
-                    if refs:
-                        owner = refs[0]
-                proof_owner, proof_start = owner, m.end()
+                refs = [r.strip() for g in REF.findall(opt or '') for r in g.split(',') if r.strip()]
+                if refs:
+                    owner, cited = refs[0], set(refs[1:])
+                else:
+                    intro = PROOF_OF.findall(text[max(last_end, m.start() - 400):m.start()])
+                    if intro and intro[-1].strip() != owner:
+                        warn(f'a proof is attributed to {intro[-1].strip()}, which the sentence before it '
+                             f'names, rather than to {owner}: {snippet(m.end())}')
+                        owner = intro[-1].strip()
+                    elif owner is not None and SECTION.search(text[current_end:m.start()]):
+                        warn(f'a proof is separated by a section heading from {owner}, the closest statement '
+                             f'before it, and is not attributed: {snippet(m.end())}')
+                        owner = None
+                    elif owner is None:
+                        warn(f'a proof follows no labelled statement and is not attributed: '
+                             f'{snippet(m.end())}')
+                proof_owner, proof_start, proof_cited = owner, m.end(), cited
         else:                                            # \end{proof}
             depth = max(0, depth - 1)
-            if depth == 0 and proof_owner is not None:
-                body = text[proof_start:m.start()]
-                cited = {r.strip() for g in REF.findall(body) for r in g.split(',') if r.strip()}
-                entry = statements.setdefault(proof_owner, ['?', 0, set()])
-                if proof_owner not in order:
-                    order.append(proof_owner)
-                entry[1] = 1
-                entry[2] |= cited
+            if depth == 0:
+                if proof_owner is not None:
+                    body = text[proof_start:m.start()]
+                    cited = {r.strip() for g in REF.findall(body) for r in g.split(',') if r.strip()}
+                    entry = statements.setdefault(proof_owner, ['?', 0, set()])
+                    if proof_owner not in order:
+                        order.append(proof_owner)
+                    entry[1] = 1
+                    entry[2] |= cited | proof_cited
                 proof_owner = None
+                last_end = m.end()
     # keep only citations of statements
     for lab in order:
         statements[lab][2] = {c for c in statements[lab][2] if c in statements and c != lab}
@@ -278,7 +329,8 @@ def main():
     ch.add_argument('-v', '--verbose', action='store_true')
     args = ap.parse_args()
     if args.cmd == 'extract':
-        order, statements = extract(gather(args.tex))
+        order, statements = extract(gather(args.tex),
+                                    warn=lambda msg: print('warning: ' + msg, file=sys.stderr))
         print('# label\tenvironment\tproved\tcited statements (from route_check.py extract)')
         for lab in order:
             env, proved, cited = statements[lab]
