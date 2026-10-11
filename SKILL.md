@@ -18,7 +18,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "2.5.0"
+  version: "2.5.1"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -308,10 +308,17 @@ about probability measures) goes to `Basic/`, beside `PaperName/` rather than in
 by field, under the directory that Mathlib uses for that field (`Basic/Algebra/`,
 `Basic/AlgebraicGeometry/`, `Basic/Analysis/`, `Basic/Combinatorics/`, `Basic/Probability/`, …),
 in a file named for its topic, and give it the name and namespace that Mathlib would give it, so
-that it can later be contributed to Mathlib or another library. `Basic` is a `lean_lib` of its own
-(`references/lean-project.md`), and its files import only Mathlib and each other, never the
-paper's. A cited result that is general is proved there too; its `External/Topic/README.md` still
-gives the source and how the paper uses it, and points to the proof. The definitions that a
+that it can later be contributed to Mathlib or another library. File it by its mathematics, not by
+what motivated it: a lemma about trees goes to `Combinatorics/` even in a paper on phylogenetics.
+Only objects that no field of Mathlib covers (phylogenetic trees with labelled leaves, for example)
+get a new field directory, named as Mathlib would name a new area (`Basic/Phylogenetics/`), and
+`Basic/README.md` says where each part could go: a new area of Mathlib, proposed on the Lean Zulip
+first, or a library for that domain, as PhysLean is for physics.
+
+`Basic` is a `lean_lib` of its own (`references/lean-project.md`), and its files import only
+Mathlib and each other, never the paper's. A cited result that is general is proved there too; its
+`External/Topic/README.md` still gives the source and how the paper uses it, and points to the
+proof. The definitions that a
 Challenge statement uses are the exception: they stay in the paper's module of shared definitions
 (`references/palomar.md`, Section 2), even the general ones, because Comparator needs them in one
 module, and the lemmas about them stay with them until they are contributed. Decide where each file
