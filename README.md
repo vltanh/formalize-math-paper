@@ -9,7 +9,7 @@ The skill guides the work from start to finish:
 
 - read the paper and record its results, constants, citations and suspected typos;
 - set up a Lean project on a Mathlib release, using the module system, with the general
-  mathematics kept apart from the start for later contribution to Mathlib;
+  mathematics in a library of its own, `Basic`, for later contribution to Mathlib;
 - state every result first, and check each statement against the paper's TeX source;
 - prove everything the paper proves (Stage 1), by the paper's own arguments, then every result it
   cites (Stage 2), until the project has no `sorry` and no `axiom`. A proof departs from the

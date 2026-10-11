@@ -86,7 +86,7 @@ proofs drift away from the paper while no statement changes:
   with a script that moves the files (`git mv`), rewrites the imports, rewrites qualified
   references to the declarations of the renamed namespace, and leaves the truly external names
   alone. Then fix the module docstrings by hand, and rebuild.
-- Move general lemmas that grew inside the paper's files to `ForMathlib/` (SKILL.md, Phase 2), in a
+- Move general lemmas that grew inside the paper's files to `Basic/` (SKILL.md, Phase 2), in a
   round of their own: keep each statement, give the lemma the name and namespace that Mathlib
   would give it, update its callers, and rerun the route check.
 - Delete the draft's notes and checklists once `README.md` and `REPORT.md` replace them, in

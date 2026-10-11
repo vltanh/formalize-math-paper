@@ -18,7 +18,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "2.4.0"
+  version: "2.5.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -286,7 +286,10 @@ it. Give each paper its own directory, keep the routes of both in the one `docs/
 (their labels must not collide), and number the report's findings through both papers in order.
 
 ```text
-PaperName/                     -- the library
+Basic/                         -- general mathematics: a library of its own, filed by field
+  Algebra/                     -- one directory per field, named as Mathlib names it
+  Analysis/Calculus/Rolle.lean -- one file per topic
+PaperName/                     -- the paper's library
   Introduction.lean            -- §1 definitions and statements
   Preliminaries.lean           -- §2
   SectionName/                 -- one directory per major section
@@ -294,24 +297,26 @@ PaperName/                     -- the library
     Auxiliary.lean             -- lemmas about the paper's objects that are not its results
     Lemma34.lean               -- one file per result, or per small group of results
   External/Topic/              -- one directory per cited result, with a README.md, from the start
-  ForMathlib/                  -- general mathematics, laid out like Mathlib, for later contribution
   Main.lean                    -- the main theorem
 Challenge.lean                 -- the main results, in the vocabulary of Mathlib
 Solution.lean                  -- their proofs from the library (may double as the root module)
 ```
 
-Keep general mathematics apart from the start. A lemma that says nothing about the paper's
-objects (a calculus fact, an inequality for the binary entropy, a lemma about probability measures)
-goes to `PaperName/ForMathlib/`, in a file laid out like Mathlib's and with the name and namespace
-that Mathlib would give it, so that it can later be contributed to Mathlib or another library. A
-file there imports only Mathlib and other files of `ForMathlib/`, never the paper's files; general
-cited results in `External/` follow the same rule. The definitions that a Challenge statement uses
-are the one exception: they stay in the module of shared definitions (`references/palomar.md`,
-Section 2), even the general ones, because Comparator needs them in one module. A general file that
-needs one of them imports that module, and `ForMathlib/README.md` names that dependency as the one
-to remove before contributing. Decide where each file belongs when you create it: moving files
-later rewrites imports, namespaces, the audit's list of modules and the documents' links, and
-conflicts with every branch that touches them.
+Keep general mathematics apart from the start, in a library of its own. A lemma that says
+nothing about the paper's objects (a calculus fact, an inequality for the binary entropy, a lemma
+about probability measures) goes to `Basic/`, beside `PaperName/` rather than inside it. File it
+by field, under the directory that Mathlib uses for that field (`Basic/Algebra/`,
+`Basic/AlgebraicGeometry/`, `Basic/Analysis/`, `Basic/Combinatorics/`, `Basic/Probability/`, …),
+in a file named for its topic, and give it the name and namespace that Mathlib would give it, so
+that it can later be contributed to Mathlib or another library. `Basic` is a `lean_lib` of its own
+(`references/lean-project.md`), and its files import only Mathlib and each other, never the
+paper's. A cited result that is general is proved there too; its `External/Topic/README.md` still
+gives the source and how the paper uses it, and points to the proof. The definitions that a
+Challenge statement uses are the exception: they stay in the paper's module of shared definitions
+(`references/palomar.md`, Section 2), even the general ones, because Comparator needs them in one
+module, and the lemmas about them stay with them until they are contributed. Decide where each file
+belongs when you create it: moving files later rewrites imports, namespaces, the audit's list of
+modules and the documents' links, and conflicts with every branch that touches them.
 
 Name declarations after the paper's numbering (`theorem1_2`, `lemma3_4`, `equation3_1`), so that
 readers and scripts can find them. Begin the docstring of every numbered result with its number and
@@ -454,7 +459,7 @@ then the arguments that call sites still pass for them with `scripts/strip_call_
 rounds, each starting from a commit, because each removal can leave other hypotheses unused. Fix
 the remaining linter warnings, and rename files or namespaces whose names mislead (for example,
 helper files called `External`). Move general lemmas that grew inside the paper's files to
-`ForMathlib/` (Phase 2). An unused hypothesis of a paper result is one that the paper's
+`Basic/` (Phase 2). An unused hypothesis of a paper result is one that the paper's
 statement does not need. Remove it, which makes the Lean statement more general than the paper's,
 and record it for the audit. Challenge statements keep the paper's hypotheses. An assumed result
 that no proof uses is not a hypothesis of the paper: remove it everywhere, including the

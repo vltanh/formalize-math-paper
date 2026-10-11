@@ -35,7 +35,7 @@ Python scripts. Never commit `.olean`, `.ilean` or other build outputs.
 name = "PaperName"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["PaperName", "Challenge", "Solution"]
+defaultTargets = ["Basic", "PaperName", "Challenge", "Solution"]
 
 [leanOptions]
 pp.unicode.fun = true
@@ -46,6 +46,10 @@ maxSynthPendingDepth = 3      # Mathlib's own setting
 name = "mathlib"
 scope = "leanprover-community"
 rev = "v4.35.0-rc3"           # for example: Mathlib's release tag for lean-toolchain
+
+[[lean_lib]]
+name = "Basic"
+globs = ["Basic.+"]           # general mathematics, which imports only Mathlib (SKILL.md, Phase 2)
 
 [[lean_lib]]
 name = "PaperName"

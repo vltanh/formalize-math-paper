@@ -187,7 +187,7 @@ here. A simpler proof that has been published belongs in Section 10. If there is
 <What would extend the formalization itself. Point to the assumed results of Section 2 and the
 items of Section 9 instead of repeating them, and add what they lack: the generality to reach, and
 the contributions to Mathlib or other libraries that would make the work feasible. List what
-`ForMathlib/` holds, where each part would go, and what it still depends on.>
+`Basic/` holds, where each part would go, and what it still depends on.>
 ```
 
 ## 3. `README.md` structure
