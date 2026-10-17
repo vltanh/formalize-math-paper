@@ -35,7 +35,7 @@ Python scripts. Never commit `.olean`, `.ilean` or other build outputs.
 name = "PaperName"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["Basic", "PaperName", "Challenge", "Solution"]
+defaultTargets = ["Basic", "External", "PaperName", "Challenge", "Solution"]
 
 [leanOptions]
 pp.unicode.fun = true
@@ -50,6 +50,10 @@ rev = "v4.35.0-rc3"           # for example: Mathlib's release tag for lean-tool
 [[lean_lib]]
 name = "Basic"
 globs = ["Basic.+"]           # general mathematics, which imports only Mathlib (SKILL.md, Phase 2)
+
+[[lean_lib]]
+name = "External"
+globs = ["External.+"]        # the results the paper cites, which import only Mathlib and Basic
 
 [[lean_lib]]
 name = "PaperName"

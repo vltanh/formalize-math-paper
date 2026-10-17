@@ -8,8 +8,10 @@ OpenCode, Amp and others.
 The skill guides the work from start to finish:
 
 - read the paper and record its results, constants, citations and suspected typos;
-- set up a Lean project on a Mathlib release, using the module system, with the general
-  mathematics in a library of its own, `Basic`, for later contribution to Mathlib;
+- set up a Lean project on a Mathlib release, using the module system, in three libraries, in
+  layers: `Basic`, the general mathematics, for later contribution to Mathlib; `External`, the
+  results the paper cites from other works, stated in their sources' terms; and the paper's own
+  results;
 - state every result first, and check each statement against the paper's TeX source;
 - prove everything the paper proves (Stage 1), by the paper's own arguments, then every result it
   cites (Stage 2), until the project has no `sorry` and no `axiom`. A proof departs from the
@@ -28,6 +30,10 @@ The skill guides the work from start to finish:
   paper's proofs), the paper's place in the literature (the work before it, alongside it and
   since it, and other formalizations), and what comes next: ways to extend, generalize or
   strengthen its results, and where its proofs could be simpler; and a short `README.md`;
+- write a private `NEXT.md`, kept out of git, on what paper you could write next: a few
+  directions that would each make a paper of their own, each explored to the step where the
+  paper's method stops, with the attempts made, the evidence computed and what is already
+  proved, and checked for novelty against the literature;
 - package the project for the [Palomar](https://palomar-registry.org) registry by default
   (Challenge/Solution, `comparator.json`, `formalization.yaml`), and, with your permission,
   publish it and run Palomar's preflight;
@@ -89,7 +95,7 @@ faster, but they are not required.
 | Path | Contents |
 | --- | --- |
 | `SKILL.md` | The workflow: principles, rules, phases and completion gates |
-| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, the credits, Palomar packaging, cleanup, rigorous numerics |
+| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, follow-up papers, the credits, Palomar packaging, cleanup, rigorous numerics |
 | `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; replacing failing proofs with `sorry`; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; checking that each proof follows the route of the paper's proof; copying shared definitions into the Challenge; linking documentation to the code; checking Markdown tables; summarizing a Claude Code session for the run log |
 | `assets/` | Templates: the axiom, dependency and route audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
 

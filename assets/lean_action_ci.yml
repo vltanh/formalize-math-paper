@@ -15,12 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: leanprover/lean-action@v1
-      # The audit sees a module's proofs only through its own `import all` line. PaperName and Basic
-      # are the libraries' root directories.
+      # The audit sees a module's proofs only through its own `import all` line. PaperName, External
+      # and Basic are the libraries' root directories.
       - name: Check that the audit imports every module of the libraries
         run: >-
-          diff <(find PaperName Basic -name '*.lean' | sed 's/\.lean$//; s#/#.#g' | sort)
-          <(grep -E '^import all (PaperName|Basic)\.' scripts/Audit.lean
+          diff <(find PaperName External Basic -name '*.lean' | sed 's/\.lean$//; s#/#.#g' | sort)
+          <(grep -E '^import all (PaperName|External|Basic)\.' scripts/Audit.lean
           | sed 's/^import all //' | sort)
       - name: Audit axioms and dependencies
         run: lake env lean scripts/Audit.lean

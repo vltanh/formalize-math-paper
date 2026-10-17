@@ -163,8 +163,10 @@ systems, found in Phase 0 and in this search, whether earlier or later than this
 they cover, and whether this work consulted or used them. If there are none, say so.>
 
 ## 11. What's next
-<How the paper's results and proofs could be improved, and what the formalization could add. Draw
-on the audit and on the literature in Section 10, and do not repeat its summaries.>
+<One line: plans for follow-up papers are kept in `NEXT.md`, which is not published (a code span,
+not a link; references/next-papers.md). Then how the paper's results and proofs could be improved,
+and what the formalization could add. Draw on the audit and on the literature in Section 10, and
+do not repeat its summaries.>
 ### Open directions
 <Ways to extend, generalize or strengthen the paper's results, drawn from: the paper's own remarks,
 open questions and conjectures, and the hypotheses it says it needs only for its method (SKILL.md,
@@ -172,7 +174,9 @@ Phase 1); the audit (hypotheses that the proofs do not use, gaps whose repair gi
 that hold more generally); the formalization (assumptions isolated as hypotheses, results proved
 more generally than the paper states them); and the later work (Section 10). Leave out a direction
 that later work has already taken, or say how far it got there. For each: the statement to aim
-for, what would have to be proved, and what stands in the way.>
+for, what would have to be proved, and what stands in the way. A direction that `NEXT.md` develops
+appears here as it would without it, never with the attack, the evidence or the partial results
+that `NEXT.md` records.>
 ### Simpler proofs
 <Where the paper's proofs could be simpler for a reader of the paper, from the work itself: the
 simpler arguments recorded while proving, which the formal proofs could not use (SKILL.md, Rules);
@@ -187,7 +191,8 @@ here. A simpler proof that has been published belongs in Section 10. If there is
 <What would extend the formalization itself. Point to the assumed results of Section 2 and the
 items of Section 9 instead of repeating them, and add what they lack: the generality to reach, and
 the contributions to Mathlib or other libraries that would make the work feasible. List what
-`Basic/` holds, where each part would go, and what it still depends on.>
+`Basic/` holds, where each part would go, and what it still depends on, and what `External/`
+holds that other formalizations citing the same sources could reuse.>
 ```
 
 ## 3. `README.md` structure
@@ -219,8 +224,8 @@ details left to `REPORT.md` and `CREDITS.md`.
 8. What's next: two or three sentences from the report's Section 11, with a link to it.
 9. Building: `lake exe cache get`, `lake build`, the audit, the toolchain, how to regenerate
    generated files, and how to update the documentation's links.
-10. Layout: a table of every module and the paper content it holds, and the `External/`
-    directories.
+10. Layout: the three libraries (`Basic`, `External` and the paper's), a table of every module
+    and the paper content it holds, and the directories of `External/`.
 11. GitHub configuration: what each workflow does and any settings it needs.
 12. License.
 

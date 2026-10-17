@@ -4,12 +4,13 @@ description: >-
   Formalize a mathematics research paper in Lean 4 with Mathlib, end to end, in any area of
   mathematics: inventory the paper, state each result faithfully, prove the paper's own results and
   then the results it cites, make an existing Lean draft (often AI-written and never compiled) build
-  with no sorry or axiom, audit the paper against the formalization in a report, and package the
-  project for the Palomar registry (Challenge/Solution, Comparator, formalization.yaml). Use this
-  skill whenever the user wants to formalize, verify, port, repair, finish or audit a Lean
-  formalization of a paper, preprint, arXiv link or list of numbered theorems; asks to "make this
-  Lean draft compile" or to remove its sorries or axioms; or wants a Lean project ready to submit to
-  Palomar, even if they name only one of these steps.
+  with no sorry or axiom, audit the paper against the formalization in a report, explore which
+  follow-up papers it could lead to, and package the project for the Palomar registry
+  (Challenge/Solution, Comparator, formalization.yaml). Use this skill whenever the user wants to
+  formalize, verify, port, repair, finish or audit a Lean formalization of a paper, preprint, arXiv
+  link or list of numbered theorems; asks to "make this Lean draft compile" or to remove its
+  sorries or axioms; wants a Lean project ready to submit to Palomar; or asks what paper to write
+  next after a formalization, even if they name only one of these steps.
 license: Apache-2.0
 compatibility: >-
   Any agent that supports Agent Skills (SKILL.md), such as Claude Code, Codex, Gemini CLI,
@@ -18,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "2.5.1"
+  version: "3.0.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -41,6 +42,10 @@ You deliver a Lean project, with documents about it, in which:
   strengthened, and how its proofs could be simpler. `README.md` summarizes the formalization, and
   `CREDITS.md` says how it was made: the procedure, the agents and models, and the time and effort
   (the run log);
+- a private `NEXT.md`, never published unless the user asks, answers what paper the user could
+  write next following this one: a few candidates that would each make a paper of their own,
+  explored in depth (the obstacle, the attempts, the evidence, what is already proved), not a
+  list of incremental extensions;
 - the project is packaged for Palomar and, with the user's permission, published and run through
   Palomar's preflight.
 
@@ -186,7 +191,7 @@ These explain the rules below. Use them when no rule covers a situation.
 | 5. Stage 2 | prove the cited results | zero axioms; every result still assumed is a named hypothesis |
 | 6. Verify | axiom audit, dependency table, route check, Solution and Comparator | `scripts/Audit.lean` and the route check pass; proofs compared with the paper's; Comparator accepts |
 | 7. Cleanup | no warnings, no unused hypotheses, no misleading names, routes unchanged | the build shows only the Challenge's `sorry`s; the route check still passes |
-| 8. Audit | `REPORT.md`, `README.md`, `CREDITS.md` | every finding checked against the TeX source |
+| 8. Audit | `REPORT.md`, `README.md`, `CREDITS.md`; the private `NEXT.md` | every finding checked against the TeX source; every follow-up candidate checked for novelty and against the bar |
 | 9. Package | CI, Palomar files and checks; publishing and preflight, with permission | Palomar's local checks pass; after publishing, the preflight reports `status: pass` |
 
 Commit at each milestone, with a message that says what changed and why.
@@ -270,7 +275,7 @@ Read the whole paper before you write any Lean. Keep a working checklist outside
   the starting point of the report's literature section (Phase 8);
 - the paper's open questions, conjectures and remarks on what its method could give, and the
   hypotheses it says it needs only for its method. They are the starting point of the report's
-  "What's next" section (Phase 8).
+  "What's next" section and of the follow-up papers in `NEXT.md` (Phase 8).
 
 ### Phase 2: Project
 
@@ -285,10 +290,16 @@ One project may formalize two closely related papers, such as a paper and the on
 it. Give each paper its own directory, keep the routes of both in the one `docs/paper_routes.tsv`
 (their labels must not collide), and number the report's findings through both papers in order.
 
+The project has three libraries, in layers, each importing only Mathlib, the layers below it and
+itself: `Basic`, general mathematics; `External`, the results of other works that the paper
+cites; and `PaperName`, the paper's own results.
+
 ```text
 Basic/                         -- general mathematics: a library of its own, filed by field
   Algebra/                     -- one directory per field, named as Mathlib names it
   Analysis/Calculus/Rolle.lean -- one file per topic
+External/                      -- the results the paper cites from other works: a library of its own
+  Topic/                       -- one directory per cited result or source, with a README.md, from the start
 PaperName/                     -- the paper's library
   Introduction.lean            -- §1 definitions and statements
   Preliminaries.lean           -- §2
@@ -296,7 +307,6 @@ PaperName/                     -- the paper's library
     Definitions.lean           -- the section's notation
     Auxiliary.lean             -- lemmas about the paper's objects that are not its results
     Lemma34.lean               -- one file per result, or per small group of results
-  External/Topic/              -- one directory per cited result, with a README.md, from the start
   Main.lean                    -- the main theorem
 Challenge.lean                 -- the main results, in the vocabulary of Mathlib
 Solution.lean                  -- their proofs from the library (may double as the root module)
@@ -316,14 +326,25 @@ get a new field directory, named as Mathlib would name a new area (`Basic/Phylog
 first, or a library for that domain, as PhysLean is for physics.
 
 `Basic` is a `lean_lib` of its own (`references/lean-project.md`), and its files import only
-Mathlib and each other, never the paper's. A cited result that is general is proved there too; its
-`External/Topic/README.md` still gives the source and how the paper uses it, and points to the
-proof. The definitions that a
+Mathlib and each other, never `External` or the paper's. A cited result that is general is proved
+there too; its `External/Topic/README.md` still gives the source and how the paper uses it, and
+points to the proof. The definitions that a
 Challenge statement uses are the exception: they stay in the paper's module of shared definitions
 (`references/palomar.md`, Section 2), even the general ones, because Comparator needs them in one
-module, and the lemmas about them stay with them until they are contributed. Decide where each file
-belongs when you create it: moving files later rewrites imports, namespaces, the audit's list of
-modules and the documents' links, and conflicts with every branch that touches them.
+module, and the lemmas about them stay with them until they are contributed.
+
+Keep the results the paper takes from other works apart too, in `External/`, beside `Basic/` and
+`PaperName/`. They are another paper's mathematics, not this one's: another formalization that
+cites the same source can reuse them, and the source's own authors can check them. `External` is a
+`lean_lib` of its own, and its files import only Mathlib, `Basic` and each other, never the
+paper's. Give each source or cited result its own directory `External/Topic/`, with modules
+`External.Topic.…` and declarations in the namespace `External.Topic`, each named after the
+source's numbering (`External.Gilmer.lemma2`). State each result in the source's own terms, with the
+source's definitions (or Mathlib's, or `Basic`'s), not the paper's: the paper's library proves
+that the paper's objects are the source's and applies the result, and when the paper's object is
+one of the Challenge's definitions, that bridge is often `Iff.rfl` or a short lemma. Decide where
+each file belongs when you create it: moving files later rewrites imports, namespaces, the audit's
+list of modules and the documents' links, and conflicts with every branch that touches them.
 
 Name declarations after the paper's numbering (`theorem1_2`, `lemma3_4`, `equation3_1`), so that
 readers and scripts can find them. Begin the docstring of every numbered result with its number and
@@ -378,6 +399,8 @@ Results the paper takes from the literature may be stated as axioms in `External
 each one its citation, its theorem or equation number, the exact special case used, and a stable
 name. Put cited results there from the start, including facts the paper uses only in a
 special case: moving files into `External/` later means renaming modules and rewriting imports.
+An axiom of `External` is stated in the source's terms, like the theorem that will replace it
+(Phase 2), so that proving it in Stage 2 changes no statement of the paper's library.
 
 When a result needs an argument that the paper does not give (an unproved theorem, a gap in a
 proof, a numerical claim), work out the mathematics before you assign it. Reduce it to steps that
@@ -454,7 +477,9 @@ reach, a declared hypothesis.
     listed in the report.
   - Is every object that a statement takes as a parameter tied to its defining property?
   - Is each result in `External/` really cited by the paper, rather than proved in it?
-  - Does each library theorem used for a cited result imply exactly the paper's form?
+  - Does each library theorem used for a cited result imply exactly the paper's form? Does each
+    bridge from the paper's objects to a source's, in the paper's library, prove the
+    identification that the paper makes, and does `External` import nothing of the paper's?
   - Does each proof follow the paper's argument, and is every departure necessary and reported?
   - Are sums, counts and unions taken over exactly the paper's index sets?
   - Are the constants exact?
@@ -466,8 +491,8 @@ then the arguments that call sites still pass for them with `scripts/strip_call_
 rounds, each starting from a commit, because each removal can leave other hypotheses unused. Fix
 the remaining linter warnings, and rename files or namespaces whose names mislead (for example,
 helper files called `External`). Move general lemmas that grew inside the paper's files to
-`Basic/` (Phase 2). An unused hypothesis of a paper result is one that the paper's
-statement does not need. Remove it, which makes the Lean statement more general than the paper's,
+`Basic/`, and cited results that grew there to `External/` (Phase 2). An unused hypothesis of a
+paper result is one that the paper's statement does not need. Remove it, which makes the Lean statement more general than the paper's,
 and record it for the audit. Challenge statements keep the paper's hypotheses. An assumed result
 that no proof uses is not a hypothesis of the paper: remove it everywhere, including the
 Challenge.
@@ -508,6 +533,18 @@ simpler, from the simpler arguments recorded during the work. Have both checked 
 (`references/audit-report.md`, Sections 1 and 2). Without network access, say so, and write them
 from the paper and the audit. Later work that corrects the paper is also a finding: record it as
 one, and tell the user at once.
+
+Then write `NEXT.md`: what paper the user could write next, following this one. Read
+`references/next-papers.md`. Section 11 of the report collects the small things the work showed;
+`NEXT.md` keeps only the directions that would make a paper of their own: an answer to a question
+someone has posed, a new idea where the paper's method demonstrably stops, a sharpness result, a
+new setting. Collect many ideas, screen them against that bar and the literature, and explore the
+best two to four in depth: find the step where the paper's argument fails (a scratch Lean file
+that follows it to the stronger statement shows the failing goal), try to get past it, compute
+evidence, and prove what can be proved. Mark each claim as proved, checked numerically or
+conjectured, and have each candidate checked by someone other than its writer. The file holds
+unpublished research ideas: keep it and its scratch files out of git (`.gitignore`), out of every
+package and pull request, and out of the public report, which only says that the file exists.
 
 Keep the documents' links to the code up to date with `scripts/linkify_docs.py`. It reads the
 `.ilean` files, so run it after `lake build`. Check Markdown tables with
@@ -589,6 +626,7 @@ proofs:           departures from the paper's proofs, each with its reason (repo
 stage 1 / 2:      remaining internal / cited results; results assumed as hypotheses
 audit:            findings so far (E-items)
 packaging:        Comparator, Palomar checks, preflight
+next papers:      the candidates in NEXT.md (private), ranked, a line each; where the file is
 needs from user:  decisions or permissions
 ```
 
@@ -598,7 +636,8 @@ needs from user:  decisions or permissions
   within Palomar's size limits; independent review of the statements against the paper done;
   representation bridges proved; baseline committed.
 - **Stage 1:** every internal result proved by the paper's argument; cited results isolated in
-  `External/` with citations.
+  the library `External`, with citations, stated in their sources' terms, and importing nothing
+  from the paper's library.
 - **Stage 2:** every cited result proved or derived from a library, or, when out of reach, a
   declared hypothesis named after its source; zero project axioms.
 - **Proof routes:** `docs/paper_routes.tsv` committed and checked against the paper; the route
@@ -623,6 +662,11 @@ needs from user:  decisions or permissions
   without network access, saying that no search could be made), with every source linked and its
   summary and date checked against it; its "What's next" section with every simpler argument
   recorded during the work checked and either listed or set aside as wrong.
+- **Follow-up papers:** `NEXT.md` written (`references/next-papers.md`), with each candidate
+  above the bar, explored to the step where the paper's method stops, its claims marked as
+  proved, checked or conjectured, and checked by another reader for novelty and substance, or
+  with the statement that none meets the bar and what came closest; `NEXT.md` and `notes/next/`
+  ignored by git and absent from every commit; the user told where they are.
 - **Packaging (unless declined):** every file that adapts code from another project keeps that
   project's notice; `formalization.yaml` written; Palomar's metadata and source
   checks pass on a clean clone; the dependencies shared with Verso pinned at Verso's revisions for

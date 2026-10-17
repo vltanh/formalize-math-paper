@@ -4,7 +4,7 @@ public meta import Lean.Elab.Command
 public meta import Lean.DocString
 -- One `import all` line per module of the libraries, so that proofs are visible to the dependency
 -- traversal (the module system hides them from a plain `import`). Generate the lines with
---   find PaperName Basic -name '*.lean' | sort | sed 's/\.lean$//; s#/#.#g; s/^/import all /'
+--   find PaperName External Basic -name '*.lean' | sort | sed 's/\.lean$//; s#/#.#g; s/^/import all /'
 import all PaperName.Main
 import all Solution
 
@@ -14,7 +14,7 @@ import all Solution
 Run with `lake env lean scripts/Audit.lean` after `lake build`.
 
 For every numbered result of the paper, this prints the axioms it depends on and the results from
-prior work (`PaperName/External/`) that it uses, whether proved there or, in a conditional
+prior work (`External/`) that it uses, whether proved there or, in a conditional
 formalization, assumed as hypotheses of its statement. It then checks every declaration
 of the library and the theorems that Palomar's comparator checks. The run fails if any of them
 depends on an axiom other than Lean's standard `propext`, `Classical.choice` and `Quot.sound` (a
@@ -33,7 +33,8 @@ precomputed set of the library's constants; looking up each constant's module in
 (`Environment.getModuleIdxFor?`) makes the interpreted script take minutes.
 
 To adapt: generate the `import all` lines, fill in the three lists, and set the libraries' root
-names in `isLibraryModule`: the paper's library and `Basic`, the library of general mathematics.
+names in `isLibraryModule`: the paper's library, `External`, the results it cites, and `Basic`,
+the library of general mathematics.
 Keep one `import all` line per module of the libraries, each on its own line: a module that is
 missing is still imported through the others, but without its proofs, and the audit then misses the
 axioms and the routes inside them. The CI template checks the list.
@@ -43,12 +44,12 @@ open Lean Elab Command
 
 namespace Audit
 
-/-- The results from prior work, with a short label: the theorems proved in `PaperName/External/`
+/-- The results from prior work, with a short label: the theorems proved in `External/`
 or, when general, in `Basic/`, and, in a conditional formalization, the propositions assumed as
 hypotheses. The traversal
 stops at them. -/
 meta def externalResults : List (String × Name) :=
-  [("<cited theorem, short label>", ``PaperName.External.citedTheorem)]
+  [("<cited theorem, short label>", ``External.Topic.citedTheorem)]
 
 /-- The numbered results of the paper, in the order of the paper. -/
 meta def paperResults : List (String × Name) :=
@@ -62,8 +63,9 @@ meta def solutionResults : List Name :=
 /-- Lean's standard axioms. -/
 meta def standardAxioms : List Name := [``propext, ``Classical.choice, ``Quot.sound]
 
-/-- Whether `m` is a module of the libraries: the paper's, or `Basic`. -/
-meta def isLibraryModule (m : Name) : Bool := (`PaperName).isPrefixOf m || (`Basic).isPrefixOf m
+/-- Whether `m` is a module of the libraries: the paper's, `External` or `Basic`. -/
+meta def isLibraryModule (m : Name) : Bool :=
+  (`PaperName).isPrefixOf m || (`External).isPrefixOf m || (`Basic).isPrefixOf m
 
 /-- The constants declared in the library. -/
 meta def libraryConstants (env : Environment) : NameSet := Id.run do
