@@ -37,13 +37,14 @@ existing one is the right home.
 
 - It is a Lake package with the project's `lean-toolchain` and Mathlib release, the module system,
   Mathlib's style, its own README (what it proves, with the exact statements; the method and its
-  references; how to depend on it; credits, `references/credits.md`), licence, CI and axiom audit.
+  references; how to depend on it; credits: its maintainers, and the AI systems that wrote it, as
+  the Rules require), licence, CI and axiom audit.
   Its library globs are `<Area>.*` (Lake's `.+` would skip the root file). To avoid rebuilding
   Mathlib, hard-link the project's `.lake/packages` and copy the Mathlib entries of its manifest.
-- Nothing in it refers back to the project that motivated it: not the paper, its objects or its
-  authors, not the project's repository or paths, in no README, docstring, comment, name or commit
-  message. It cites only its mathematical sources, and says what it proves, not how or why it came
-  to exist.
+- It carries no provenance. It says what it proves and on which mathematical sources, not what it
+  was written for, who asked for it, where its files came from, or how it was made. Nothing in it
+  refers back to the project that motivated it (the paper, its objects or authors, the project's
+  repository or paths), in no README, docstring, comment, name or commit message.
 
 ## 4. Depending on it
 

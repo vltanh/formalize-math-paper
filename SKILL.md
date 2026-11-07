@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "3.2.2"
+  version: "3.2.3"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -308,7 +308,8 @@ documents' links.
 Rarely, a general development deserves a Lake package and repository of its own, required by the
 project at a pinned commit: a theorem known by name that no library has and that others would
 import. The default is not to split. `references/separate-packages.md` gives the bar, one package
-per area, and what such a package must be: it stands alone and never refers back to the project.
+per area, and what such a package must be: it stands alone, with no provenance and no reference
+back to the project.
 
 Name declarations after the paper's numbering (`theorem1_2`, `lemma3_4`, `equation3_1`), so that
 readers and scripts can find them. Begin the docstring of every numbered result with its number and
