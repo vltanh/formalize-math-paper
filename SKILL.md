@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "3.2.1"
+  version: "3.2.2"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -219,7 +219,7 @@ compile allowed:  yes (the default whenever a toolchain exists)
 publishing:       push? create a repository? make it public? (default: ask each time)
 target:           Palomar packaging (default yes; skip it only if the user declines)
 authors:          the human author(s) and maintainer(s), and the license (Apache-2.0 if not given)
-run log:          the start time with its time zone, the agent, model and procedure (this skill, with
+run log:          the start time with its time zone, the agent, model and procedure (this skill with
                   its repository and version), recorded now
 earlier work:     earlier formalizations of the same paper or result, and of the results it cites,
                   found by searching now
@@ -307,9 +307,8 @@ documents' links.
 
 Rarely, a general development deserves a Lake package and repository of its own, required by the
 project at a pinned commit: a theorem known by name that no library has and that others would
-import. The default is not to split. `references/separate-packages.md` gives the bar, the rule of
-one package per area, and how to build, publish and require one; the user decides. Such a package
-never refers back to the project that motivated it.
+import. The default is not to split. `references/separate-packages.md` gives the bar, one package
+per area, and what such a package must be: it stands alone and never refers back to the project.
 
 Name declarations after the paper's numbering (`theorem1_2`, `lemma3_4`, `equation3_1`), so that
 readers and scripts can find them. Begin the docstring of every numbered result with its number and
@@ -489,14 +488,14 @@ inside backticks.
 
 ### Phase 9: Package and publish
 
-Package for Palomar unless the user declined in Phase 0. Read `references/palomar.md`: the
-required files, `formalization.yaml`, Palomar's validation scripts, CI
-(`assets/lean_action_ci.yml`) and the preflight workflow (`assets/palomar_preflight.yml`).
-Everything up to Palomar's local checks needs no permission; each later step needs the user's
-explicit go-ahead (Rules), and the preflight also a confirmed authorization relationship. Submit only
-a commit whose preflight report says `status: pass`, after checking the dependency pins that
-rendering with Verso needs (`references/palomar.md`, Section 1). Registering publishes Palomar's
-review permanently: show the user the review, and register only when they decide to.
+Package for Palomar unless the user declined in Phase 0. Read `references/palomar.md`: the required
+files, `formalization.yaml`, Palomar's validation scripts, CI (`assets/lean_action_ci.yml`) and the
+preflight workflow (`assets/palomar_preflight.yml`). Everything up to Palomar's local checks needs
+no permission; each later step needs the user's explicit go-ahead (Rules), and the preflight also a
+confirmed authorization relationship. Submit only a commit whose preflight report says `status:
+pass`, after checking the dependency pins that rendering with Verso needs (`references/palomar.md`,
+Section 1). Registering publishes Palomar's review permanently: show the user the review, and
+register only when they decide to.
 
 ## Bundled tools
 
