@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: famous-theorem-gets-own-package
+expected_outcome: |
+  A plan that proposes a separate Lake package, named for its area, for Kakutani's theorem, leaves the decision to the user, and keeps the package free of references to the paper.

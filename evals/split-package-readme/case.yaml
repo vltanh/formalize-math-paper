@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: split-package-readme
+expected_outcome: |
+  A README that describes the package on its own: no mention of the paper or the project it came from, credits for Bob Roe's MIT code, the maintainer and the AI credit, and how to depend on it.

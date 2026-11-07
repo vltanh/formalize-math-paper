@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "3.2.4"
+  version: "3.2.5"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -210,9 +210,9 @@ Lean / Mathlib:   the newest Lean release or release candidate (at least Palomar
                   project needs requires a specific Mathlib commit
 libraries:        the public libraries beyond Mathlib that prove results the paper cites
                   (references/palomar.md, Section 1, says which may appear in statements)
-packages:         famous results the project must build that deserve a package and repository of
-                  their own, if any (default: none; references/separate-packages.md), each with its
-                  name, visibility and when to publish, decided with the user
+packages:         none by default; a package of its own for a famous result is proposed during the
+                  inventory, and its name, visibility and publication are decided with the user
+                  (references/separate-packages.md)
 out of reach:     cited results that no library supports and the project cannot build, and how
                   each is handled (Rules)
 compile allowed:  yes (the default whenever a toolchain exists)
