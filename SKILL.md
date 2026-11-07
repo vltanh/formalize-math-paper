@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "3.1.0"
+  version: "3.2.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -297,70 +297,18 @@ it. Give each paper its own directory, keep the routes of both in the one `docs/
 (their labels must not collide), and number the report's findings through both papers in order.
 
 The project has three libraries, in layers, each importing only Mathlib, the layers below it and
-itself: `Basic`, general mathematics; `External`, the results of other works that the paper
-cites; and `PaperName`, the paper's own results.
+itself: `Basic`, general mathematics, filed by field as Mathlib files it and named as Mathlib would
+name it, so that it can be contributed later; `External`, the results of other works that the
+paper cites, one directory per source, stated in the source's own terms; and `PaperName`, the
+paper's own results, arranged by section. `references/lean-project.md`, Section 6, has the layout,
+where each kind of lemma goes, and how to name things. Decide where each file belongs when you
+create it: moving files later rewrites imports, namespaces, the audit's list of modules and the
+documents' links.
 
-```text
-Basic/                         -- general mathematics: a library of its own, filed by field
-  Algebra/                     -- one directory per field, named as Mathlib names it
-  Analysis/Calculus/Rolle.lean -- one file per topic
-External/                      -- the results the paper cites from other works: a library of its own
-  Topic/                       -- one directory per cited result or source, with a README.md, from the start
-PaperName/                     -- the paper's library
-  Introduction.lean            -- §1 definitions and statements
-  Preliminaries.lean           -- §2
-  SectionName/                 -- one directory per major section
-    Definitions.lean           -- the section's notation
-    Auxiliary.lean             -- lemmas about the paper's objects that are not its results
-    Lemma34.lean               -- one file per result, or per small group of results
-  Main.lean                    -- the main theorem
-Challenge.lean                 -- the main results, in the vocabulary of Mathlib
-Solution.lean                  -- their proofs from the library (may double as the root module)
-```
-
-Keep general mathematics apart from the start, in a library of its own. A lemma that says
-nothing about the paper's objects (a calculus fact, an inequality for the binary entropy, a lemma
-about probability measures) goes to `Basic/`, beside `PaperName/` rather than inside it. File it
-by field, under the directory that Mathlib uses for that field (`Basic/Algebra/`,
-`Basic/AlgebraicGeometry/`, `Basic/Analysis/`, `Basic/Combinatorics/`, `Basic/Probability/`, …),
-in a file named for its topic, and give it the name and namespace that Mathlib would give it, so
-that it can later be contributed to Mathlib or another library. File it by its mathematics, not by
-what motivated it: a lemma about trees goes to `Combinatorics/` even in a paper on phylogenetics.
-Only objects that no field of Mathlib covers (phylogenetic trees with labelled leaves, for example)
-get a new field directory, named as Mathlib would name a new area (`Basic/Phylogenetics/`), and
-`Basic/README.md` says where each part could go: a new area of Mathlib, proposed on the Lean Zulip
-first, or a library for that domain, as PhysLean is for physics.
-
-Rarely, a general development goes further, into a Lake package of its own, published as its own
-repository and required by the project at a pinned commit: a famous theorem that no library has and
-that others would import, such as Brouwer's fixed-point theorem or the Pontryagin maximum principle.
-The default is not to split, since every repository adds CI, Mathlib bumps and places for a reader
-to look. `references/separate-packages.md` gives the bar (famous by name, missing from the
-libraries, substantial, general, reusable), the rule of one package per area (`lean4-fixed-point`
-rather than `lean4-brouwer`), and how to build, publish and require one. The user decides, and
-creating the repository needs permission (Rules). Palomar restricts only the Challenge's imports, so
-the Solution may depend on such a package (`references/palomar.md`, Section 1).
-
-`Basic` is a `lean_lib` of its own (`references/lean-project.md`), and its files import only
-Mathlib and each other, never `External` or the paper's. A cited result that is general is proved
-there too; its `External/Topic/README.md` still gives the source and how the paper uses it, and
-points to the proof. The definitions that a
-Challenge statement uses are the exception: they stay in the paper's module of shared definitions
-(`references/palomar.md`, Section 2), even the general ones, because Comparator needs them in one
-module, and the lemmas about them stay with them until they are contributed.
-
-Keep the results the paper takes from other works apart too, in `External/`, beside `Basic/` and
-`PaperName/`. They are another paper's mathematics, not this one's: another formalization that
-cites the same source can reuse them, and the source's own authors can check them. `External` is a
-`lean_lib` of its own, and its files import only Mathlib, `Basic` and each other, never the
-paper's. Give each source or cited result its own directory `External/Topic/`, with modules
-`External.Topic.…` and declarations in the namespace `External.Topic`, each named after the
-source's numbering (`External.Gilmer.lemma2`). State each result in the source's own terms, with the
-source's definitions (or Mathlib's, or `Basic`'s), not the paper's: the paper's library proves
-that the paper's objects are the source's and applies the result, and when the paper's object is
-one of the Challenge's definitions, that bridge is often `Iff.rfl` or a short lemma. Decide where
-each file belongs when you create it: moving files later rewrites imports, namespaces, the audit's
-list of modules and the documents' links, and conflicts with every branch that touches them.
+Rarely, a general development deserves a Lake package and repository of its own, required by the
+project at a pinned commit: a theorem known by name that no library has and that others would
+import. The default is not to split. `references/separate-packages.md` gives the bar, the rule of
+one package per area, and how to build, publish and require one; the user decides.
 
 Name declarations after the paper's numbering (`theorem1_2`, `lemma3_4`, `equation3_1`), so that
 readers and scripts can find them. Begin the docstring of every numbered result with its number and
@@ -380,24 +328,20 @@ every statement elaborate").
 Write `Challenge.lean`: the paper's main results, and only those, restated with `sorry` proofs in
 Mathlib's vocabulary. (Palomar also allows Tau Ceti's and CSLib's, but then marks the entry as
 having qualified statement dependencies; see `references/palomar.md`, Sections 1 and 2.) The
-Challenge is the statement of record. A reader can check it without reading the rest of the project, and Palomar
-trusts it because it imports nothing beyond the libraries that Palomar allows. Intermediate results
-stay proved in the library, linked from the README. Plan the Challenge's size from the start:
-Palomar allows at most 1,000 lines and prefers 300, and the definitions the statements need count
-too. When the Challenge defines an object that a reader cannot recognize at a glance, add a
-compared theorem that ties it to something known about it, such as a known numerical value.
-Readers and Palomar's review can then tell that the definition is the intended one. A conditional
-result shows every assumed result in the signature of each theorem that uses it (Phase 5).
+Challenge is the statement of record. A reader can check it without reading the rest of the project,
+and Palomar trusts it because it imports nothing beyond the libraries that Palomar allows.
+Intermediate results stay proved in the library, linked from the README. Plan the Challenge's size
+from the start: Palomar allows at most 1,000 lines and prefers 300, and the definitions the
+statements need count too. When the Challenge defines an object that a reader cannot recognize at a
+glance, add a compared theorem that ties it to something known about it, such as a known numerical
+value. Readers and Palomar's review can then tell that the definition is the intended one. A
+conditional result shows every assumed result in the signature of each theorem that uses it (Phase
+5).
 
-Then review every statement, including the Challenge's, against the TeX source. Check the order of
-quantifiers and where constants are chosen; strict versus weak inequalities, and ranges; casts and
-truncation (`ℕ` subtraction and division, `Nat.floor`); indexing from 0 versus 1; "max over z"
-versus "for every z"; whether "positive integer" became `ℕ`; the types Lean inferred where the
-statement does not give them; implicit standing assumptions; whether the hypotheses that a draft
-declares with `variable` reach the statements whose proofs use them (Lean leaves out of a statement
-every section variable that it does not mention: check with `#check`); and whether every hypothesis
-of a statement is either the paper's or a declared assumption. Prove a bridge lemma for each
-representation choice.
+Then review every statement, including the Challenge's, against the TeX source, with the list in
+`references/checklists.md`, Section 1 (quantifiers, constants, ranges, casts and truncation,
+indexing, inferred types, section variables, every hypothesis accounted for). Prove a bridge lemma
+for each representation choice.
 
 Have the statements and the Challenge reviewed against the TeX source by someone other than their
 writer: a separate agent if your environment has them, otherwise a separate pass of your own. Then
@@ -446,14 +390,12 @@ For each cited result:
 3. Otherwise, formalize it under `External/Topic/`, with a `README.md` that gives the source, the
    statement, and how its Lean forms relate to the way the paper uses it. Proving a different
    standard form is fine if it gives exactly the estimates the paper needs; say so.
-4. If neither is feasible, because the mathematics it needs is missing from Lean and beyond the
-   project, follow the rule on cited results out of reach. By default, define the result in
-   `External/Topic/` as a proposition named after its source, with no proof. Make it a hypothesis
-   of every statement whose proof uses it, including the Challenge's. Several such hypotheses may
-   be bundled in a class of hypotheses, named for what it is. The class takes the data as
-   parameters, and is written in the signature of each theorem that needs it. The topic's
-   `README.md` says what Lean lacks. If the user chose to build the missing mathematics, write down
-   the layers before you start the first, and keep the end state of every layer releasable.
+4. If neither is feasible, follow the rule on cited results out of reach: by default the result
+   becomes a proposition in `External/Topic/`, named after its source, with no proof, and a
+   hypothesis of every statement whose proof uses it, the Challenge's included (several may be
+   bundled in a class of hypotheses, written in each theorem's signature). The topic's `README.md`
+   says what Lean lacks. If the user chose to build the missing mathematics, write down the layers
+   first, and keep the end state of every layer releasable.
 
 At the end, the project has no axioms, and every cited result is either proved or, when out of
 reach, a declared hypothesis.
@@ -466,9 +408,10 @@ reach, a declared hypothesis.
   the paper's results and of the Challenge theorems. It also lists which cited results each paper
   result uses (the dependency table for the report). Under the module system it needs `import all`
   for every module; the template explains why.
-- Run the route check. The audit writes the routes of the formal proofs to `.lake/route_deps.tsv`,
-  and `python3 scripts/route_check.py check docs/paper_routes.tsv --accept
-  docs/route_differences.tsv` compares them with the routes of the paper's proofs. It reports any
+- Run the route check, after the audit: the audit writes the routes of the formal proofs to
+  `.lake/route_deps.tsv`, and `python3 scripts/route_check.py check docs/paper_routes.tsv --accept
+  docs/route_differences.tsv` compares them with the routes of the paper's proofs. A file left from
+  an earlier audit hides the differences of every proof changed since. It reports any
   result whose proof does not use a result that the paper's proof cites, or uses one that the
   paper's argument never reaches. Settle every difference. Either change the Lean proof to follow
   the paper, or, if the difference is a necessary departure (Rules) or a use that the paper leaves
@@ -480,38 +423,22 @@ reach, a declared hypothesis.
 - Complete `Solution.lean`, which restates each Challenge theorem word for word and proves it from
   the library, and write `comparator.json` (`references/palomar.md`, Sections 2 and 3). Then run
   `lake comparator` (it needs bubblewrap; see `references/palomar.md`, Section 5).
-- A passing build proves only what the statements say. So ask of the formalization:
-  - Does a helper lemma hide half a proof, through a hypothesis that assumes what should be shown?
-  - Is a hypothesis stronger than the paper's?
-  - Could a statement be vacuous: hypotheses that contradict each other, an empty range, a
-    definition that nothing satisfies? Construct an instance of each structure or class of
-    hypotheses that a statement takes, or say in the report why that is not yet possible.
-  - Does a parameter hide an assumption? For every structure, class or subtype that a Challenge
-    theorem takes, list its propositional content, recursively, and classify each item: a
-    hypothesis of the paper, a law that defines the object, a fact proved in the project, or an
-    assumed result. Every assumed result must be a declared hypothesis, named after its source and
-    listed in the report.
-  - Is every object that a statement takes as a parameter tied to its defining property?
-  - Is each result in `External/` really cited by the paper, rather than proved in it?
-  - Does each library theorem used for a cited result imply exactly the paper's form? Does each
-    bridge from the paper's objects to a source's, in the paper's library, prove the
-    identification that the paper makes, and does `External` import nothing of the paper's?
-  - Does each proof follow the paper's argument, and is every departure necessary and reported?
-  - Are sums, counts and unions taken over exactly the paper's index sets?
-  - Are the constants exact?
+- A passing build proves only what the statements say. Go through the questions in
+  `references/checklists.md`, Section 2: hidden assumptions, vacuous statements, hypotheses
+  stronger than the paper's, exact index sets and constants.
 
 ### Phase 7: Cleanup
 
 Read `references/cleanup.md`. In short: remove unused hypotheses with `scripts/strip_unused.py`,
 then the arguments that call sites still pass for them with `scripts/strip_call_args.py`. Work in
-rounds, each starting from a commit, because each removal can leave other hypotheses unused. Fix
-the remaining linter warnings, and rename files or namespaces whose names mislead (for example,
-helper files called `External`). Move general lemmas that grew inside the paper's files to
-`Basic/`, and cited results that grew there to `External/` (Phase 2). An unused hypothesis of a
-paper result is one that the paper's statement does not need. Remove it, which makes the Lean statement more general than the paper's,
-and record it for the audit. Challenge statements keep the paper's hypotheses. An assumed result
-that no proof uses is not a hypothesis of the paper: remove it everywhere, including the
-Challenge.
+rounds, each starting from a commit, because each removal can leave other hypotheses unused. Fix the
+remaining linter warnings, and rename files or namespaces whose names mislead (for example, helper
+files called `External`). Move general lemmas that grew inside the paper's files to `Basic/`, and
+cited results that grew there to `External/` (Phase 2). An unused hypothesis of a paper result is
+one that the paper's statement does not need. Remove it, which makes the Lean statement more general
+than the paper's, and record it for the audit. Challenge statements keep the paper's hypotheses. An
+assumed result that no proof uses is not a hypothesis of the paper: remove it everywhere, including
+the Challenge.
 
 Cleanup changes how proofs are written, never which argument they make. Merging duplicate helpers,
 shortening proofs and splitting files can change a proof's route without changing any statement.
@@ -540,27 +467,19 @@ Users care about three things:
 - Every claim about the paper is checked against the TeX source, and every arithmetic claim is
   recomputed. A wrong error report costs more trust than a missed typo.
 
-End the report with two sections. The first places the paper in the literature: the work before
-it, the work that appeared independently at the same time, the work that has followed it, and the
-formalizations of it or its results. Write it from the paper's own account and a dated search,
-including for versions of the paper newer than the one formalized. The second, "What's next", says
-how the paper's results could be extended, generalized or strengthened, and how its proofs could be
-simpler, from the simpler arguments recorded during the work. Have both checked like the findings
-(`references/audit-report.md`, Sections 1 and 2). Without network access, say so, and write them
-from the paper and the audit. Later work that corrects the paper is also a finding: record it as
-one, and tell the user at once.
+End the report with two sections: the paper in the literature (the work before it, alongside it
+and after it, and its formalizations, from the paper's own account and a dated search, including
+for newer versions of the paper), and "What's next" (how the results could be extended,
+generalized or strengthened, and the simpler arguments recorded during the work). Check both like
+the findings (`references/audit-report.md`, Sections 1 and 2). Later work that corrects the paper is
+also a finding: record it, and tell the user at once.
 
-Then write `NEXT.md`: what paper the user could write next, following this one. Read
-`references/next-papers.md`. Section 11 of the report collects the small things the work showed;
-`NEXT.md` keeps only the directions that would make a paper of their own: an answer to a question
-someone has posed, a new idea where the paper's method demonstrably stops, a sharpness result, a
-new setting. Collect many ideas, screen them against that bar and the literature, and explore the
-best two to four in depth: find the step where the paper's argument fails (a scratch Lean file
-that follows it to the stronger statement shows the failing goal), try to get past it, compute
-evidence, and prove what can be proved. Mark each claim as proved, checked numerically or
-conjectured, and have each candidate checked by someone other than its writer. The file holds
-unpublished research ideas: keep it and its scratch files out of git (`.gitignore`), out of every
-package and pull request, and out of the public report, which only says that the file exists.
+Then write the private `NEXT.md`: the papers the user could write next, following
+`references/next-papers.md`. Only directions that would make a paper of their own pass its bar;
+explore the best two to four in depth, mark each claim as proved, checked or conjectured, and have
+each candidate checked by someone other than its writer. Keep `NEXT.md` and its scratch files out
+of git, of every package and pull request, and of the public report, which only says that the file
+exists.
 
 Keep the documents' links to the code up to date with `scripts/linkify_docs.py`. It reads the
 `.ilean` files, so run it after `lake build`. Check Markdown tables with
@@ -569,123 +488,42 @@ inside backticks.
 
 ### Phase 9: Package and publish
 
-Package for Palomar unless the user declined in Phase 0. Read `references/palomar.md`. It covers
-the required files, `formalization.yaml`, Palomar's own validation scripts, CI
-(`assets/lean_action_ci.yml`), the preflight workflow (`assets/palomar_preflight.yml`), and how to
-submit. Everything up to Palomar's local checks needs no permission. Each later step needs the
-user's explicit go-ahead: creating the repository, pushing, making it public, running the preflight
-(confirm the authorization relationship first), submitting and registering. Submit only a commit
-whose preflight report says `status: pass`. The preflight does not render the Challenge. Palomar
-renders it after verification, with the documentation tool Verso, so check the dependency pins that
-rendering needs before you submit (`references/palomar.md`, Section 1). Registering publishes
-Palomar's review permanently: show the user the review, and register only when they decide to.
+Package for Palomar unless the user declined in Phase 0. Read `references/palomar.md`: the
+required files, `formalization.yaml`, Palomar's validation scripts, CI
+(`assets/lean_action_ci.yml`) and the preflight workflow (`assets/palomar_preflight.yml`).
+Everything up to Palomar's local checks needs no permission; each later step needs the user's
+explicit go-ahead (Rules), and the preflight also a confirmed authorization relationship. Submit only
+a commit whose preflight report says `status: pass`, after checking the dependency pins that
+rendering with Verso needs (`references/palomar.md`, Section 1). Registering publishes Palomar's
+review permanently: show the user the review, and register only when they decide to.
 
 ## Bundled tools
 
-Run the scripts from the project root, as `python3 <skill-dir>/scripts/<name> …`. Copy the ones
-that CI runs into the project's `scripts/` directory.
-
-| Tool | Use |
-| --- | --- |
-| `scripts/check_file.py FILE [--autosorry]` | check one file with the lakefile's options; with `--autosorry`, replace failing proofs with `sorry` until the file elaborates |
-| `scripts/autosorry.py FILE LOG` | the replacement step on its own, given Lean's output |
-| `scripts/to_module.py FILE…` | convert files to the module system |
-| `scripts/stmt_diff.py REV [PATH…]` | list the declarations whose statements or definitions changed since `REV` |
-| `scripts/strip_unused.py LOG [--dry-run]` | delete the binders that the unused-variables linter reports |
-| `scripts/strip_call_args.py [REV] [--dry-run]` | delete, at every call site, the arguments of binders removed since `REV` (default `HEAD`); run it once per cleanup round, right after `strip_unused.py`, with the commit that started the round |
-| `scripts/snapshot_check.py take DIR` / `check DIR FILE [--emit]` | check files against a private copy of the build outputs, so that parallel agents do not break each other's imports |
-| `scripts/session_stats.py [TRANSCRIPT…] [--since TIME] [--until TIME]` | the run log's figures (elapsed time, models, sub-agents, the most running at once, agent time, tokens, tool calls) from Claude Code session transcripts, for the whole run or for one round |
-| `scripts/linkify_docs.py [--check]` | link the Lean names in the documents to their lines; copy it into the project and configure its first block |
-| `scripts/check_md_tables.py FILE… [--fix]` | find, or fix, Markdown table rows broken by a `\|` inside a cell; copy it into the project |
-| `scripts/route_check.py extract TEX…` / `check ROUTES [--accept FILE]` | record which results each of the paper's proofs cites; compare these with the routes of the formal proofs that the audit writes, and fail on any difference not recorded with its reason; copy it into the project |
-| `scripts/sync_challenge_defs.py [--check]` | copy the block of shared definitions from a library module into `Challenge.lean`, or check that the copy is up to date (`references/palomar.md`, Section 2); copy it into the project and configure its first block |
-| `assets/Audit.lean` | the axiom and dependency audit, which also writes the route of every numbered result for `route_check.py`; copy it to `scripts/Audit.lean` and fill in its lists |
-| `assets/lean_action_ci.yml` | CI: build, the audit's imports, audit, route check, the Challenge's copy of shared definitions, links, tables |
-| `assets/palomar_preflight.yml` | Palomar's mechanical preflight, run on demand |
+`scripts/` has the project's mechanical tools, run from the project root as
+`python3 <skill-dir>/scripts/<name> …` (each prints its usage with `--help`): `check_file.py`,
+`autosorry.py`, `to_module.py`, `stmt_diff.py`, `strip_unused.py`, `strip_call_args.py`,
+`snapshot_check.py`, `session_stats.py`, `linkify_docs.py`, `check_md_tables.py`, `route_check.py`
+and `sync_challenge_defs.py`; `assets/` has the audit (`Audit.lean`) and the CI and preflight
+workflows. `references/tools.md` says what each does and which to copy into the project.
 
 ## Run log
 
-Keep an untracked log (for example `notes/runlog.md`) from Phase 0. Record:
-
-- the start time with its time zone, and when each phase ends (the milestone commits record the
-  latter);
-- the agent and harness with their versions, the model(s), and this skill with its repository and
-  version or commit;
-- each sub-agent: what it worked on, when it started and finished, and how often it was resumed.
-
-From the log, report the elapsed time to the audited formalization: from the start to the commit
-that completes `REPORT.md` (`CREDITS.md`, which reports this time, comes in a later commit). Also
-report the number of sub-agents and the most that ran at once, their total working time, and their
-tool calls and tokens (output, input and cache reads, separately). Where the platform keeps session
-transcripts, take these figures from them: the summaries shown when an agent finishes may measure
-something else. For Claude Code, `scripts/session_stats.py` computes them. Pass every transcript if
-the work spanned several sessions, and `--until` with the time of the commit that completes
-`REPORT.md`. When the user asks for more work later, log each round the same way, and get its
-figures with `--since` and `--until` at its start and end. Put the figures in `CREDITS.md`, one
-section per round (`references/credits.md`), and in `formalization.yaml` (`automation.methods`:
-`models`, `framework`, `tool_setup`, `cost`). Put the elapsed time and the number of running agents
-in status reports.
+Keep an untracked log (for example `notes/runlog.md`) from Phase 0: the start time with its time
+zone, the agent, harness, model(s) and this skill's version, each sub-agent (task, start, end,
+resumptions), and the end of each phase. `references/credits.md`, Section 1, says what figures to
+report and how to take them from the session transcripts (`scripts/session_stats.py` for Claude
+Code); they go in `CREDITS.md`, one section per round, in `formalization.yaml` and in status
+reports.
 
 ## Status reports
 
-When you report progress, use this form, and fill in only what applies:
-
-```text
-repository / branch / head:
-phase:
-elapsed:          time since the start; sub-agents running / finished
-build:            passes / fails (first error)
-sorry / axiom:    counts (excluding Challenge.lean)
-statements:       changes to paper results (only documented ones), helper lemmas found false
-proofs:           departures from the paper's proofs, each with its reason (reported every time
-                  until the user has seen it); route-check differences still open
-stage 1 / 2:      remaining internal / cited results; results assumed as hypotheses
-audit:            findings so far (E-items)
-packaging:        Comparator, Palomar checks, preflight
-next papers:      the candidates in NEXT.md (private), ranked, a line each; where the file is
-needs from user:  decisions or permissions
-```
+When you report progress, use the form in `references/checklists.md`, Section 3, and fill in
+only what applies: the phase, elapsed time and agents, the build, `sorry` and axiom counts,
+statement changes, departures, open route differences, findings, packaging, and what you need
+from the user.
 
 ## Completion gates
 
-- **Statements:** every numbered result stated; Challenge written, with the main results only and
-  within Palomar's size limits; independent review of the statements against the paper done;
-  representation bridges proved; baseline committed.
-- **Stage 1:** every internal result proved by the paper's argument; cited results isolated in
-  the library `External`, with citations, stated in their sources' terms, and importing nothing
-  from the paper's library.
-- **Stage 2:** every cited result proved or derived from a library, or, when out of reach, a
-  declared hypothesis named after its source; zero project axioms.
-- **Proof routes:** `docs/paper_routes.tsv` committed and checked against the paper; the route
-  check passes on the final commit, and every difference it records has its reason; every
-  departure from the paper's proofs is necessary (Rules) and reported in its docstring, in the
-  report's table of departures, in `formalization.yaml` and to the user; someone other than the
-  provers compared the formal proofs with the paper's.
-- **Verification:** clean build; `scripts/Audit.lean` passes for every declaration; `Solution.lean`
-  and `comparator.json` written, and Comparator accepts the solution; no assumption hidden in a
-  parameter; every structure or class of hypotheses has an instance, or the reason it cannot have
-  one yet is recorded.
-- **Cleanup:** the build prints only the Challenge's `sorry` warnings; unused hypotheses removed,
-  and those of paper results recorded; misleading names fixed; the route check passes as before.
-- **Documentation:** `REPORT.md`, `README.md` and `CREDITS.md` written, links up to date, tables
-  valid, findings checked against the source; every departure from the paper's proofs listed in the
-  report and the README's summary; `CREDITS.md` reports the procedure, the agents and models, the
-  elapsed time and the effort from the run log, round by round, and the README's credits sum it up
-  in a few lines with a link; the README kept short; earlier formalizations cited; a draft's own
-  notes deleted; a conditional formalization says so in the README's first paragraph, in
-  `formalization.yaml` and in the report, which lists what it assumes; the report's literature
-  section written from a dated search for the work before, alongside and after the paper (or,
-  without network access, saying that no search could be made), with every source linked and its
-  summary and date checked against it; its "What's next" section with every simpler argument
-  recorded during the work checked and either listed or set aside as wrong.
-- **Follow-up papers:** `NEXT.md` written (`references/next-papers.md`), with each candidate
-  above the bar, explored to the step where the paper's method stops, its claims marked as
-  proved, checked or conjectured, and checked by another reader for novelty and substance, or
-  with the statement that none meets the bar and what came closest; `NEXT.md` and `notes/next/`
-  ignored by git and absent from every commit; the user told where they are.
-- **Packaging (unless declined):** every file that adapts code from another project keeps that
-  project's notice; `formalization.yaml` written; Palomar's metadata and source
-  checks pass on a clean clone; the dependencies shared with Verso pinned at Verso's revisions for
-  the toolchain; with the user's permission for each step, the repository published, CI passing,
-  and the preflight reporting `status: pass` on the exact commit to submit; the user decides about
-  submission and registration.
+The work is done when every gate in `references/checklists.md`, Section 4, is met: statements,
+Stage 1 and 2, proof routes, verification, cleanup, documentation, follow-up papers and packaging.
+Go through them before you report the work as finished.

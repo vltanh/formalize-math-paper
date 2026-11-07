@@ -1,7 +1,7 @@
 # Packages of their own: when a result deserves its own repository
 
-A formalization sometimes has to prove a famous theorem that no Lean library has: a fixed-point
-theorem, the Pontryagin maximum principle, a classical packing theorem. Such a development can
+A formalization sometimes has to prove a famous theorem that no Lean library has: a classical
+theorem of analysis, topology or geometry that the paper cites by name. Such a development can
 become a Lake package of its own, published as its own repository, which the project then requires
 at a pinned commit. Done well, others can import it and it outlives the paper. Done too often, it
 leaves a scatter of small repositories, each needing its own CI, Mathlib bumps and maintenance, and
@@ -25,15 +25,15 @@ agreement.
 Propose a package of its own only when **all** of these hold:
 
 - **Famous by name.** The development proves a theorem, or a small theory around one, that
-  mathematicians outside the paper's area know by name and would look for: Brouwer's fixed-point
-  theorem, the Pontryagin maximum principle, Fejes Tóth's theorem on lattice packings. A lemma
-  that only this paper needs, however long, does not qualify.
+  mathematicians outside the paper's area know by name and would look for: a named theorem found
+  in textbooks, not a lemma of the paper's field. A lemma that only this paper needs, however long,
+  does not qualify.
 - **Missing.** Neither Mathlib nor another maintained public Lean library has it, and no Mathlib
   pull request for it is close to merging (search Mathlib, its open pull requests, the Lean Zulip
   and GitHub; Phase 0, "earlier work").
 - **Substantial.** It is large enough (as a rule of thumb, several hundred lines or more, often
   thousands) that it is not one quick contribution to Mathlib, or it needs infrastructure of its own
-  (for the maximum principle: ODEs with measurable controls, needle variations).
+  (a theory of its own that the proof builds on).
 - **General.** Its statements say nothing about the paper's objects, and it can import only
   Mathlib and other such packages. If it needs the paper's definitions, it is not general.
 - **Reusable.** Someone outside this project could plausibly import it.
@@ -44,12 +44,12 @@ packages for a paper, and often none. If the list of candidates grows longer, gr
 
 ## 2. One package per area
 
-Name a package for its area, not for one theorem, so that related results can join it later instead
-of starting more repositories: `lean4-fixed-point` (Brouwer now; Kakutani and Schauder later), not
-`lean4-brouwer`; `lean4-optimal-control` (the maximum principle with Filippov's existence theorem
-and the ODE toolkit they share), not one repository for each. Inside it, give each theorem its own
-directory (`FixedPoint/Brouwer/`, `FixedPoint/Kakutani/`). Before proposing a new package, check
-whether an existing one, the user's or the project's earlier ones, is the right home.
+Name a package for its area, not for one theorem, so that related results can join it later
+instead of starting more repositories: `lean4-<area>`, holding one theorem now and its relatives
+later, rather than `lean4-<theorem>`; one package for a theorem together with the results and the
+infrastructure it shares with them, rather than one repository for each. Inside it, give each
+theorem its own directory (`<Area>/<Theorem>/`). Before proposing a new package, check whether an
+existing one, the user's or the project's earlier ones, is the right home.
 
 ## 3. Mathlib first
 
@@ -76,10 +76,10 @@ to it are actions that others can see (SKILL.md, Rules).
 
 ## 5. How to build it
 
-- A sibling directory of the project (`../lean4-fixed-point`), with its own `lakefile.toml` (Lake
-  package and library named for the area, in PascalCase, for example `FixedPoint`), the project's
+- A sibling directory of the project (`../lean4-<area>`), with its own `lakefile.toml` (Lake
+  package and library named for the area, in PascalCase, `<Area>`), the project's
   `lean-toolchain` and the same Mathlib release tag, so that the two can be used together.
-- In `lakefile.toml`, `globs = ["FixedPoint.*"]`: Lake's `.+` matches only submodules, so the
+- In `lakefile.toml`, `globs = ["<Area>.*"]`: Lake's `.+` matches only submodules, so the
   root file would not be built.
 - The module system, as in the project (`references/lean-project.md`, Section 3).
 - Its own `README.md` (what it proves, with the exact Lean statements; the method and its
@@ -103,14 +103,14 @@ to it are actions that others can see (SKILL.md, Rules).
 
   ```toml
   [[require]]
-  name = "FixedPoint"
-  git = "https://github.com/<owner>/lean4-fixed-point"
+  name = "<Area>"
+  git = "https://github.com/<owner>/lean4-<area>"
   rev = "<full commit hash>"
   ```
 
-  then `lake update FixedPoint` (only that package, so that Mathlib's pin does not move), and commit
+  then `lake update <Area>` (only that package, so that Mathlib's pin does not move), and commit
   `lakefile.toml` and `lake-manifest.json`.
-- During development, before it is published, `path = "../lean4-fixed-point"` replaces `git` and
+- During development, before it is published, `path = "../lean4-<area>"` replaces `git` and
   `rev`; switch to the pinned commit before the project is pushed.
 - Bump the package's Mathlib together with the project's: a project and its packages must agree on
   Mathlib's revision.

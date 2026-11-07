@@ -69,6 +69,9 @@ def strip_comments_and_strings(text):
 
 
 def main():
+    if len(sys.argv) != 3 or sys.argv[1] in ('-h', '--help'):
+        print(__doc__.strip())
+        sys.exit(0 if sys.argv[1:2] in (['-h'], ['--help']) else 2)
     path, errpath = sys.argv[1], sys.argv[2]
     src = open(path, encoding='utf-8').read()
     lines = src.split('\n')

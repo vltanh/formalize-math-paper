@@ -11,6 +11,9 @@ declarations used in public statements, and module docstrings placed before `mod
 import pathlib
 import sys
 
+if not sys.argv[1:] or sys.argv[1] in ('-h', '--help'):
+    print(__doc__.strip())
+    sys.exit(0 if sys.argv[1:] else 2)
 for path in sys.argv[1:]:
     p = pathlib.Path(path)
     lines = p.read_text(encoding='utf-8').split('\n')

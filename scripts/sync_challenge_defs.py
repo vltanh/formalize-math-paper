@@ -39,6 +39,10 @@ def block(text: str, name: str) -> tuple[int, int]:
 
 
 def main() -> None:
+    args = sys.argv[1:]
+    if args and args[0] in ('-h', '--help') or any(a != '--check' for a in args):
+        print(__doc__.strip())
+        sys.exit(0 if args and args[0] in ('-h', '--help') else 2)
     defs_path, chal_path = ROOT / DEFS, ROOT / CHALLENGE
     defs, chal = defs_path.read_text(), chal_path.read_text()
     di, dj = block(defs, DEFS)

@@ -7,6 +7,7 @@
 3. The module system
 4. Checking files and building
 5. Common errors when repairing a draft
+6. Layout of the project
 
 ## 1. Versions
 
@@ -67,8 +68,8 @@ name = "Solution"
 ```
 
 A library beyond Mathlib that proves a cited result is required the same way, pinned to a full
-commit hash (`git = "…"`, `rev = "<commit>"`). A package of the project's own, split out for a famous
-result (`references/separate-packages.md`), is required by `path = "../package"` while it is
+commit hash (`git = "…"`, `rev = "<commit>"`). A package of the project's own, split out for a
+famous result (`references/separate-packages.md`), is required by `path = "../package"` while it is
 developed and by its published commit before the project is pushed.
 
 Create `Challenge.lean` and `Solution.lean` with the project, as modules that are empty except for
@@ -190,3 +191,61 @@ particular, do not change a statement to make an error go away.
   the definition to the module that needs it first.
 - **Heavy proofs.** Before raising `maxHeartbeats`, split the proof or give `simp` or `ring` a
   smaller goal. If a raise cannot be avoided, make it local to that one declaration.
+
+## 6. Layout of the project
+
+The project has three libraries, in layers, each importing only Mathlib, the layers below it and
+itself: `Basic`, general mathematics; `External`, the results of other works that the paper
+cites; and `PaperName`, the paper's own results.
+
+```text
+Basic/                         -- general mathematics: a library of its own, filed by field
+  Algebra/                     -- one directory per field, named as Mathlib names it
+  Analysis/Calculus/Rolle.lean -- one file per topic
+External/                      -- the results the paper cites from other works: a library of its own
+  Topic/                       -- one directory per cited result or source, with a README.md, from the start
+PaperName/                     -- the paper's library
+  Introduction.lean            -- §1 definitions and statements
+  Preliminaries.lean           -- §2
+  SectionName/                 -- one directory per major section
+    Definitions.lean           -- the section's notation
+    Auxiliary.lean             -- lemmas about the paper's objects that are not its results
+    Lemma34.lean               -- one file per result, or per small group of results
+  Main.lean                    -- the main theorem
+Challenge.lean                 -- the main results, in the vocabulary of Mathlib
+Solution.lean                  -- their proofs from the library (may double as the root module)
+```
+
+Keep general mathematics apart from the start, in a library of its own. A lemma that says
+nothing about the paper's objects (a calculus fact, a real inequality, a lemma about probability
+measures) goes to `Basic/`, beside `PaperName/` rather than inside it. File it
+by field, under the directory that Mathlib uses for that field (`Basic/Algebra/`,
+`Basic/AlgebraicGeometry/`, `Basic/Analysis/`, `Basic/Combinatorics/`, `Basic/Probability/`, …),
+in a file named for its topic, and give it the name and namespace that Mathlib would give it, so
+that it can later be contributed to Mathlib or another library. File it by its mathematics, not by
+what motivated it: a lemma about graphs goes to `Combinatorics/` whatever the paper's subject.
+Only objects that no field of Mathlib covers get a new field directory, named as Mathlib would name
+a new area (`Basic/NewArea/`), and
+`Basic/README.md` says where each part could go: a new area of Mathlib, proposed on the Lean Zulip
+first, or a library for that domain, as PhysLean is for physics.
+
+`Basic` is a `lean_lib` of its own (`references/lean-project.md`), and its files import only
+Mathlib and each other, never `External` or the paper's. A cited result that is general is proved
+there too; its `External/Topic/README.md` still gives the source and how the paper uses it, and
+points to the proof. The definitions that a
+Challenge statement uses are the exception: they stay in the paper's module of shared definitions
+(`references/palomar.md`, Section 2), even the general ones, because Comparator needs them in one
+module, and the lemmas about them stay with them until they are contributed.
+
+Keep the results the paper takes from other works apart too, in `External/`, beside `Basic/` and
+`PaperName/`. They are another paper's mathematics, not this one's: another formalization that
+cites the same source can reuse them, and the source's own authors can check them. `External` is a
+`lean_lib` of its own, and its files import only Mathlib, `Basic` and each other, never the
+paper's. Give each source or cited result its own directory `External/Topic/`, with modules
+`External.Topic.…` and declarations in the namespace `External.Topic`, each named after the
+source's numbering (`External.Author.lemma2`). State each result in the source's own terms, with the
+source's definitions (or Mathlib's, or `Basic`'s), not the paper's: the paper's library proves
+that the paper's objects are the source's and applies the result, and when the paper's object is
+one of the Challenge's definitions, that bridge is often `Iff.rfl` or a short lemma. Decide where
+each file belongs when you create it: moving files later rewrites imports, namespaces, the audit's
+list of modules and the documents' links, and conflicts with every branch that touches them.
