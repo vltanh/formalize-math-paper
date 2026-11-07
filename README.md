@@ -95,7 +95,7 @@ faster, but they are not required.
 | Path | Contents |
 | --- | --- |
 | `SKILL.md` | The workflow: principles, rules, phases and completion gates |
-| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, follow-up papers, the credits, Palomar packaging, cleanup, rigorous numerics |
+| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, follow-up papers, the credits, Palomar packaging, cleanup, rigorous numerics, packages of their own for famous results |
 | `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; replacing failing proofs with `sorry`; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; checking that each proof follows the route of the paper's proof; copying shared definitions into the Challenge; linking documentation to the code; checking Markdown tables; summarizing a Claude Code session for the run log |
 | `assets/` | Templates: the axiom, dependency and route audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
 

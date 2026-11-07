@@ -66,6 +66,11 @@ name = "Challenge"
 name = "Solution"
 ```
 
+A library beyond Mathlib that proves a cited result is required the same way, pinned to a full
+commit hash (`git = "…"`, `rev = "<commit>"`). A package of the project's own, split out for a famous
+result (`references/separate-packages.md`), is required by `path = "../package"` while it is
+developed and by its published commit before the project is pushed.
+
 Create `Challenge.lean` and `Solution.lean` with the project, as modules that are empty except for
 their imports, so that `lake build` works from the start. Phase 3 fills in the Challenge, and
 Phase 6 the Solution. `Solution.lean` can import the whole project and serve as the library's

@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "3.0.1"
+  version: "3.1.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -210,6 +210,9 @@ Lean / Mathlib:   the newest Lean release or release candidate (at least Palomar
                   project needs requires a specific Mathlib commit
 libraries:        the public libraries beyond Mathlib that prove results the paper cites
                   (references/palomar.md, Section 1, says which may appear in statements)
+packages:         famous results the project must build that deserve a package and repository of
+                  their own, if any (default: none; references/separate-packages.md), each with its
+                  name, visibility and when to publish, decided with the user
 out of reach:     cited results that no library supports and the project cannot build, and how
                   each is handled (Rules)
 compile allowed:  yes (the default whenever a toolchain exists)
@@ -266,7 +269,10 @@ Read the whole paper before you write any Lean. Keep a working checklist outside
 - each citation, marked as used in a proof or only for context. For each one used in a proof, note
   where its proof can come from: Mathlib, another public library, the project itself, or nowhere
   yet, because the mathematics it needs is missing from Lean. Survey the libraries before you
-  decide, and decide now how to handle the last kind (Rules), because it sets the scope;
+  decide, and decide now how to handle the last kind (Rules), because it sets the scope. If the
+  project must build a famous result that no library has, check it against the bar in
+  `references/separate-packages.md`, and propose a package of its own to the user only if it
+  clears it;
 - suspected typos, inconsistencies and gaps, with the TeX line, and the corrections that errata or
   later versions make (Phase 0). These become the audit's E-items, so record them as you go. Settle
   a correction that changes a statement before the baseline (Phase 3, Rules);
@@ -325,14 +331,15 @@ get a new field directory, named as Mathlib would name a new area (`Basic/Phylog
 `Basic/README.md` says where each part could go: a new area of Mathlib, proposed on the Lean Zulip
 first, or a library for that domain, as PhysLean is for physics.
 
-A general development large enough to stand on its own, such as a famous theorem that the paper
-needs and no library has (Brouwer's fixed-point theorem, the Pontryagin maximum principle), can go
-further: into a Lake package of its own, published as its own repository, which the project then
-requires at a pinned commit. Creating and publishing that repository needs the user's permission
-(Rules). Write it from the start as such a package: its own directory, `lakefile.toml`, README,
-licence, CI and axiom audit, importing only Mathlib and other such packages. Palomar restricts only
-the Challenge's imports, so the Solution may depend on it, even after it is registered as an entry
-of its own (`references/palomar.md`, Section 1).
+Rarely, a general development goes further, into a Lake package of its own, published as its own
+repository and required by the project at a pinned commit: a famous theorem that no library has and
+that others would import, such as Brouwer's fixed-point theorem or the Pontryagin maximum principle.
+The default is not to split, since every repository adds CI, Mathlib bumps and places for a reader
+to look. `references/separate-packages.md` gives the bar (famous by name, missing from the
+libraries, substantial, general, reusable), the rule of one package per area (`lean4-fixed-point`
+rather than `lean4-brouwer`), and how to build, publish and require one. The user decides, and
+creating the repository needs permission (Rules). Palomar restricts only the Challenge's imports, so
+the Solution may depend on such a package (`references/palomar.md`, Section 1).
 
 `Basic` is a `lean_lib` of its own (`references/lean-project.md`), and its files import only
 Mathlib and each other, never `External` or the paper's. A cited result that is general is proved
