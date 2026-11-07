@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "3.2.3"
+  version: "3.2.4"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 

@@ -42,9 +42,11 @@ existing one is the right home.
   Its library globs are `<Area>.*` (Lake's `.+` would skip the root file). To avoid rebuilding
   Mathlib, hard-link the project's `.lake/packages` and copy the Mathlib entries of its manifest.
 - It carries no provenance. It says what it proves and on which mathematical sources, not what it
-  was written for, who asked for it, where its files came from, or how it was made. Nothing in it
-  refers back to the project that motivated it (the paper, its objects or authors, the project's
-  repository or paths), in no README, docstring, comment, name or commit message.
+  was written for, who asked for it, or how it was made. Code split out of the project needs no
+  credit, and nothing in the package refers back to the project that motivated it (the paper, its
+  objects or authors, the project's repository or paths), in no README, docstring, comment, name
+  or commit message. Code taken from someone else's work is the exception: credit it, and keep its
+  licence notice (SKILL.md, Completion gates).
 
 ## 4. Depending on it
 
