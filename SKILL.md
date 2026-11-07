@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "3.0.0"
+  version: "3.0.1"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -325,6 +325,15 @@ get a new field directory, named as Mathlib would name a new area (`Basic/Phylog
 `Basic/README.md` says where each part could go: a new area of Mathlib, proposed on the Lean Zulip
 first, or a library for that domain, as PhysLean is for physics.
 
+A general development large enough to stand on its own, such as a famous theorem that the paper
+needs and no library has (Brouwer's fixed-point theorem, the Pontryagin maximum principle), can go
+further: into a Lake package of its own, published as its own repository, which the project then
+requires at a pinned commit. Creating and publishing that repository needs the user's permission
+(Rules). Write it from the start as such a package: its own directory, `lakefile.toml`, README,
+licence, CI and axiom audit, importing only Mathlib and other such packages. Palomar restricts only
+the Challenge's imports, so the Solution may depend on it, even after it is registered as an entry
+of its own (`references/palomar.md`, Section 1).
+
 `Basic` is a `lean_lib` of its own (`references/lean-project.md`), and its files import only
 Mathlib and each other, never `External` or the paper's. A cited result that is general is proved
 there too; its `External/Topic/README.md` still gives the source and how the paper uses it, and
@@ -362,9 +371,9 @@ For an existing draft, `scripts/autosorry.py` replaces each proof that fails to 
 every statement elaborate").
 
 Write `Challenge.lean`: the paper's main results, and only those, restated with `sorry` proofs in
-Mathlib's vocabulary. (Palomar also allows Tau Ceti's, but then marks the entry as having qualified
-statement dependencies; see `references/palomar.md`, Sections 1 and 2.) The Challenge is the
-statement of record. A reader can check it without reading the rest of the project, and Palomar
+Mathlib's vocabulary. (Palomar also allows Tau Ceti's and CSLib's, but then marks the entry as
+having qualified statement dependencies; see `references/palomar.md`, Sections 1 and 2.) The
+Challenge is the statement of record. A reader can check it without reading the rest of the project, and Palomar
 trusts it because it imports nothing beyond the libraries that Palomar allows. Intermediate results
 stay proved in the library, linked from the README. Plan the Challenge's size from the start:
 Palomar allows at most 1,000 lines and prefers 300, and the definitions the statements need count

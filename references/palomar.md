@@ -41,13 +41,17 @@ decides to.
   public GitHub repositories pinned to full commit hashes; the manifest provides the pins.
   Mathlib must be pinned to a commit on its `master` branch or to an exact release tag. Use the
   release tag for the toolchain, because of the next point.
-- Everything that the Challenge imports, directly or indirectly, must come from Lean core, Mathlib
-  or Tau Ceti, at pins on Palomar's allowlist, and from nothing else. Importing Tau Ceti is
-  allowed, but it marks the entry as having qualified statement dependencies. A project that
-  Palomar has registered cannot be imported. Dependencies used only by the Solution may be any
-  public Git repository pinned to a commit. A library that tracks Mathlib's `master`, as Tau Ceti
-  does, requires a specific Mathlib commit: use the commit its manifest pins, and compare the
-  resulting manifest with Verso's, as below.
+- Everything that the Challenge imports, directly or indirectly, must come from Lean core, Mathlib,
+  Tau Ceti or CSLib, at pins on Palomar's allowlist, and from nothing else. Importing Tau Ceti or
+  CSLib is allowed, but it marks the entry as having qualified statement dependencies. No other
+  statement dependency is accepted, not even a project that Palomar has already registered.
+- Only the Challenge's imports are restricted. Dependencies used only by the Solution may be any
+  public Git repository pinned to a commit, including a project that Palomar has registered
+  (PalomarSubmission's README: "arbitrary pinned dependencies remain available to the proof in
+  `Solution.lean`"). A general library split out of a formalization (SKILL.md, Phase 2) can
+  therefore be registered on its own and still be imported by the formalization's proofs.
+- A library that tracks Mathlib's `master`, as Tau Ceti does, requires a specific Mathlib commit:
+  use the commit its manifest pins, and compare the resulting manifest with Verso's, as below.
 - The Challenge must render. After verification, Palomar renders it with the release of Verso
   (Lean's documentation tool) for the project's toolchain, and merges Verso's Lake manifest into
   the project's. If both pin a package at different revisions, the render stops, and the
@@ -79,9 +83,9 @@ decides to.
 
 - `Challenge.lean` contains only the statements of record, which are the paper's main results,
   with `sorry` proofs, in Mathlib's vocabulary. It imports nothing from the project. Use Tau Ceti's
-  vocabulary only when restating its definitions would cost more than the qualified mark (Section
-  1). Restate project definitions inline with Mathlib constructions. For example, a probability
-  over a finite set becomes a count divided by a cardinality. Write the module docstring as a
+  or CSLib's vocabulary only when restating its definitions would cost more than the qualified
+  mark (Section 1). Restate project definitions inline with Mathlib constructions. For example, a
+  probability over a finite set becomes a count divided by a cardinality. Write the module docstring as a
   plain-language account of each theorem, with every convention it uses. State the results exactly
   as the paper does, including quantifiers and constants, except for obvious misprints, which are
   corrected and documented (SKILL.md, Rules).
