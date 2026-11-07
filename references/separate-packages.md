@@ -90,6 +90,12 @@ to it are actions that others can see (SKILL.md, Rules).
 - To avoid rebuilding Mathlib, hard-link the project's packages:
   `cp -al ../Project/.lake/packages .lake/` and copy the Mathlib entries of the project's
   `lake-manifest.json`; check that `lake build` builds only the package's own modules.
+- The package stands alone. Nothing in it refers back to the project that motivated it: not the
+  paper, its objects or its authors, not the project's repository or file paths, in no README,
+  docstring, comment, declaration name or commit message. It cites only its mathematical sources.
+  The dependency runs one way: the project's documents say where it uses the package, never the
+  reverse. Files moved from the project start the package's history afresh, with commit messages
+  that describe the mathematics.
 - A cited result keeps its place in the project: `External/` states it in its source's terms, says
   where it comes from, and proves it from the package (or the Solution uses the package's theorem
   directly). The route check and the audit treat it like any other cited result.
