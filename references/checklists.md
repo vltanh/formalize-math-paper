@@ -91,15 +91,17 @@ needs from user:  decisions or permissions
   and those of paper results recorded; misleading names fixed; the route check passes as before.
 - **Documentation:** `REPORT.md`, `README.md` and `CREDITS.md` written, links up to date, tables
   valid, findings checked against the source; every departure from the paper's proofs listed in the
-  report and the README's summary; `CREDITS.md` reports the procedure, the agents and models, the
+  report, which the README links to; `CREDITS.md` reports the procedure, the agents and models, the
   elapsed time and the effort from the run log, round by round, and the README's credits sum it up
-  in a few lines with a link; the README kept short; earlier formalizations cited; a draft's own
-  notes deleted; a conditional formalization says so in the README's first paragraph, in
-  `formalization.yaml` and in the report, which lists what it assumes; the report's literature
-  section written from a dated search for the work before, alongside and after the paper (or,
-  without network access, saying that no search could be made), with every source linked and its
-  summary and date checked against it; its "What's next" section with every simpler argument
-  recorded during the work checked and either listed or set aside as wrong.
+  in a few lines with a link; the README rewritten for the current state, about 100–150 lines, with
+  no paragraph over four lines (`audit-report.md`, Section 3), and the repository description in
+  step with it; earlier formalizations cited; a draft's own notes deleted; a conditional
+  formalization says so in the README's first paragraph, in `formalization.yaml` and in the report,
+  which lists what it assumes; the report's literature section written from a dated search for the
+  work before, alongside and after the paper (or, without network access, saying that no search
+  could be made), with every source linked and its summary and date checked against it; its "What's
+  next" section with every simpler argument recorded during the work checked and either listed or
+  set aside as wrong.
 - **Follow-up papers:** `NEXT.md` written (`references/next-papers.md`), with each candidate
   above the bar, explored to the step where the paper's method stops, its claims marked as
   proved, checked or conjectured, and checked by another reader for novelty and substance, or

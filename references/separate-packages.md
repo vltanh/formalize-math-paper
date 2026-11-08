@@ -41,11 +41,12 @@ Others will import the package without knowing the project, so it reads as a lib
 - It is a Lake package with the project's `lean-toolchain` and Mathlib release, the module system,
   Mathlib's style, its own README (what it proves, with the exact statements; the method and its
   references; how to depend on it; credits: its maintainers, and the AI systems that wrote it, as
-  the Rules require), licence, CI and axiom audit. The README states only what is true of the
-  package: where a fact is not settled yet (a commit hash, the exact form of a statement, a file
-  name), it leaves a marked placeholder rather than a plausible guess. While proofs are still open,
-  the audit may list the `sorry`s instead of failing on them; switch that off before publishing. Its
-  library globs are `<Area>.*`, since Lake's `.+` would skip the root file.
+  the Rules require), licence, CI and axiom audit. The README is short, as the project's is
+  (`audit-report.md`, Section 3); long explanations go in a `docs/` file it links. It states only
+  what is true of the package: where a fact is not settled yet (a commit hash, the exact form of a
+  statement, a file name), it leaves a marked placeholder rather than a plausible guess. While
+  proofs are still open, the audit may list the `sorry`s instead of failing on them; switch that off
+  before publishing. Its library globs are `<Area>.*`, since Lake's `.+` would skip the root file.
 - It carries no provenance. It says what it proves and on which mathematical sources, not what it
   was written for, who asked for it, or how it was made. Code split out of the project needs no
   credit, and no README, docstring, comment, name or commit message of the package mentions the

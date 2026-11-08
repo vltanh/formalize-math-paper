@@ -51,12 +51,12 @@ settles it); and every suggestion against the literature and against the audit t
 A suggestion that turns out to be known is not a suggestion: it moves to Section 10, under
 "Before the paper", "Concurrent work" or "Since the paper" as its source's date decides.
 
-Later work that corrects the paper is a finding of the audit: an erratum, a later version that
-fixes a slip, a counterexample to one of its results, or a gap that the audit missed. Add it to the
+Later work that corrects the paper is a finding of the audit: an erratum, a later version that fixes
+a slip, a counterexample to one of its results, or a gap that the audit missed. Add it to the
 E-items, or update the E-item it concerns, citing the source, and carry it into the report's
-Summary and the README's audit summary. Tell the user at once. If it bears on a result that the
-project proved or assumed, also check the Lean statement, and any hypothesis it assumes, against
-the paper and the source again.
+Summary, and into the README's table of findings if it is among the main ones. Tell the user at
+once. If it bears on a result that the project proved or assumed, also check the Lean statement, and
+any hypothesis it assumes, against the paper and the source again.
 
 ## 2. `REPORT.md` structure
 
@@ -197,41 +197,65 @@ holds that other formalizations citing the same sources could reuse.>
 
 ## 3. `README.md` structure
 
-The README is the project's front page. Keep it short: bullets rather than long paragraphs, and the
-details left to `REPORT.md` and `CREDITS.md`.
+The README is the project's front page. A mathematician or a Lean user reads it in a minute to
+decide whether to trust the work and what it covers. It describes the current state; the history
+of the work belongs in `CREDITS.md` and the commit log. Rewrite it whole at the end of each round
+instead of adding a paragraph per round: appended paragraphs are how a README turns into a wall of
+text.
 
-1. Title, CI badge, and one paragraph on the paper and its main result, for a mathematician. If
-   the formalization is conditional, this paragraph says so and names what it assumes.
-2. What is proved: every result the paper proves; the cited results and where they are proved; the
-   assumed results, if any, with a link to the report's table; the build, `sorry` and `axiom`
-   status; the audit script and how to run it.
-3. The main results: each Challenge theorem, linked, with a statement in plain language. For a
-   well-known problem, compare the Challenge's formulation with the standard one.
-4. Palomar (if packaged): the files, how to run `lake comparator`, the preflight workflow.
-5. Audit summary: short bullets, using the report's E-numbers. Lead with errors, then gaps,
-   missing and redundant hypotheses, and the use of cited results. Then the proofs: that they
-   follow the paper's arguments, and every departure, with its reason.
-6. Credits, in two or three bullets: who and what wrote the code, at whose request, and by which
-   procedure, with a link to this skill's repository (for example: "first written by [AI system]
-   as an uncompiled draft; [AI system] made it compile, checked the statements and wrote the
-   audit"); whether a person has reviewed the proofs; and when it was made, with how many
-   sub-agents. Then a link to `CREDITS.md` for the rest (its structure is in `credits.md`). No
-   links to old drafts.
-7. Related work: a few bullets from the report's Section 10, with a link to it: the history of the
-   problem, the closest earlier, concurrent and later work, and the formalizations of the paper or
-   its results, with whether this work consulted them. If later work corrects the paper, start
-   with that.
-8. What's next: two or three sentences from the report's Section 11, with a link to it.
-9. Building: `lake exe cache get`, `lake build`, the audit, the toolchain, how to regenerate
-   generated files, and how to update the documentation's links.
-10. Layout: the three libraries (`Basic`, `External` and the paper's), a table of every module
-    and the paper content it holds, and the directories of `External/`.
-11. GitHub configuration: what each workflow does and any settings it needs.
-12. License.
+Aim for 100 to 150 lines. Keep every paragraph to four lines or fewer and every bullet to three.
+When a point needs more, put it in a table, or in `REPORT.md` with a link.
+
+1. Title, CI badge, and two short paragraphs: the paper and its question, for a mathematician;
+   then what is formalized, and whether anything is conditional (name the assumption) or open.
+2. Status: a table with one row per chapter or section of the paper, saying proved, proved in
+   corrected form, conditional on a named hypothesis, or not formalized.
+3. Main results: a table with the paper's number, the Lean name and a one-line statement in plain
+   language. Mark the Challenge theorems. For a well-known problem, compare the Challenge's
+   formulation with the standard one in a sentence or two.
+4. If the formalization is conditional, one short paragraph: what is assumed, why it is not an
+   axiom, and what will discharge it. Say it there and in the status table, not in every section.
+5. What the audit found: a table of the five to ten findings a reader most needs, one line each
+   with its E-number (errors and false statements first, then gaps that change what the paper
+   proves, then missing hypotheses), followed by the total and a link to the report. Then one
+   sentence on the proofs: that they follow the paper's, with a link to the report's table of
+   departures. The full lists stay in the report.
+6. Trust, in three to five bullets: the build, `sorry` and `axiom` status; the audit script; the
+   route check; who reviewed the statements and the proofs, and whether any person did.
+7. Dependencies (packages and libraries beyond Mathlib, with what each provides); Palomar, in two
+   or three lines (the files, how to run `lake comparator`); Building (the commands, the
+   toolchain); Layout, with one row per top-level directory (module-by-module tables belong in
+   `Basic/README.md`, `External/README.md` or the report).
+8. Related work and credits, two or three bullets each, with links to the report's Section 10 and
+   to `CREDITS.md`. The credits say who and what wrote the code, at whose request, by which
+   procedure (with a link to this skill's repository), whether a person has reviewed the proofs,
+   and when. No links to old drafts. Then the license.
+
+When the repository is published, keep its GitHub description in step with the README: update it
+(`gh repo edit --description`) in the same step as the push that changes what the repository
+proves.
 
 ## 4. Style and mechanics
 
 - Write for mathematicians. Use the paper's notation in prose, and Lean names in code spans.
+- Write plainly. Each sentence should add a fact the reader does not have yet; say each thing once.
+  Avoid the habits of machine-written prose that creep into audit documents and that readers
+  notice:
+  - staging instead of stating: a contrast with a claim nobody made ("not just X, but Y"), a
+    closing sentence that repeats the paragraph, a run-up such as "Here is what you need to know";
+  - inflation: "crucial", "robust", "comprehensive", "pivotal", "a testament to"; a claim of
+    priority only where the report's literature search supports it;
+  - formatting by rule: bold on every bullet's label, title-case headings, emojis, a horizontal
+    rule between sections; keep bold for the one thing a reader must not miss, such as
+    "conditional";
+  - dashes as connectors between clauses: use a period, comma, colon or parentheses (dashes in
+    ranges such as Chapters 2–8 are fine);
+  - "serves as", "features", "boasts" where "is" or "has" will do; stacked qualifiers;
+  - writing about the document ("This section summarizes", "the table below shows") or about how it
+    was made, which belongs in `CREDITS.md`.
+- Before publishing, read the README as a newcomer would: check its length (`wc -l`) and its
+  longest paragraph, and that the first screen says what is proved, what is conditional and what
+  is not formalized.
 - The report describes only the paper and the current formalization. Leave out the history of the
   repair (which draft lemmas were false, what was renamed), and do not link to old drafts or pull
   requests. That history belongs in commit messages.

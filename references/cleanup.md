@@ -52,7 +52,7 @@ proofs").
    - Run `python3 <skill-dir>/scripts/stmt_diff.py <commit before the cleanup>`.
    - For each paper result that lost a hypothesis, the Lean statement is now more general than
      the paper's. Record the result, the hypothesis and why it is not needed. The audit lists
-     them in the report's table of redundant hypotheses and in the README's summary.
+     them in the report's table of redundant hypotheses.
    - A definition that lost an unused parameter changes how readers see it. If it is a notion of
      the paper, mention the change under "How the formalization reads the paper".
    - The Challenge statements keep the paper's hypotheses. An assumed result (SKILL.md, Rules)

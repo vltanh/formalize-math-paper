@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "3.2.5"
+  version: "3.3.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -458,13 +458,15 @@ one who recorded it (a separate agent if available). In practice this overturns 
 inventory's own claims, and can show that a statement was changed without need. When it does,
 restore the paper's statement, rerun the Phase 6 checks, and update the Challenge and the report to
 match. A conditional formalization says so in the README's first paragraph, and the report lists
-every assumed result. Once `README.md` and `REPORT.md` exist, delete a draft's own notes (Phase 0).
+every assumed result. Rewrite the README whole at the end of each round, short and in tables, and
+write every document plainly (`references/audit-report.md`, Sections 3 and 4). Once `README.md` and
+`REPORT.md` exist, delete a draft's own notes (Phase 0).
 Users care about three things:
 
 - The report analyzes the paper and the current formalization. It is not a history of the repair,
   and it does not point to old drafts or pull requests.
-- The report lists every departure from the paper's proofs, with its reason, and so does the
-  README's summary. If every proof follows the paper's, both say so.
+- The report lists every departure from the paper's proofs, with its reason; the README says in
+  one sentence whether the proofs follow the paper's and links to that list.
 - Every claim about the paper is checked against the TeX source, and every arithmetic claim is
   recomputed. A wrong error report costs more trust than a missed typo.
 
