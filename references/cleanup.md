@@ -56,7 +56,7 @@ proofs").
    - A definition that lost an unused parameter changes how readers see it. If it is a notion of
      the paper, mention the change under "How the formalization reads the paper".
    - The Challenge statements keep the paper's hypotheses. An assumed result (SKILL.md, Rules)
-     that no proof uses is not one of them: remove it everywhere, including the Challenge.
+     that no proof uses is not one of the paper's: remove it everywhere, including the Challenge.
    - The commit message lists the removals.
 
 ## Simplifying proofs and merging duplicates
@@ -89,19 +89,13 @@ proofs drift away from the paper while no statement changes:
 - Move general lemmas that grew inside the paper's files to `Basic/` (SKILL.md, Phase 2), in a
   round of their own: keep each statement, give the lemma the name and namespace that Mathlib
   would give it, update its callers, and rerun the route check. Move cited results that grew
-  inside the paper's files, or in an older layout's `PaperName/External/`, to the library
-  `External` the same way: keep each statement, restate it in its source's terms if it uses the
-  paper's definitions, prove the bridge in the paper's library, and update the audit's lists,
-  `isLibraryModule` and the documents' links.
-- Delete the draft's notes and checklists once `README.md` and `REPORT.md` replace them, in
-  Phase 8. They remain in the history. Your own working notes (the inventory, the run log) are
-  untracked and stay until the end.
+  inside the paper's library to the library `External` the same way: keep each statement, restate
+  it in its source's terms if it uses the paper's definitions, prove the bridge in the paper's
+  library, and update the audit's lists, `isLibraryModule` and the documents' links.
+- A draft's own notes are deleted in Phase 8 (SKILL.md, Phase 0). Your own working notes (the
+  inventory, the run log) are untracked and stay until the end.
 - After moving or renaming modules, delete their old build outputs under `.lake/build`: stale
   `.ilean` files make `scripts/linkify_docs.py` link to the old paths.
-- Keep the generator of every generated Lean file in the repository (for example under
-  `scripts/`), check that it reproduces the file byte for byte, and say in the README how to run
-  it. Name template fragments that are not modules `*.lean.in`: Palomar rejects every `.lean` file
-  that is not a module, used or not.
-- Add `__pycache__/` to `.gitignore` when the repository contains Python scripts.
+- A generated Lean file keeps its generator in the repository (`numerics.md`, Section 4).
 - Dead code (helper lemmas nothing uses) can stay unless the user asks for a minimal
   repository. If you remove it, do so in its own commit.

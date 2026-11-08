@@ -67,9 +67,9 @@ inequality checked by `norm_num`), and:
 - commit the generator with the project, and check that it reproduces the committed Lean file
   byte for byte;
 - say in the README how to run it;
-- keep each generated file under Palomar's limit of 10,000 lines, split into modules if needed;
-- name the template fragments that the generator assembles `*.lean.in`, because every `.lean` file
-  must be a module.
+- keep each generated file within Palomar's limit on file length, split into modules if needed;
+- name the template fragments that the generator assembles `*.lean.in`, because Palomar rejects
+  every `.lean` file that is not a module, used or not (`palomar.md`, Section 1).
 
 ## 5. Integrals in closed form
 
@@ -77,8 +77,8 @@ When an area or another integral has an elementary antiderivative, get it from `
 `HasDerivAt F (f t) t` with the `HasDerivAt` combinators followed by `ring`, apply
 `intervalIntegral.integral_eq_sub_of_hasDerivAt`, and evaluate `F b - F a` by interval
 arithmetic. If a function is given piecewise, integrate it piece by piece. When many pieces share
-one form (for example, polynomials times `cos t` and `sin t`, or times exponentials), one structure
-for that form, with a lemma that computes its integral, covers them all at once.
+one form (for example, polynomials times a fixed trigonometric or exponential factor), one
+structure for that form, with a lemma that computes its integral, covers them all at once.
 
 ## 6. Existence and uniqueness of a solution
 
@@ -106,16 +106,15 @@ of an explicit construction that a paper takes from a numerical solution):
 Proving a family of inequalities `F(s, τ) ≥ 0` over a rectangle by brute force is expensive, and it
 fails outright where `F` vanishes. Reduce the dimension first:
 
-- **Monotonicity in one variable.** If `∂F/∂τ` has a sign, `F` is monotone in `τ`. If it is first
-  `≥ 0` and then `≤ 0` (for example, because it has the sign of a function that decreases in `τ`,
-  such as `h(s - τ) - g(τ)` with `g` and `h` increasing), `F` has no interior minimum in `τ`. In
-  both cases `F(s, τ) ≥ min(F(s, a), F(s, b))`, and only the edges remain: inequalities in one
-  variable. A change of sign from `-` to `+` gives an interior minimum, which needs its own
-  argument.
-- **Integral representations.** Where possible, write the quantity as an integral whose integrand
-  has a known sign, as with `F(s) = ∫ ρ(r) sin(r - s) dr` with `ρ ≥ 0` over a range where
-  `sin(r - s) ≥ 0`. This proves its sign on whole intervals at once.
-- **The structure of the problem.** Convexity, or a covering of the parameter region by finitely
+- Monotonicity in one variable. If `∂F/∂τ` has a sign, `F` is monotone in `τ`. If it is first
+  `≥ 0` and then `≤ 0` (for example, because it has the sign of a function that decreases in
+  `τ`), `F` has no interior minimum in `τ`. In both cases `F(s, τ) ≥ min(F(s, a), F(s, b))`, and
+  only the edges remain: inequalities in one variable. A change of sign from `-` to `+` gives an
+  interior minimum, which needs its own argument.
+- Integral representations. Where possible, write the quantity as an integral (or a sum) whose
+  integrand has a known sign, such as a nonnegative weight against a kernel that is nonnegative on
+  the range in question. This proves its sign on whole intervals at once.
+- The structure of the problem. Convexity, or a covering of the parameter region by finitely
   many pieces with one witness on each, often turns a claim in two parameters into claims in
   one parameter.
 
@@ -126,11 +125,11 @@ as a short mathematical plan before writing the Lean.
 
 An inequality `f ≥ 0` that is tight somewhere cannot be proved by enclosures near that point.
 
-- **A simple zero at an endpoint** (`f(a) = 0 < f'(a)`): bound `f(x)/(x - a)` instead, after
+- A simple zero at an endpoint (`f(a) = 0 < f'(a)`): bound `f(x)/(x - a)` instead, after
   dividing out the factor symbolically, or show `f' > 0` on `[a, a + δ]` and use enclosures
   beyond.
-- **A tangency** (`f(c) = f'(c) = 0` inside the interval): find its cause, which is usually an
+- A tangency (`f(c) = f'(c) = 0` inside the interval): find its cause, which is usually an
   identity of the construction. Prove that identity exactly, and use a second-order argument
   (convexity, or the sign of `f''`) near `c`.
-- **A margin that is tiny but positive:** prove it at its own scale, with a reduction that
+- A margin that is tiny but positive: prove it at its own scale, with a reduction that
   isolates the small quantity. Do not try to refine a global grid until it passes.

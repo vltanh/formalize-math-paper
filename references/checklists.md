@@ -51,7 +51,6 @@ A passing build proves only what the statements say. Ask of the formalization:
 
 When you report progress, use this form, and fill in only what applies:
 
-
 ```text
 repository / branch / head:
 phase:
@@ -70,46 +69,48 @@ needs from user:  decisions or permissions
 
 ## 4. Completion gates
 
-- **Statements:** every numbered result stated; Challenge written, with the main results only and
-  within Palomar's size limits; independent review of the statements against the paper done;
+- Statements: every numbered result stated; Challenge written, with the main results only and
+  within Palomar's size limits; the statements checked against the paper independently;
   representation bridges proved; baseline committed.
-- **Stage 1:** every internal result proved by the paper's argument; cited results isolated in
-  the library `External`, with citations, stated in their sources' terms, and importing nothing
-  from the paper's library.
-- **Stage 2:** every cited result proved or derived from a library, or, when out of reach, a
-  declared hypothesis named after its source; zero project axioms.
-- **Proof routes:** `docs/paper_routes.tsv` committed and checked against the paper; the route
-  check passes on the final commit, and every difference it records has its reason; every
-  departure from the paper's proofs is necessary (Rules) and reported in its docstring, in the
-  report's table of departures, in `formalization.yaml` and to the user; someone other than the
-  provers compared the formal proofs with the paper's.
-- **Verification:** clean build; `scripts/Audit.lean` passes for every declaration; `Solution.lean`
+- Stage 1: every internal result proved by the paper's argument; cited results isolated in the
+  library `External`, with citations, stated in their sources' terms, and importing nothing from
+  the paper's library.
+- Stage 2: every cited result proved or derived from a library, or, when out of reach, a declared
+  hypothesis named after its source; zero project axioms.
+- Proof routes: `docs/paper_routes.tsv` committed and checked against the paper; the route check
+  passes on the final commit, and every difference it records has its reason; every departure
+  from the paper's proofs is necessary (Rules) and reported in its docstring, in the report's
+  table of departures, in `formalization.yaml` and to the user; the formal proofs compared with
+  the paper's independently of their provers.
+- Verification: clean build; `scripts/Audit.lean` passes for every declaration; `Solution.lean`
   and `comparator.json` written, and Comparator accepts the solution; no assumption hidden in a
   parameter; every structure or class of hypotheses has an instance, or the reason it cannot have
   one yet is recorded.
-- **Cleanup:** the build prints only the Challenge's `sorry` warnings; unused hypotheses removed,
-  and those of paper results recorded; misleading names fixed; the route check passes as before.
-- **Documentation:** `REPORT.md`, `README.md` and `CREDITS.md` written, links up to date, tables
-  valid, findings checked against the source; every departure from the paper's proofs listed in the
-  report, which the README links to; `CREDITS.md` reports the procedure, the agents and models, the
-  elapsed time and the effort from the run log, round by round, and the README's credits sum it up
-  in a few lines with a link; the README rewritten for the current state, about 100–150 lines, with
-  no paragraph over four lines (`audit-report.md`, Section 3), and the repository description in
-  step with it; earlier formalizations cited; a draft's own notes deleted; a conditional
-  formalization says so in the README's first paragraph, in `formalization.yaml` and in the report,
-  which lists what it assumes; the report's literature section written from a dated search for the
-  work before, alongside and after the paper (or, without network access, saying that no search
-  could be made), with every source linked and its summary and date checked against it; its "What's
-  next" section with every simpler argument recorded during the work checked and either listed or
-  set aside as wrong.
-- **Follow-up papers:** `NEXT.md` written (`references/next-papers.md`), with each candidate
-  above the bar, explored to the step where the paper's method stops, its claims marked as
-  proved, checked or conjectured, and checked by another reader for novelty and substance, or
-  with the statement that none meets the bar and what came closest; `NEXT.md` and `notes/next/`
-  ignored by git and absent from every commit; the user told where they are.
-- **Packaging (unless declined):** every file that adapts code from another project keeps that
-  project's notice; `formalization.yaml` written; Palomar's metadata and source
-  checks pass on a clean clone; the dependencies shared with Verso pinned at Verso's revisions for
-  the toolchain; with the user's permission for each step, the repository published, CI passing,
-  and the preflight reporting `status: pass` on the exact commit to submit; the user decides about
+- Cleanup: the build prints only the Challenge's `sorry` warnings; unused hypotheses removed, and
+  those of paper results recorded; misleading names fixed; the route check passes as before.
+- Documentation:
+  - `REPORT.md` written, its findings checked against the source, and every departure from the
+    paper's proofs listed in it; a conditional formalization says so in the README's first
+    paragraph, in `formalization.yaml` and in the report, which lists what it assumes;
+  - the report's literature section written from a dated search for the work before, alongside
+    and after the paper (or, without network access, saying that no search could be made), with
+    every source linked and its summary and date checked against it, and earlier formalizations
+    cited; its "What's next" section with every simpler argument recorded during the work checked
+    and either listed or set aside as wrong;
+  - `README.md` rewritten for the current state, short, with status, results and findings in
+    tables and a link to the report's departures (`audit-report.md`, Section 3); the repository
+    description in step with it;
+  - `CREDITS.md` reports the procedure, the agents and models, the elapsed time and the effort
+    from the run log, round by round, and the README's credits sum it up with a link;
+  - links up to date, tables valid; a draft's own notes deleted.
+- Follow-up papers: `NEXT.md` written (`references/next-papers.md`), with each candidate above the
+  bar, explored to the step where the paper's method stops, its claims marked as proved, checked
+  or conjectured, and checked independently for novelty and substance, or with the statement that
+  none meets the bar and what came closest; `NEXT.md` and `notes/next/` ignored by git and absent
+  from every commit; the user told where they are.
+- Packaging (unless declined): every file that adapts code from another project keeps that
+  project's notice; `formalization.yaml` written; Palomar's metadata and source checks pass on a
+  clean clone; the dependencies shared with Verso pinned at Verso's revisions for the toolchain;
+  with the user's permission for each step, the repository published, CI passing, and the
+  preflight reporting `status: pass` on the exact commit to submit; the user decides about
   submission and registration.

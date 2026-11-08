@@ -46,7 +46,7 @@ maxSynthPendingDepth = 3      # Mathlib's own setting
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "v4.35.0-rc3"           # for example: Mathlib's release tag for lean-toolchain
+rev = "<release tag>"         # Mathlib's release tag for the version in lean-toolchain
 
 [[lean_lib]]
 name = "Basic"
@@ -81,7 +81,7 @@ every module in the build.
 ## 3. The module system
 
 Palomar requires every `.lean` file, scripts included, to begin with `module` (only comments may
-come before it) and to have at most 10,000 lines. A module file looks like this:
+come before it; `palomar.md`, Section 1, has the other limits). A module file looks like this:
 
 ```lean
 module
@@ -136,9 +136,6 @@ end PaperName
   `lake env lean -DautoImplicit=false -DmaxSynthPendingDepth=3 PaperName/Section/File.lean`.
   `lake env lean` does not apply the lakefile's `leanOptions`, so pass the same options with
   `-D`. `scripts/check_file.py` does this, reading the options from `lakefile.toml`.
-- Run one build at a time per checkout. Two `lake build`s at the same time, or a build next to an
-  editor's `lake setup-file`, can delete each other's outputs ("object file … does not exist").
-  Rerun the build when that happens.
 - Run long builds in the background. A clean build of a large project can take tens of minutes,
   even with Mathlib's cache.
 - Before you start repair agents, build once. Then every module's `.olean` exists, with `sorry`s,
@@ -153,13 +150,13 @@ end PaperName
 Drafts written without a compiler fail in predictable ways. Fix the cause, never the symptom. In
 particular, do not change a statement to make an error go away.
 
-- **Unknown or renamed constants.** Grep `.lake/packages/mathlib/Mathlib` for the concept. A
+- Unknown or renamed constants. Grep `.lake/packages/mathlib/Mathlib` for the concept. A
   deprecation warning names the replacement.
-- **Notation that does not exist.** Drafts invent notation, such as big unions over a `Finset`
+- Notation that does not exist. Drafts invent notation, such as big unions over a `Finset`
   (use `Finset.biUnion`). Check that the notation really parses.
-- **Dependent versus non-dependent functions.** `Finset.univ.pi` produces dependent functions;
+- Dependent versus non-dependent functions. `Finset.univ.pi` produces dependent functions;
   `Fintype.piFinset` is usually what is meant.
-- **Instance problems.**
+- Instance problems:
   - Missing instances such as `NeZero n`, `Fintype α` or `DecidableEq α`: add the typeclass
     hypothesis, or a `letI`/`haveI` that derives it from an existing hypothesis.
   - Filters over `Prop`-valued predicates need `DecidablePred`. Use `classical` in proofs, and
@@ -167,12 +164,12 @@ particular, do not change a statement to make an error go away.
     the same one.
   - When two instances clash, state helper lemmas so they do not depend on which instance is
     used, or close the goal with `convert` or `congr`.
-- **Implicit arguments that cannot be inferred.** Pass them by name (`(m := m)`), or make them
+- Implicit arguments that cannot be inferred. Pass them by name (`(m := m)`), or make them
   explicit.
-- **Indices with side conditions.** Definitions such as "the block containing x" may need a
+- Indices with side conditions. Definitions such as "the block containing x" may need a
   hypothesis like `0 < m`. An auto-param binder `(h : 0 < m := by assumption)` keeps call sites
   clean. Arithmetic on `Fin` usually needs `have := i.isLt` before `omega`.
-- **Section variables.** A `variable` enters a theorem only when the statement mentions it or an
+- Section variables. A `variable` enters a theorem only when the statement mentions it or an
   `include` names it.
   - Typeclass `variable`s are included automatically when the statement mentions their type. An
     included variable that the theorem does not need triggers a linter warning. Fix it with
@@ -185,11 +182,11 @@ particular, do not change a statement to make an error go away.
     statement has the hypotheses its proof uses. Add `include h` after the `variable` (or
     `include h in` before a single theorem): this restores the statement the draft meant, so it
     corrects a slip. Record it, with a counterexample to the statement as compiled.
-- **Reserved words.** Identifiers such as `given`, `at` or `from` clash with keywords, `λ` is
+- Reserved words. Identifiers such as `given`, `at` or `from` clash with keywords, `λ` is
   `fun`, and characters such as `₋` and `₊` cannot appear in identifiers. Rename them.
-- **Order of declarations.** A draft may use a definition before declaring it. Reorder, or move
+- Order of declarations. A draft may use a definition before declaring it. Reorder, or move
   the definition to the module that needs it first.
-- **Heavy proofs.** Before raising `maxHeartbeats`, split the proof or give `simp` or `ring` a
+- Heavy proofs. Before raising `maxHeartbeats`, split the proof or give `simp` or `ring` a
   smaller goal. If a raise cannot be avoided, make it local to that one declaration.
 
 ## 6. Layout of the project
@@ -216,26 +213,25 @@ Challenge.lean                 -- the main results, in the vocabulary of Mathlib
 Solution.lean                  -- their proofs from the library (may double as the root module)
 ```
 
-Keep general mathematics apart from the start, in a library of its own. A lemma that says
-nothing about the paper's objects (a calculus fact, a real inequality, a lemma about probability
-measures) goes to `Basic/`, beside `PaperName/` rather than inside it. File it
-by field, under the directory that Mathlib uses for that field (`Basic/Algebra/`,
-`Basic/AlgebraicGeometry/`, `Basic/Analysis/`, `Basic/Combinatorics/`, `Basic/Probability/`, …),
-in a file named for its topic, and give it the name and namespace that Mathlib would give it, so
-that it can later be contributed to Mathlib or another library. File it by its mathematics, not by
-what motivated it: a lemma about graphs goes to `Combinatorics/` whatever the paper's subject.
-Only objects that no field of Mathlib covers get a new field directory, named as Mathlib would name
-a new area (`Basic/NewArea/`), and
+Keep general mathematics apart from the start, in a library of its own. A lemma that says nothing
+about the paper's objects (a calculus fact, a real inequality, a lemma about probability measures)
+goes to `Basic/`, beside `PaperName/` rather than inside it. File it by field, under the directory
+that Mathlib uses for that field (`Basic/Algebra/`, `Basic/AlgebraicGeometry/`, `Basic/Analysis/`,
+`Basic/Combinatorics/`, `Basic/Probability/`, …), in a file named for its topic, and give it the
+name and namespace that Mathlib would give it, so that it can later be contributed to Mathlib or
+another library. File it by its mathematics, not by what motivated it: a lemma about graphs goes to
+`Combinatorics/` whatever the paper's subject. Only objects that no field of Mathlib covers get a
+new field directory, named as Mathlib would name a new area (`Basic/NewArea/`), and
 `Basic/README.md` says where each part could go: a new area of Mathlib, proposed on the Lean Zulip
 first, or a library for that domain, as PhysLean is for physics.
 
-`Basic` is a `lean_lib` of its own (`references/lean-project.md`), and its files import only
-Mathlib and each other, never `External` or the paper's. A cited result that is general is proved
-there too; its `External/Topic/README.md` still gives the source and how the paper uses it, and
-points to the proof. The definitions that a
-Challenge statement uses are the exception: they stay in the paper's module of shared definitions
-(`references/palomar.md`, Section 2), even the general ones, because Comparator needs them in one
-module, and the lemmas about them stay with them until they are contributed.
+`Basic` is a `lean_lib` of its own (Section 2), and its files import only Mathlib and each other,
+never `External` or the paper's. A cited result that is general is proved there too; its
+`External/Topic/README.md` still gives the source and how the paper uses it, and points to the
+proof. The definitions that a Challenge statement uses are the exception: they stay in the paper's
+module of shared definitions (`references/palomar.md`, Section 2), even the general ones, because
+Comparator needs them in one module, and the lemmas about them stay with them until they are
+contributed.
 
 Keep the results the paper takes from other works apart too, in `External/`, beside `Basic/` and
 `PaperName/`. They are another paper's mathematics, not this one's: another formalization that
@@ -247,5 +243,4 @@ source's numbering (`External.Author.lemma2`). State each result in the source's
 source's definitions (or Mathlib's, or `Basic`'s), not the paper's: the paper's library proves
 that the paper's objects are the source's and applies the result, and when the paper's object is
 one of the Challenge's definitions, that bridge is often `Iff.rfl` or a short lemma. Decide where
-each file belongs when you create it: moving files later rewrites imports, namespaces, the audit's
-list of modules and the documents' links, and conflicts with every branch that touches them.
+each file belongs when you create it (SKILL.md, Phase 2).

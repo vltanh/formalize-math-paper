@@ -76,7 +76,7 @@ decides to.
 - Code adapted from another project keeps that project's notice: every file that contains adapted
   code says so in its header (the source, its commit and its license), and the license text stays
   in the repository. Check this by comparing the files with the source, not from memory: a file
-  that copied a few dozen lines of a proof is adapted code too.
+  that copied part of one proof is adapted code too.
 - No build outputs, no Git submodules, no Git LFS.
 
 ## 2. Challenge and Solution
@@ -112,10 +112,9 @@ decides to.
   definitions and the Challenge's vocabulary. `Solution.lean` can import the whole project and
   serve as its entry point.
 - Put both in the lakefile: `Challenge` and `Solution` as `lean_lib`s and default targets.
-- When the Challenge defines an object a reader cannot recognize at a glance, include a
-  compared theorem that identifies it with the literature, such as its known numerical value. The
-  editorial review checks that every definition has its ordinary meaning, and such a theorem is the
-  evidence.
+- The editorial review checks that every definition of the Challenge has its ordinary meaning.
+  The compared theorem that ties an unfamiliar definition to something known (SKILL.md, Phase 3)
+  is the evidence.
 
 ## 3. `comparator.json`
 
@@ -133,7 +132,7 @@ decides to.
 ## 4. `formalization.yaml`
 
 Start from the current template, `tests/fixtures/palomar-template-formalization.yaml` in
-PalomarSubmission (format v0.4), and replace every `TEMPLATE` value. The rules that matter most:
+PalomarSubmission, and replace every `TEMPLATE` value. The rules that matter most:
 
 - `project.authors` and `project.responsible_maintainers` are people only: the user, or whoever
   they name. Credit AI systems in `automation.methods`, one entry per system, with `method:
@@ -217,9 +216,8 @@ the user wants that documentation.
 
 ## 7. Publishing
 
-Each of these steps needs the user's explicit permission: creating the GitHub repository, pushing,
-making it public, running the preflight, submitting, registering. Permission for one is not
-permission for another.
+Creating the GitHub repository, pushing, making it public, running the preflight, submitting and
+registering each need the user's explicit permission (SKILL.md, Rules).
 
 - After the repository is created, add the CI badge to the top of the README, before the commit
   that will go through the preflight and be submitted.
@@ -246,7 +244,7 @@ run the editorial review (Section 1).
 4. Download the report, whose artifact is named after the `request_id`, and read it:
 
    ```sh
-   gh run download <run-id> -n mechanical-report-preflight001 -D <scratch dir>/preflight
+   gh run download <run-id> -n mechanical-report-<request_id> -D <scratch dir>/preflight
    python3 -c "import json, sys; d = json.load(open(sys.argv[1])); print(d['status'], d['errors'], d['warnings'])" <scratch dir>/preflight/mechanical-report.json
    ```
 
@@ -266,8 +264,8 @@ Submissions go to https://submit.palomar-registry.org only. Before submitting, s
 
 Then offer the two ways to submit:
 
-- **The browser** (the user signs in with GitHub). This gives the stronger proof of who submitted.
-- **The `gh` route described in `llms.txt`** (intake, a temporary tag, a secret gist, verify,
+- The browser (the user signs in with GitHub). This gives the stronger proof of who submitted.
+- The `gh` route described in `llms.txt` (intake, a temporary tag, a secret gist, verify,
   then delete both). Palomar records that this route proves less than the browser sign-in: tell
   the user that the two are not equivalent. Never drive the browser sign-in yourself.
 

@@ -5,42 +5,21 @@ with Mathlib, in any area of mathematics. It works with any agent that supports 
 format: Claude Code, OpenAI Codex, Gemini CLI, Google Antigravity, GitHub Copilot, Cursor,
 OpenCode, Amp and others.
 
-The skill guides the work from start to finish:
+It takes a paper (an arXiv link is enough), or an existing Lean draft that has never compiled, to
+a Lean project that builds with no `sorry` and no `axiom`, with an audit of the paper and the
+files to submit it to the [Palomar](https://palomar-registry.org) registry.
 
-- read the paper and record its results, constants, citations and suspected typos;
-- set up a Lean project on a Mathlib release, using the module system, in three libraries, in
-  layers: `Basic`, the general mathematics, for later contribution to Mathlib; `External`, the
-  results the paper cites from other works, stated in their sources' terms; and the paper's own
-  results;
-- state every result first, and check each statement against the paper's TeX source;
-- prove everything the paper proves (Stage 1), by the paper's own arguments, then every result it
-  cites (Stage 2), until the project has no `sorry` and no `axiom`. A proof departs from the
-  paper's only when it must: the paper's step is wrong, needs mathematics that Lean lacks, or has
-  no meaning in the formalization's representation. Every departure is reported, with its reason,
-  in the code, the report, the metadata and to you. A cited result that no Lean library can
-  yet support becomes a visible hypothesis of the statements that use it, and the result is
-  reported as conditional. The skill asks you only when building the missing theory would be a
-  large but feasible effort;
-- verify: the axioms of every declaration; the route of every proof (the paper's results it
-  uses) against the results that the paper's proof cites, extracted from the TeX source; and
-  Comparator;
-- clean up: remove unused hypotheses and other warnings, without changing any proof's argument;
-- write `REPORT.md`, an audit of the paper against the formalization (errors and gaps, missing
-  and redundant hypotheses, how the paper uses each cited result, every departure from the
-  paper's proofs), the paper's place in the literature (the work before it, alongside it and
-  since it, and other formalizations), and what comes next: ways to extend, generalize or
-  strengthen its results, and where its proofs could be simpler; and a short `README.md`;
-- write a private `NEXT.md`, kept out of git, on what paper you could write next: a few
-  directions that would each make a paper of their own, each explored to the step where the
-  paper's method stops, with the attempts made, the evidence computed and what is already
-  proved, and checked for novelty against the literature;
-- package the project for the [Palomar](https://palomar-registry.org) registry by default
-  (Challenge/Solution, `comparator.json`, `formalization.yaml`), and, with your permission,
-  publish it and run Palomar's preflight;
-- keep a run log, and report in `CREDITS.md` how the formalization was made: the procedure, the
-  agents and models, the elapsed time and the effort.
-
-It also covers turning an existing, never-compiled Lean draft into a project that builds.
+| Step | What the skill does |
+| --- | --- |
+| Inventory | records the paper's results, constants, citations and suspected typos |
+| Project | sets up a Lean project on a Mathlib release, with the module system, in three layered libraries: `Basic` (general mathematics, for later contribution to Mathlib), `External` (the results the paper cites, in their sources' terms) and the paper's own |
+| Statements | states every result first, and checks each statement against the paper's TeX source |
+| Proofs | proves what the paper proves, by the paper's own arguments, then the results it cites. A proof departs from the paper's only when it must, and every departure is reported to you with its reason. A cited result that no Lean library can yet support becomes a visible hypothesis, and the result is reported as conditional |
+| Verification | checks the axioms of every declaration, checks that each proof uses the results that the paper's proof cites (extracted from the TeX source), and runs Comparator |
+| Cleanup | removes unused hypotheses and other warnings without changing any proof's argument |
+| Documents | writes `REPORT.md` (errors and gaps, missing and redundant hypotheses, use of cited results, departures, the paper in the literature, what comes next), a short `README.md`, and `CREDITS.md` (how the formalization was made, from a run log) |
+| Next papers | writes a private `NEXT.md`, kept out of git: directions that would each make a paper of their own, explored to the step where the paper's method stops and checked for novelty |
+| Packaging | prepares the Challenge/Solution pair, `comparator.json` and `formalization.yaml` for Palomar, and, with your permission, publishes the project and runs Palomar's preflight |
 
 ## Install
 

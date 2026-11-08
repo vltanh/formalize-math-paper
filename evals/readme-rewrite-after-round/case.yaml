@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: readme-rewrite-after-round
+expected_outcome: |
+  A short, scannable README for the current state: what is proved by section, the main results, the conditional main theorem stated as conditional (with its hypothesis named) near the top, the main findings with E-numbers and a link to REPORT.md for the rest, trust and build information, credits, with no round-by-round history and no wall-of-text paragraphs.
+context:
+  scaffold_script: place-files.sh

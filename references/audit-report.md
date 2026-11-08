@@ -14,16 +14,15 @@ paper gets. Then audit the paper separately, against its TeX source. For each ki
 
 | Kind | How to find it | What to record |
 | --- | --- | --- |
-| Error | A step or claim that is false as written: a wrong inequality, constant or index range, a product that counts a factor twice, a theorem applied wrongly | Location and TeX line; why it is false (a counterexample or the computation); the correct version; whether the result still holds |
+| Error | A step or claim that is false as written: a wrong inequality, constant or index range, a term counted twice, a theorem applied wrongly | Location and TeX line; why it is false (a counterexample or the computation); the correct version; whether the result still holds |
 | Gap | A claim used without justification: "clearly", "it is easy to see", a missing case, a step that needs a condition the statement does not give | What is missing, and why it holds or does not; if the statement holds anyway, the corrected argument |
 | Typo | A wrong cross-reference ("Theorem 1.2" for 1.3), a self-citation, a slip in a variable name | Location and correction |
 | Missing hypothesis | A statement that is false without a condition that the paper leaves implicit | The condition, a counterexample without it, and where the formalization states it (a correction agreed with the user) |
 | Redundant hypothesis | A hypothesis that a statement includes but its proof never uses: start from the hypotheses that the cleanup removed | The hypothesis, and whether the Lean statement drops it |
 | Use of a cited result | Each citation used in a proof: are its hypotheses checked, and is it applied in the form it was proved in? | A verdict: correct, applied loosely but correctly, or stated or applied wrongly |
 
-Verify every finding before you report it. Have someone other than the one who recorded it do this
-(a separate agent if available, working from the TeX source and the inventory; otherwise a separate
-pass of your own):
+Verify every finding before you report it, by an independent check (SKILL.md, Principles) that
+works from the TeX source and the inventory:
 
 - Quote the TeX text. Do not report from memory of the PDF.
 - Recompute every arithmetic claim, by script if needed: products and sums of constants,
@@ -41,8 +40,8 @@ Number the findings E1, E2, … in the order they occur in the paper. Group typo
 item. If you add or remove a finding later, renumber the findings, and update every reference to
 them, in `REPORT.md` and in `README.md`.
 
-Have someone other than their writer check the report's sections on the literature and on what's
-next (Sections 10 and 11) the same way. That reader checks every summary of another work against
+Check the report's sections on the literature and on what's next (Sections 10 and 11) the same
+way, independently of their writer. The checker reads every summary of another work against
 that work's abstract and statements, and against its status (published, preprint, withdrawn or
 disputed); every claim about what came before the paper, alongside it or after it against the
 source that proves it, and every date that places a work before, alongside or after the paper;
@@ -72,8 +71,9 @@ how the audit script checks it; Challenge and Comparator; whether any statement 
 change; whether every proof follows the paper's, and how many depart from it (Section 7)>
 
 ## 1. Summary
-- **Errors.** … - **Gaps.** … - **Missing hypotheses.** … - **Redundant hypotheses.** …
-- **Use of cited results.** …
+| Kind | Findings |
+<One row each: errors, gaps, missing hypotheses, redundant hypotheses, use of cited results; each
+finding in a line, with its E-number.>
 
 ## 2. Results from prior work and how the paper uses them
 ### Proved in `External/`
@@ -89,8 +89,11 @@ strongly than its source proves can make a theorem vacuous.>
 <A sentence listing the citations that only give context and are not used in proofs.>
 
 ## 3. Errors and gaps in the paper
-**E1. <Location>.** <what is wrong, why, the correct version, whether the result still holds, how
-the Lean handles it, and any later work that corrects it> … **En. Typos.** …
+### E1. <Location>
+<What is wrong, why, the correct version, whether the result still holds, how the Lean handles
+it, and any later work that corrects it.>
+…
+### En. Typos
 
 ## 4. Missing hypotheses
 <Conditions without which a statement is false, each with a counterexample, and where the
@@ -197,37 +200,37 @@ holds that other formalizations citing the same sources could reuse.>
 
 ## 3. `README.md` structure
 
-The README is the project's front page. A mathematician or a Lean user reads it in a minute to
-decide whether to trust the work and what it covers. It describes the current state; the history
-of the work belongs in `CREDITS.md` and the commit log. Rewrite it whole at the end of each round
-instead of adding a paragraph per round: appended paragraphs are how a README turns into a wall of
-text.
+The README is the project's front page. A mathematician or a Lean user should learn from it,
+quickly, what is proved, what is conditional or open, what the audit found, and whether to trust
+the work. It describes the current state; the history of the work belongs in `CREDITS.md` and the
+commit log. So at the end of each round, rewrite it whole for the new state rather than adding to
+it: a README that grows a paragraph per round soon becomes hard to read.
 
-Aim for 100 to 150 lines. Keep every paragraph to four lines or fewer and every bullet to three.
-When a point needs more, put it in a table, or in `REPORT.md` with a link.
+Keep it short. Put status, results and findings in tables, keep each paragraph to a few lines, and
+move whatever needs more to `REPORT.md`, with a link. The full lists stay in the report; the README
+shows what a reader needs first. In order:
 
 1. Title, CI badge, and two short paragraphs: the paper and its question, for a mathematician;
    then what is formalized, and whether anything is conditional (name the assumption) or open.
-2. Status: a table with one row per chapter or section of the paper, saying proved, proved in
+2. Status: a table with one row per section (or part) of the paper, saying proved, proved in
    corrected form, conditional on a named hypothesis, or not formalized.
 3. Main results: a table with the paper's number, the Lean name and a one-line statement in plain
    language. Mark the Challenge theorems. For a well-known problem, compare the Challenge's
-   formulation with the standard one in a sentence or two.
+   formulation with the standard one briefly (Palomar's review looks for this).
 4. If the formalization is conditional, one short paragraph: what is assumed, why it is not an
    axiom, and what will discharge it. Say it there and in the status table, not in every section.
-5. What the audit found: a table of the five to ten findings a reader most needs, one line each
-   with its E-number (errors and false statements first, then gaps that change what the paper
-   proves, then missing hypotheses), followed by the total and a link to the report. Then one
-   sentence on the proofs: that they follow the paper's, with a link to the report's table of
-   departures. The full lists stay in the report.
-6. Trust, in three to five bullets: the build, `sorry` and `axiom` status; the audit script; the
-   route check; who reviewed the statements and the proofs, and whether any person did.
-7. Dependencies (packages and libraries beyond Mathlib, with what each provides); Palomar, in two
-   or three lines (the files, how to run `lake comparator`); Building (the commands, the
-   toolchain); Layout, with one row per top-level directory (module-by-module tables belong in
-   `Basic/README.md`, `External/README.md` or the report).
-8. Related work and credits, two or three bullets each, with links to the report's Section 10 and
-   to `CREDITS.md`. The credits say who and what wrote the code, at whose request, by which
+5. What the audit found: a table of the findings a reader most needs, one line each with its
+   E-number (errors and false statements first, then gaps that change what the paper proves, then
+   missing hypotheses), followed by the total and a link to the report. Then one sentence on
+   whether the proofs follow the paper's, with a link to the report's table of departures.
+6. Trust, in a few bullets: the build, `sorry` and `axiom` status; the audit script; the route
+   check; who reviewed the statements and the proofs, and whether any person did.
+7. Dependencies (packages and libraries beyond Mathlib, with what each provides); Palomar, briefly
+   (the files, how to run `lake comparator`); Building (the commands, the toolchain); Layout, with
+   one row per top-level directory (module-by-module tables belong in `Basic/README.md`,
+   `External/README.md` or the report).
+8. Related work and credits, a few bullets each, with links to the report's Section 10 and to
+   `CREDITS.md`. The credits say who and what wrote the code, at whose request, by which
    procedure (with a link to this skill's repository), whether a person has reviewed the proofs,
    and when. No links to old drafts. Then the license.
 
@@ -237,25 +240,10 @@ proves.
 
 ## 4. Style and mechanics
 
-- Write for mathematicians. Use the paper's notation in prose, and Lean names in code spans.
-- Write plainly. Each sentence should add a fact the reader does not have yet; say each thing once.
-  Avoid the habits of machine-written prose that creep into audit documents and that readers
-  notice:
-  - staging instead of stating: a contrast with a claim nobody made ("not just X, but Y"), a
-    closing sentence that repeats the paragraph, a run-up such as "Here is what you need to know";
-  - inflation: "crucial", "robust", "comprehensive", "pivotal", "a testament to"; a claim of
-    priority only where the report's literature search supports it;
-  - formatting by rule: bold on every bullet's label, title-case headings, emojis, a horizontal
-    rule between sections; keep bold for the one thing a reader must not miss, such as
-    "conditional";
-  - dashes as connectors between clauses: use a period, comma, colon or parentheses (dashes in
-    ranges such as Chapters 2–8 are fine);
-  - "serves as", "features", "boasts" where "is" or "has" will do; stacked qualifiers;
-  - writing about the document ("This section summarizes", "the table below shows") or about how it
-    was made, which belongs in `CREDITS.md`.
-- Before publishing, read the README as a newcomer would: check its length (`wc -l`) and its
-  longest paragraph, and that the first screen says what is proved, what is conditional and what
-  is not formalized.
+- Write for mathematicians, in the paper's notation, with Lean names in code spans. Write plainly:
+  say each thing once, and prefer a table or a short paragraph to a long one.
+- Before publishing, read the README as a newcomer would. Its first screen should say what is
+  proved, what is conditional and what is not formalized.
 - The report describes only the paper and the current formalization. Leave out the history of the
   repair (which draft lemmas were false, what was renamed), and do not link to old drafts or pull
   requests. That history belongs in commit messages.

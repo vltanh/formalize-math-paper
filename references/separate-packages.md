@@ -8,18 +8,18 @@ Mathlib upgrades and one more place where a reader has to look. Keep general mat
 
 ## 1. The bar
 
-Propose a package of its own only when **all** of these hold:
+Propose a package of its own only when all of these hold:
 
-- **Famous by name.** It proves a theorem, or a small theory around one, that mathematicians outside
+- Famous by name. It proves a theorem, or a small theory around one, that mathematicians outside
   the paper's area know by name. A lemma that only this paper needs, however long, does not
   qualify.
-- **Missing.** Neither Mathlib nor another maintained public Lean library has it, and no Mathlib
+- Missing. Neither Mathlib nor another maintained public Lean library has it, and no Mathlib
   pull request for it is close to merging.
-- **Substantial.** It is not one quick contribution to Mathlib: several hundred lines or more, or a
-  theory of its own that the proof builds on.
-- **General.** Its statements say nothing about the paper's objects, and it imports only Mathlib
+- Substantial. It is more than one quick contribution to Mathlib: a theory of its own that the
+  proof builds on, or as a rough guide several hundred lines or more.
+- General. Its statements say nothing about the paper's objects, and it imports only Mathlib
   and other such packages.
-- **Reusable.** Someone outside this project could plausibly import it.
+- Reusable. Someone outside this project could plausibly import it.
 
 Otherwise it stays in `Basic/` or `External/`, and small general lemmas are offered to Mathlib,
 the long-term home of general mathematics. Expect at most one or two packages for a paper, often
@@ -52,7 +52,7 @@ Others will import the package without knowing the project, so it reads as a lib
   credit, and no README, docstring, comment, name or commit message of the package mentions the
   project (the paper, its objects or authors, the project's repository or paths). Code taken from
   someone else's work is the exception: credit it, and keep its licence notice
-  (`references/checklists.md`, Section 4).
+  (`palomar.md`, Section 1).
 - Tell everyone who writes in the package, agents included, that it stands alone, and before
   publishing search its files and commit messages for the paper's title and authors, the project's
   repository, and phrases such as "for the formalization of" or "at the request of".

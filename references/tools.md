@@ -1,5 +1,7 @@
 # Bundled tools
 
+## 1. The tools
+
 Run the scripts from the project root, as `python3 <skill-dir>/scripts/<name> …`. Copy the ones
 that CI runs into the project's `scripts/` directory.
 
@@ -20,3 +22,30 @@ that CI runs into the project's `scripts/` directory.
 | `assets/Audit.lean` | the axiom and dependency audit, which also writes the route of every numbered result for `route_check.py`; copy it to `scripts/Audit.lean` and fill in its lists |
 | `assets/lean_action_ci.yml` | CI: build, the audit's imports, audit, route check, the Challenge's copy of shared definitions, links, tables |
 | `assets/palomar_preflight.yml` | Palomar's mechanical preflight, run on demand |
+
+## 2. The routes of the paper's proofs
+
+`route_check.py extract main.tex [MORE.tex | DIR …] > docs/paper_routes.tsv` writes one row per
+labelled statement of a theorem-like environment: its label, its environment, whether the paper
+proves it, and the labels that its proof cites. It attributes a proof to the statement named in the
+proof's optional argument ("Proof of Theorem~\ref{…}"); failing that, to the statement that the
+sentence before the proof names; failing that, to the closest statement before it in the same
+section. It prints a warning for every proof attributed by one of the last two heuristics and for
+every proof it could not attribute: check each against the paper. Then compare the whole file with
+your own reading. The extraction cannot see:
+
+- a result that the paper proves in running text, or a labelled equation that states a result: add
+  its row by hand, with a `#` comment line that says why;
+- a result with no label (a theorem stated in prose): give it a label of your own, add its row with
+  a comment that explains the label, and name the label in the result's docstring.
+
+The file holds only labels, so it can be committed even when the TeX source cannot be. A proof
+that cites a result only in passing is not corrected here: when the route check reports it, record
+it in `docs/route_differences.tsv` with its reason.
+
+`route_check.py check` finds each Lean result by the first label in backticks in its docstring. A
+difference `-X` means that the paper's proof cites X and the Lean proof never reaches it; `+X`
+means that the Lean proof uses X and the paper's argument never reaches it. Each line of the accept
+file is `LABEL<TAB>±OTHER<TAB>reason`, and `*` as the label records a result that the paper uses
+throughout without citing it. The check fails on a difference that the file does not record, and
+on an entry that no longer describes a difference.

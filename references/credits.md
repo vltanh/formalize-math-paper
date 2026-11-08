@@ -26,9 +26,9 @@ in status reports.
 ## 2. `CREDITS.md`
 
 `CREDITS.md` says how the formalization was made, from the run log and the session transcripts
-(Section 1). The README's credits sum it up in two or three bullets and link to it
-(`audit-report.md`, Section 3, item 6). Write it in bullets, with one section for each round of
-work: the first formalization, then each later round that the user asked for.
+(Section 1). The README's credits sum it up in a few bullets and link to it (`audit-report.md`,
+Section 3, item 8). Write it in bullets, with one section for each round of work: the first
+formalization, then each later round that the user asked for.
 
 ```markdown
 # Credits
@@ -36,11 +36,11 @@ work: the first formalization, then each later round that the user asked for.
 How this formalization was made, from the run log and the session transcripts.
 
 ## Who
-- **Author and maintainer:** <the people; who asked for the formalization and chose its scope>
-- **Formalization:** <each AI system: the model(s), and the agent and harness, with their versions;
+- Author and maintainer: <the people; who asked for the formalization and chose its scope>
+- Formalization: <each AI system: the model(s), and the agent and harness, with their versions;
   how many sessions; who wrote the draft, if there was one>
-- **Procedure:** <this skill, with a link to its repository and its version or commit>
-- **Review:** <whether a person has reviewed the proofs; which independent agents checked what>
+- Procedure: <this skill, with a link to its repository and its version or commit>
+- Review: <whether a person has reviewed the proofs; which independent agents checked what>
 
 ## <Round> (<dates>)
 <For a later round, what the user asked for.>

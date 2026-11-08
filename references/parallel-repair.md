@@ -25,8 +25,9 @@ against the compiled interfaces of the files they import, without waiting for up
 
 - Split the work by files, in dependency order. An agent owns whole files: never give two agents
   the same file.
-- Aim for about 20–40 `sorry`s per agent. Group small files of one section together. Give a very
-  large file its own agent, or split it into modules first.
+- Give each agent as much as it can finish in one session without losing track of the paper's
+  arguments: a few dozen `sorry`s at most, fewer when the proofs are long. Group small files of one
+  section together. Give a very large file its own agent, or split it into modules first.
 - Downstream agents can start at once. They rely on upstream statements, which are already
   compiled, and not on upstream proofs.
 - Start the agents in the background, so they run at the same time, as many at once as
@@ -126,38 +127,34 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
 1. Run a full `lake build` and fix the integration errors. They usually come from signature
    changes that did not reach a caller, or from stale `.olean`s. Wait until no agent is building:
    two builds in one checkout delete each other's outputs.
-2. Check the axioms of the main theorems (`#print axioms`). During Stage 1, only the axioms of
-   cited results in `External/` may appear. Once `scripts/Audit.lean` exists (Phase 6), run it in
-   full.
-3. Run `lake env lean scripts/Audit.lean` and the route check (SKILL.md, Phase 6) once the audit
-   exists. Until then, read the routes of the integrated results against `docs/paper_routes.tsv`
-   instead. Every difference is a proof to rewrite or a departure to report.
-4. Run `python3 <skill-dir>/scripts/stmt_diff.py <baseline commit>`. It lists every declaration
+2. Check the axioms and the routes. Once `scripts/Audit.lean` exists (Phase 6), run it and the
+   route check (SKILL.md, Phase 6). Before that, check the axioms of the main theorems with
+   `#print axioms` (during Stage 1, only the axioms of cited results in `External/` may appear),
+   and read the routes of the integrated results against `docs/paper_routes.tsv`. Every route
+   difference is a proof to rewrite or a departure to report.
+3. Run `python3 <skill-dir>/scripts/stmt_diff.py <baseline commit>`. It lists every declaration
    whose statement or definition body changed. Compare the list with the agents' reports.
    - A change that no agent reported is either a false statement that was fixed silently (find
      the counterexample) or a weakening without reason (revert it).
    - A paper result appears in the list only through a documented decision: an obvious misprint
      corrected, or a correction the user agreed to.
-5. Commit. The message lists every helper lemma found false, the hypothesis added and why, and
-   every departure from the paper's proofs with its reason.
-   Commit messages are where the repair's history belongs; the report describes only the final
-   formalization.
+4. Commit. The message lists every helper lemma found false, the hypothesis added and why, and
+   every departure from the paper's proofs with its reason: commit messages are where the repair's
+   history belongs (`audit-report.md`, Section 4).
 
 ## Handling false statements
 
-- **Helper lemma false.** Add the minimal hypothesis that makes it true and is available at every
+SKILL.md's Rules say how to handle a false paper result, a false helper lemma and a gap in a
+proof. In repair work, also:
+
+- A false helper lemma gets the minimal hypothesis that makes it true and is available at every
   call site. The usual causes are truncated subtraction or division on `ℕ`, missing positivity or
   nonnegativity, empty sets or zero sizes, and boundary indices.
-- **A definition that does not match its lemmas.** Sometimes the lemmas describe the intended
-  object and the definition is wrong. Redefine it as exactly what the lemmas describe, and check
-  that the definition still matches the paper.
-- **Paper result false as stated.** Stop work on it and tell the user at once, with the
-  counterexample and the TeX location; other work continues. With their agreement, formalize the
-  closest correct statement, and record it as an error (an E-item of the report), in the report's
-  list of corrections under "How the formalization reads the paper", and in
-  `formalization.yaml`'s `fidelity`. An obvious misprint with only one possible correction needs
-  no agreement (SKILL.md, Rules), only the same records.
-- **Paper result whose proof has a gap.** Do not add a hypothesis. Find a correct argument that
-  repairs the step and keeps the rest of the paper's proof. Record the gap as an E-item, and the
-  repair as a departure. If you find neither a proof nor a counterexample, tell the user
-  (SKILL.md, Rules).
+- A definition that does not match its lemmas. Sometimes the lemmas describe the intended object
+  and the definition is wrong. Redefine it as exactly what the lemmas describe, and check that the
+  definition still matches the paper.
+
+Pass a false paper result to the user at once, with the counterexample and its TeX location. Once
+corrected, it is recorded as an E-item, in the report's list of corrections under "How the
+formalization reads the paper", and in `formalization.yaml`'s `fidelity`. A repaired gap is an
+E-item and a departure.
