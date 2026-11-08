@@ -21,6 +21,14 @@ files to submit it to the [Palomar](https://palomar-registry.org) registry.
 | Next papers | writes a private `NEXT.md`, kept out of git: directions that would each make a paper of their own, explored to the step where the paper's method stops and checked for novelty |
 | Packaging | prepares the Challenge/Solution pair, `comparator.json` and `formalization.yaml` for Palomar, and, with your permission, publishes the project and runs Palomar's preflight |
 
+## Made with this skill
+
+| Repository | What it formalizes |
+| --- | --- |
+| [lean4-smoothed-polygon](https://github.com/vltanh/lean4-smoothed-polygon) | Hales and Vajjha, *Packings of Smoothed Polygons* (arXiv:2405.04331): Chapters 2–8, with an audit of the book (61 findings, among them false statements refuted in Lean); Mahler's First conjecture (Theorem 16.3.1) proved conditionally on one named hypothesis |
+| [lean4-optimal-control](https://github.com/vltanh/lean4-optimal-control) | the Pontryagin maximum principle by Agrachev and Sachkov's proof, and Filippov's theorem, including the form with a state constraint |
+| [lean4-fixed-point](https://github.com/vltanh/lean4-fixed-point) | Brouwer's fixed-point theorem, by the analytic proof of Milnor and Rogers |
+
 ## Install
 
 With the [`skills`](https://github.com/vercel-labs/skills) installer, which detects your agents
