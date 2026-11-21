@@ -29,6 +29,10 @@ files to submit it to the [Palomar](https://palomar-registry.org) registry.
 | [lean4-optimal-control](https://github.com/vltanh/lean4-optimal-control) | the Pontryagin maximum principle by Agrachev and Sachkov's proof, and Filippov's theorem, including the form with a state constraint |
 | [lean4-fixed-point](https://github.com/vltanh/lean4-fixed-point) | Brouwer's fixed-point theorem, by the analytic proof of Milnor and Rogers |
 
+A repository may hold several related papers (a theorem and its sequel, complementary cases of
+one problem, a claim and its refutation): they share code, each keeps its own Challenge, Palomar
+submission and documents, and an umbrella README connects them.
+
 ## Install
 
 With the [`skills`](https://github.com/vercel-labs/skills) installer, which detects your agents
@@ -82,7 +86,7 @@ faster, but they are not required.
 | Path | Contents |
 | --- | --- |
 | `SKILL.md` | The workflow: principles, rules, phases and completion gates |
-| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, follow-up papers, the credits, Palomar packaging, cleanup, rigorous numerics, packages of their own for famous results, checklists (statement review, verification, status reports, completion gates), the bundled tools |
+| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, follow-up papers, the credits, Palomar packaging, cleanup, rigorous numerics, packages of their own for famous results, several papers in one repository, checklists (statement review, verification, status reports, completion gates), the bundled tools |
 | `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; replacing failing proofs with `sorry`; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; checking that each proof follows the route of the paper's proof; copying shared definitions into the Challenge; linking documentation to the code; checking Markdown tables; summarizing a Claude Code session for the run log |
 | `assets/` | Templates: the axiom, dependency and route audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
 

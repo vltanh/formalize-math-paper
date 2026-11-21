@@ -23,6 +23,9 @@ section per round (Section 2), and in `formalization.yaml` (`automation.methods`
 `models`, `framework`, `tool_setup`, `cost`). Put the elapsed time and the number of running agents
 in status reports.
 
+With several papers in one repository, each paper's `CREDITS.md` reports the rounds spent on that
+paper, and the umbrella README sums them up in one line per paper (`multi-paper.md`, Section 6).
+
 ## 2. `CREDITS.md`
 
 `CREDITS.md` says how the formalization was made, from the run log and the session transcripts

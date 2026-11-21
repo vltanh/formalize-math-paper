@@ -35,9 +35,16 @@ from pathlib import Path
 DOCS = ['README.md', 'REPORT.md', 'CREDITS.md']
 # Namespaces in which the documents name declarations without their prefix, most specific last.
 NAMESPACES = ['PaperName', 'ChallengeNamespace']
+# With several papers in one repository (references/multi-paper.md): the namespaces of the documents
+# in each top-level directory, tried before `NAMESPACES`, so that a short name in a paper's documents
+# names that paper's declaration; the first namespace that declares a name wins. Example:
+# {'PaperA': ['PaperA', 'PaperAChallenge'], 'PaperB': ['PaperB', 'PaperBChallenge']}.
+NAMESPACES_BY_DIR = {}
 # Top-level module names of the project: a code span naming such a module links to its file.
 MODULE_ROOTS = ('PaperName', 'External', 'Basic', 'Challenge', 'Solution')
-# The module whose declarations win when a name is declared in several modules.
+# The module whose declarations win when a name is declared in several modules. With several
+# papers, a tuple of modules, one per paper (each Challenge repeats its own paper's definitions):
+# ('PaperA.Challenge', 'PaperB.Challenge').
 PREFERRED_MODULE = 'Challenge'
 # Directories, besides the repository root, against which the paths in the documents of a
 # given directory are resolved.
@@ -56,7 +63,8 @@ def private(path):
     so a link to them would be broken in the repository."""
     import subprocess
     parts = Path(os.path.normpath(path)).parts
-    if parts and (parts[0] in PRIVATE or os.path.normpath(path) in PRIVATE):
+    # `NEXT.md` is private in any directory (each paper of a multi-paper repository has one).
+    if any(part in PRIVATE for part in parts) or os.path.normpath(path) in PRIVATE:
         return True
     return subprocess.run(['git', 'check-ignore', '-q', path], cwd=ROOT).returncode == 0
 
@@ -102,7 +110,9 @@ def load_locations():
         if not (ROOT / module_file(data['module'])).is_file():
             continue
         # The preferred module's declarations win over restatements elsewhere.
-        target = preferred if data['module'] == PREFERRED_MODULE else locations
+        preferred_modules = ((PREFERRED_MODULE,) if isinstance(PREFERRED_MODULE, str)
+                             else tuple(PREFERRED_MODULE))
+        target = preferred if data['module'] in preferred_modules else locations
         for name, ranges in data.get('decls', {}).items():
             # `ranges` holds the declaration's range, then its name's; lines count from 0.
             target[name] = (data['module'], ranges[4] + 1)
@@ -116,10 +126,18 @@ class Linker:
     def __init__(self, locations):
         self.locations = locations
 
-    def declaration(self, name):
+    def declaration(self, name, doc_dir=''):
         candidates = [name]
         # Short names such as `U` or `h` are variables, not declarations.
         if len(name) >= 4:
+            top = Path(doc_dir).parts[0] if doc_dir else ''
+            own = [ns + '.' + name for ns in NAMESPACES_BY_DIR.get(top, [])]
+            # The directory's namespaces in order: the first that declares the name wins (the
+            # library's before the Challenge's, whose Solution restates its theorems).
+            own_hits = [c for c in own if c in self.locations]
+            if name not in self.locations and own_hits:
+                module, line = self.locations[own_hits[0]]
+                return '%s#L%d' % (module_file(module), line)
             candidates += [ns + '.' + name for ns in NAMESPACES]
         hits = [c for c in candidates if c in self.locations]
         if not hits:
@@ -134,7 +152,9 @@ class Linker:
         """The repository path or URL that `text` names, or None."""
         path = text.rstrip('/')
         if path and not path.startswith(('/', '.')) and ' ' not in path:
-            for base in [''] + PATH_BASES.get(doc_dir, []):
+            # A document's own directory comes first: `REPORT.md` in `PaperA/README.md` is
+            # `PaperA/REPORT.md`.
+            for base in ([doc_dir] if doc_dir else []) + [''] + PATH_BASES.get(doc_dir, []):
                 candidate = os.path.normpath(os.path.join(base, path))
                 if (ROOT / candidate).exists() and not private(candidate):
                     return candidate
@@ -150,7 +170,7 @@ class Linker:
             return None
         if text in CORE:
             return DOCS_URL + CORE[text].replace('.', '/') + '.html#' + text
-        return self.declaration(text)
+        return self.declaration(text, doc_dir)
 
     def link(self, text, doc_dir):
         """The link target for `text` in a document of `doc_dir`, or None."""

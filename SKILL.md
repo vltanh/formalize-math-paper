@@ -49,6 +49,11 @@ You deliver a Lean project, with documents about it, in which:
 - the project is packaged for Palomar and, with the user's permission, published and run through
   Palomar's preflight.
 
+A repository may formalize several related papers (a theorem and its sequel, complementary cases of
+one problem, a claim and its refutation). The papers then share code, but each keeps its own
+Challenge, Palomar files and documents, and an umbrella README connects them
+(`references/multi-paper.md`).
+
 The work has two stages. In Stage 1, formalize everything the paper itself proves. Results it takes
 from the literature may be temporary axioms. In Stage 2, remove those axioms: prove them, or
 turn the ones out of reach into stated hypotheses. Setup comes before the two stages, and
@@ -216,6 +221,8 @@ Record these. Ask the user only about what you cannot work out yourself:
 
 ```text
 paper:            arXiv id and version (or DOI); source TeX if available; later versions and errata
+papers:           one, or several in one repository (references/multi-paper.md; when a paper joins
+                  an existing project, ask whether it joins the repository)
 repository:       new or existing; work on a branch and commit in small, coherent steps
 starting point:   from scratch, or an existing draft (where?)
 Lean / Mathlib:   the newest Lean release or release candidate (at least Palomar's minimum), and
@@ -304,9 +311,12 @@ on it, and parallel work does not stall. Decide where each file belongs when you
 results included: moving files later rewrites imports, namespaces, the audit's list of modules and
 the documents' links, and conflicts with every branch that touches them.
 
-One project may formalize two closely related papers, such as a paper and the one that sharpens
-it. Give each paper its own directory, keep the routes of both in the one `docs/paper_routes.tsv`
-(their labels must not collide), and number the report's findings through both papers in order.
+Several related papers may share one repository (`references/multi-paper.md`). Then each paper
+has a directory of its own, holding its library, its own self-contained definitions module, its
+Challenge and Solution, its Palomar files, its documents and its routes; `Basic/`, `External/`,
+the tools and the licence are shared; and an umbrella README at the root connects the papers.
+Decide this layout before the second paper's statements are written, and when a paper joins a
+single-paper project, move the first paper into its directory first.
 
 Rarely, a theorem known by name that no library has and that others would import deserves a Lake
 package of its own, required at a pinned commit. The default is not to split.
@@ -458,6 +468,11 @@ dated search, including for newer versions of the paper), and "What's next" (how
 be extended, generalized or strengthened, and the simpler arguments recorded during the work).
 Later work that corrects the paper is also a finding: record it, and tell the user at once.
 
+With several papers, each paper's documents follow this phase for that paper alone, in its
+directory, and the umbrella README at the root (`references/multi-paper.md`, Section 6) gives the
+state of the problem across the papers and the literature review that connects them, checked
+independently like a report's literature section.
+
 Then write the private `NEXT.md`: the papers the user could write next, following
 `references/next-papers.md`. Only directions that would make a paper of their own pass its bar;
 explore the best few in depth, mark each claim as proved, checked or conjectured, and have each
@@ -468,7 +483,9 @@ and pull request, and of the public report, which only says that the file exists
 
 Package for Palomar unless the user declined in Phase 0. Read `references/palomar.md`: the required
 files, `formalization.yaml`, Palomar's validation scripts, CI (`assets/lean_action_ci.yml`) and the
-preflight workflow (`assets/palomar_preflight.yml`). Everything up to Palomar's local checks needs
+preflight workflow (`assets/palomar_preflight.yml`). With several papers, each is a submission of
+its own, with its own Comparator configuration and metadata path (`references/multi-paper.md`,
+Section 7). Everything up to Palomar's local checks needs
 no permission; each later step needs the user's explicit go-ahead (Rules), and the preflight also a
 confirmed authorization relationship. Submit only a commit whose preflight report says `status:
 pass`, after checking the dependency pins that rendering with Verso needs (`references/palomar.md`,

@@ -234,6 +234,9 @@ shows what a reader needs first. In order:
    procedure (with a link to this skill's repository), whether a person has reviewed the proofs,
    and when. No links to old drafts. Then the license.
 
+With several papers in one repository, each paper's README follows this structure for its paper
+and links to the umbrella README at the root, which `multi-paper.md`, Section 6, describes.
+
 When the repository is published, keep its GitHub description in step with the README: update it
 (`gh repo edit --description`) in the same step as the push that changes what the repository
 proves.

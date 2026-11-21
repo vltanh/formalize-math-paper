@@ -6,6 +6,9 @@ name: Palomar preflight
 # Pin `uses` and `pipeline_commit` to the same full PalomarSubmission commit:
 #   git ls-remote https://github.com/PalomarRegistry/PalomarSubmission.git HEAD
 # `request_id` must be exactly 12 lowercase letters or digits.
+# With several papers in one repository, make one copy per paper and add
+# "formalization_metadata_path":"PaperA/formalization.yaml" to `options`, with that paper's
+# "comparator_config_path":"PaperA/comparator.json".
 on:
   workflow_dispatch:
 

@@ -16,7 +16,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: leanprover/lean-action@v1
       # The audit sees a module's proofs only through its own `import all` line. PaperName, External
-      # and Basic are the libraries' root directories.
+      # and Basic are the libraries' root directories. With several papers (references/multi-paper.md),
+      # list every paper's directory in both places and add `! -name Challenge.lean` to the `find`.
       - name: Check that the audit imports every module of the libraries
         run: >-
           diff <(find PaperName External Basic -name '*.lean' | sed 's/\.lean$//; s#/#.#g' | sort)
@@ -26,6 +27,8 @@ jobs:
         run: lake env lean scripts/Audit.lean
       # The routes of the paper's proofs (docs/paper_routes.tsv, from route_check.py extract) and the
       # reviewed differences (docs/route_differences.tsv); see SKILL.md, "Faithful proofs".
+      # With several papers (references/multi-paper.md), run this step once per paper, with the
+      # paper's own docs/paper_routes.tsv and docs/route_differences.tsv.
       - name: Check that the proofs follow the routes of the paper's proofs
         run: >-
           python3 scripts/route_check.py check docs/paper_routes.tsv

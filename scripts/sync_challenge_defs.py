@@ -12,7 +12,9 @@ Run from the repository root:
     python3 scripts/sync_challenge_defs.py           # rewrite the block in the Challenge
     python3 scripts/sync_challenge_defs.py --check   # exit 1 if the copy differs (for CI)
 
-Configure the block below for the project.
+Configure the block below for the project. A repository with several papers lists one
+`(definitions module, Challenge)` pair per paper in `PAIRS` (references/multi-paper.md); every
+pair is copied, or checked, in turn.
 """
 
 import sys
@@ -22,6 +24,10 @@ from pathlib import Path
 # The library module that holds the shared definitions, and the Challenge file.
 DEFS = 'PaperName/Defs.lean'
 CHALLENGE = 'Challenge.lean'
+# With several papers, one (definitions module, Challenge) pair per paper, e.g.
+#   PAIRS = [('PaperA/Defs.lean', 'PaperA/Challenge.lean'), ('PaperB/Defs.lean', 'PaperB/Challenge.lean')]
+# When PAIRS is empty, the single pair (DEFS, CHALLENGE) is used.
+PAIRS = []
 # The marker lines around the shared block, in both files.
 BEGIN = '-- BEGIN SHARED DEFINITIONS\n'
 END = '-- END SHARED DEFINITIONS\n'
@@ -38,24 +44,35 @@ def block(text: str, name: str) -> tuple[int, int]:
     return i, j + len(END)
 
 
+def sync(defs_name: str, chal_name: str, check: bool) -> bool:
+    """Copy (or, with `check`, compare) the shared block of one pair; return whether it was current."""
+    defs_path, chal_path = ROOT / defs_name, ROOT / chal_name
+    defs, chal = defs_path.read_text(), chal_path.read_text()
+    di, dj = block(defs, defs_name)
+    ci, cj = block(chal, chal_name)
+    shared = defs[di:dj]
+    if check:
+        if chal[ci:cj] != shared:
+            print(f'{chal_name}: the shared definitions differ from {defs_name}; '
+                  f'run python3 scripts/sync_challenge_defs.py')
+            return False
+        print(f'{chal_name}: the shared definitions match {defs_name}')
+        return True
+    chal_path.write_text(chal[:ci] + shared + chal[cj:])
+    print(f'{chal_name}: shared definitions copied from {defs_name}')
+    return True
+
+
 def main() -> None:
     args = sys.argv[1:]
     if args and args[0] in ('-h', '--help') or any(a != '--check' for a in args):
         print(__doc__.strip())
         sys.exit(0 if args and args[0] in ('-h', '--help') else 2)
-    defs_path, chal_path = ROOT / DEFS, ROOT / CHALLENGE
-    defs, chal = defs_path.read_text(), chal_path.read_text()
-    di, dj = block(defs, DEFS)
-    ci, cj = block(chal, CHALLENGE)
-    shared = defs[di:dj]
-    if '--check' in sys.argv[1:]:
-        if chal[ci:cj] != shared:
-            sys.exit(f'{CHALLENGE}: the shared definitions differ from {DEFS}; '
-                     f'run python3 scripts/sync_challenge_defs.py')
-        print(f'{CHALLENGE}: the shared definitions match {DEFS}')
-    else:
-        chal_path.write_text(chal[:ci] + shared + chal[cj:])
-        print(f'{CHALLENGE}: shared definitions copied from {DEFS}')
+    check = '--check' in args
+    pairs = PAIRS or [(DEFS, CHALLENGE)]
+    current = [sync(d, c, check) for d, c in pairs]
+    if not all(current):
+        sys.exit(1)
 
 
 if __name__ == '__main__':

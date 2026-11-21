@@ -43,6 +43,9 @@ The file holds only labels, so it can be committed even when the TeX source cann
 that cites a result only in passing is not corrected here: when the route check reports it, record
 it in `docs/route_differences.tsv` with its reason.
 
+With several papers (`multi-paper.md`, Section 5), each paper has its own pair of route files in
+its directory, and the check runs once per paper against the audit's single `.lake/route_deps.tsv`.
+
 `route_check.py check` finds each Lean result by the first label in backticks in its docstring. A
 difference `-X` means that the paper's proof cites X and the Lean proof never reaches it; `+X`
 means that the Lean proof uses X and the paper's argument never reaches it. Each line of the accept

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: sibling-paper-result-and-definitions
+expected_outcome: |
+  A recommendation that paper B import paper A's proved library instead of an axiom, keep each paper's definition of quasiconvexity in that paper's own terms with bridge lemmas between them, record the dependency in paper B's report, and put the combined statement in the library of the paper that claims it (paper B), outside paper A's Challenge.

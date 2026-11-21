@@ -78,6 +78,10 @@ decides to.
   in the repository. Check this by comparing the files with the source, not from memory: a file
   that copied part of one proof is adapted code too.
 - No build outputs, no Git submodules, no Git LFS.
+- Several papers in one repository are several submissions: each names its own Comparator
+  configuration and metadata file (`comparator_config_path`, `formalization_metadata_path`,
+  repository-relative), with its own Challenge and Solution modules; the licence stays the single
+  root file (`multi-paper.md`, Section 7).
 
 ## 2. Challenge and Solution
 
@@ -93,7 +97,9 @@ decides to.
   be bundled in a class of hypotheses, named for what it is. Write the class in the signature of
   each theorem that needs it. Do not declare it with `variable`, which hides which theorems use it.
   Keep data and assumptions apart: the class takes the data as parameters. The module docstring
-  lists the assumed results, with their sources.
+  lists the assumed results, with their sources. Since the Challenge imports nothing from the
+  project, the hypotheses' definitions, and the objects they mention, belong to the block of
+  shared definitions below, and the library's statements use the same names.
 - When the statements need definitions too large to restate inline, keep them in one
   module of the library, between two marker comments. Copy that block word for word into the
   Challenge with `scripts/sync_challenge_defs.py`; CI runs it with `--check`. Comparator requires
@@ -237,6 +243,9 @@ run the editorial review (Section 1).
    and `pipeline_commit` to the same full PalomarSubmission commit
    (`git ls-remote https://github.com/PalomarRegistry/PalomarSubmission.git HEAD`). `request_id`
    must be exactly 12 lowercase letters or digits.
+   With several papers, make one workflow per paper and add
+   `"formalization_metadata_path":"PaperA/formalization.yaml"` to its `options`, with that paper's
+   `comparator_config_path`.
 2. The workflow's `options` declare the authorization relationship, which the public report
    records. Check with the user that it is accurate, and ask before running the workflow.
 3. Run it on the commit to submit (`gh workflow run palomar_preflight.yml --ref main`). If you push

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: papers-join-one-repository
+expected_outcome: |
+  A plan in which each paper has its own directory (library, self-contained definitions module, Challenge, Solution, comparator.json, formalization.yaml, README, REPORT, CREDITS, route files), shared code stays in Basic/ and External/, an umbrella README at the root states the problem and connects the papers, each paper is a separate Palomar submission using comparator_config_path and formalization_metadata_path with one root LICENSE, and the first paper is moved into its own directory (with its checks rerun) before the new papers' statements are written.
