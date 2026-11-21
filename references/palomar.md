@@ -244,7 +244,7 @@ run the editorial review (Section 1).
    (`git ls-remote https://github.com/PalomarRegistry/PalomarSubmission.git HEAD`). `request_id`
    must be exactly 12 lowercase letters or digits.
    With several papers, make one workflow per paper and add
-   `"formalization_metadata_path":"PaperA/formalization.yaml"` to its `options`, with that paper's
+   `"formalization_metadata_path":"palomar/PaperA/formalization.yaml"` to its `options`, with that paper's
    `comparator_config_path`.
 2. The workflow's `options` declare the authorization relationship, which the public report
    records. Check with the user that it is accurate, and ask before running the workflow.

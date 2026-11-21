@@ -44,7 +44,7 @@ that cites a result only in passing is not corrected here: when the route check 
 it in `docs/route_differences.tsv` with its reason.
 
 With several papers (`multi-paper.md`, Section 5), each paper has its own pair of route files in
-its directory, and the check runs once per paper against the audit's single `.lake/route_deps.tsv`.
+`docs/<Paper>/`, and the check runs once per paper against the audit's single `.lake/route_deps.tsv`.
 
 `route_check.py check` finds each Lean result by the first label in backticks in its docstring. A
 difference `-X` means that the paper's proof cites X and the Lean proof never reaches it; `+X`

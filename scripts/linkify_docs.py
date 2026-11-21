@@ -37,8 +37,9 @@ DOCS = ['README.md', 'REPORT.md', 'CREDITS.md']
 NAMESPACES = ['PaperName', 'ChallengeNamespace']
 # With several papers in one repository (references/multi-paper.md): the namespaces of the documents
 # in each top-level directory, tried before `NAMESPACES`, so that a short name in a paper's documents
-# names that paper's declaration; the first namespace that declares a name wins. Example:
-# {'PaperA': ['PaperA', 'PaperAChallenge'], 'PaperB': ['PaperB', 'PaperBChallenge']}.
+# names that paper's declaration; the first namespace that declares a name wins, and the longest
+# directory that contains the document is used. Example:
+# {'PaperA': ['PaperA', 'PaperAChallenge'], 'docs/PaperB': ['PaperB', 'PaperBChallenge']}.
 NAMESPACES_BY_DIR = {}
 # Top-level module names of the project: a code span naming such a module links to its file.
 MODULE_ROOTS = ('PaperName', 'External', 'Basic', 'Challenge', 'Solution')
@@ -46,6 +47,9 @@ MODULE_ROOTS = ('PaperName', 'External', 'Basic', 'Challenge', 'Solution')
 # papers, a tuple of modules, one per paper (each Challenge repeats its own paper's definitions):
 # ('PaperA.Challenge', 'PaperB.Challenge').
 PREFERRED_MODULE = 'Challenge'
+# The source directory of each module root whose `lean_lib` has a `srcDir` other than the
+# repository root (for example Challenges kept in `palomar/`: {'PaperA': 'palomar'}).
+SOURCE_DIRS = {}
 # Directories, besides the repository root, against which the paths in the documents of a
 # given directory are resolved.
 PATH_BASES = {'': ['.github/workflows']}
@@ -93,7 +97,19 @@ def warn(message):
 
 
 def module_file(module):
-    return '/'.join(module.split('.')) + '.lean'
+    path = '/'.join(module.split('.')) + '.lean'
+    base = SOURCE_DIRS.get(module.split('.')[0])
+    return base + '/' + path if base else path
+
+
+def dir_namespaces(doc_dir):
+    """The namespaces of `NAMESPACES_BY_DIR` for a document in `doc_dir`: those of the longest
+    configured directory that contains it."""
+    best = None
+    for d in NAMESPACES_BY_DIR:
+        if (doc_dir == d or doc_dir.startswith(d + '/')) and (best is None or len(d) > len(best)):
+            best = d
+    return NAMESPACES_BY_DIR[best] if best is not None else []
 
 
 def mathlib_page(module):
@@ -130,8 +146,7 @@ class Linker:
         candidates = [name]
         # Short names such as `U` or `h` are variables, not declarations.
         if len(name) >= 4:
-            top = Path(doc_dir).parts[0] if doc_dir else ''
-            own = [ns + '.' + name for ns in NAMESPACES_BY_DIR.get(top, [])]
+            own = [ns + '.' + name for ns in dir_namespaces(doc_dir)]
             # The directory's namespaces in order: the first that declares the name wins (the
             # library's before the Challenge's, whose Solution restates its theorems).
             own_hits = [c for c in own if c in self.locations]

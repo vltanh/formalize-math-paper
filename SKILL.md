@@ -311,10 +311,12 @@ on it, and parallel work does not stall. Decide where each file belongs when you
 results included: moving files later rewrites imports, namespaces, the audit's list of modules and
 the documents' links, and conflicts with every branch that touches them.
 
-Several related papers may share one repository (`references/multi-paper.md`). Then each paper
-has a directory of its own, holding its library, its own self-contained definitions module, its
-Challenge and Solution, its Palomar files, its documents and its routes; `Basic/`, `External/`,
-the tools and the licence are shared; and an umbrella README at the root connects the papers.
+Several related papers may share one repository (`references/multi-paper.md`). Then the Lean
+code lives under one root named after the question, with `Common/Basic/`, `Common/External/` and
+one library per paper, each with its own self-contained definitions module; `palomar/<Paper>/`
+holds each paper's Challenge, Solution and Palomar files, and `docs/<Paper>/` its documents and
+routes; the tools and the licence are shared; and an umbrella README at the root connects the
+papers.
 Decide this layout before the second paper's statements are written, and when a paper joins a
 single-paper project, move the first paper into its directory first.
 
@@ -468,8 +470,8 @@ dated search, including for newer versions of the paper), and "What's next" (how
 be extended, generalized or strengthened, and the simpler arguments recorded during the work).
 Later work that corrects the paper is also a finding: record it, and tell the user at once.
 
-With several papers, each paper's documents follow this phase for that paper alone, in its
-directory, and the umbrella README at the root (`references/multi-paper.md`, Section 6) gives the
+With several papers, each paper's documents follow this phase for that paper alone, in
+`docs/<Paper>/`, and the umbrella README at the root (`references/multi-paper.md`, Section 6) gives the
 state of the problem across the papers and the literature review that connects them, checked
 independently like a report's literature section.
 

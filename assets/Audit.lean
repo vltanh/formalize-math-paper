@@ -5,8 +5,8 @@ public meta import Lean.DocString
 -- One `import all` line per module of the libraries, so that proofs are visible to the dependency
 -- traversal (the module system hides them from a plain `import`). Generate the lines with
 --   find PaperName External Basic -name '*.lean' | sort | sed 's/\.lean$//; s#/#.#g; s/^/import all /'
--- With several papers (references/multi-paper.md), list every paper's directory and add
--- `! -name Challenge.lean`: import every paper's Solution, and no Challenge.
+-- With several papers (references/multi-paper.md), list every module of `<Project>/` and every
+-- paper's Solution in `palomar/`, and no Challenge.
 import all PaperName.Main
 import all Solution
 
