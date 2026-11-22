@@ -39,10 +39,10 @@ A passing build proves only what the statements say. Ask of the formalization:
   assumed result. Every assumed result must be a declared hypothesis, named after its source and
   listed in the report.
 - Is every object that a statement takes as a parameter tied to its defining property?
-- Is each result in `Common/External/` really cited by the paper, rather than proved in it?
+- Is each result in `External/` really cited by the paper, rather than proved in it?
 - Does each library theorem used for a cited result imply exactly the paper's form? Does each
   bridge from the paper's objects to a source's, in the paper's library, prove the
-  identification that the paper makes, and does `Common/External/` import nothing of the paper's?
+  identification that the paper makes, and does `External/` import nothing of the paper's?
 - Does each proof follow the paper's argument, and is every departure necessary and reported?
 - Are sums, counts and unions taken over exactly the paper's index sets?
 - Are the constants exact?
@@ -73,8 +73,8 @@ needs from user:  decisions or permissions
   within Palomar's size limits; the statements checked against the paper independently;
   representation bridges proved; baseline committed.
 - Stage 1: every internal result proved by the paper's argument; cited results isolated in
-  `ProjectName/Common/External/`, with citations, stated in their sources' terms, and importing
-  nothing from the paper's library.
+  `External/`, with citations, stated in their sources' terms, and importing nothing from the
+  paper's library.
 - Stage 2: every cited result proved or derived from a library, or, when out of reach, a declared
   hypothesis named after its source; zero project axioms.
 - Proof routes: `docs/PaperName/paper_routes.tsv` committed and checked against the paper; the route

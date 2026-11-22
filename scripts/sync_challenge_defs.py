@@ -3,8 +3,8 @@
 
 Comparator requires every constant that a Challenge statement uses to be the same in the
 Challenge and in the Solution's environment. When the statements need definitions too large to
-restate inline, keep them in one module of the library, `ProjectName/PaperName/Defs.lean`, between
-the two marker lines below, and let this script copy that block verbatim into the Challenge,
+restate inline, keep them in one module of the library, `PaperName/Defs.lean`, between the two
+marker lines below, and let this script copy that block verbatim into the Challenge,
 `palomar/PaperName/Challenge.lean`, which may not import the project.
 The Solution imports the library, so both environments then contain the same definitions.
 
@@ -23,7 +23,7 @@ from pathlib import Path
 
 # ---- configuration -------------------------------------------------------------------------
 # The library module that holds the shared definitions, and the Challenge file.
-DEFS = 'ProjectName/PaperName/Defs.lean'
+DEFS = 'PaperName/Defs.lean'
 CHALLENGE = 'palomar/PaperName/Challenge.lean'
 # With several papers, one (definitions module, Challenge) pair per paper, e.g.
 #   PAIRS = [('ProjectName/PaperA/Defs.lean', 'palomar/PaperA/Challenge.lean'),

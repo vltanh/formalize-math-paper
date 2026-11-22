@@ -4,4 +4,4 @@ focus: trace
 weight: 1
 ---
 
-layout.md says why this layout is used even for one paper: a second paper can join later without moving files or renaming modules
+layout.md says why the code has this shape: a project of one paper keeps the shortest paths, and a second paper can join later by one move of the first paper's code under a root for the project (with its modules renamed), while palomar/<Paper>/ and docs/<Paper>/ stay where they are

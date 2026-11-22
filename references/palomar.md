@@ -104,8 +104,8 @@ decides to.
   project, the hypotheses' definitions, and the objects they mention, belong to the block of
   shared definitions below, and the library's statements use the same names.
 - When the statements need definitions too large to restate inline, keep them in one module of the
-  paper's library, `ProjectName/PaperName/Defs.lean`, between two marker comments. Copy that block
-  word for word into the Challenge with `scripts/sync_challenge_defs.py`; CI runs it with `--check`.
+  paper's library, `PaperName/Defs.lean`, between two marker comments. Copy that block word for
+  word into the Challenge with `scripts/sync_challenge_defs.py`; CI runs it with `--check`.
   Comparator requires the constants that the statements use to be the same in the Challenge and in
   the Solution's environment, and the exact copy makes them the same without bridge lemmas. Keep the
   block in a module that imports exactly what the Challenge imports, and put in it every definition
@@ -122,7 +122,7 @@ decides to.
   the project. Bridge lemmas translate between the project's definitions and the Challenge's
   vocabulary. The Solution imports the paper's library and serves as its entry point.
 - Both belong to the lakefile's library `Palomar`, whose source directory is `palomar/`, a default
-  target (`lean-project.md`, Section 3).
+  target declared after the library of the code (`lean-project.md`, Section 3).
 - The editorial review checks that every definition of the Challenge has its ordinary meaning.
   The compared theorem that ties an unfamiliar definition to something known (SKILL.md, Phase 3)
   is the evidence.

@@ -12,7 +12,7 @@ files to submit it to the [Palomar](https://palomar-registry.org) registry.
 | Step | What the skill does |
 | --- | --- |
 | Inventory | records the paper's results, constants, citations and suspected typos |
-| Project | sets up a Lean project on a Mathlib release, with the module system, in the standard layout (below), with three layered libraries: `Common/Basic` (general mathematics, for later contribution to Mathlib), `Common/External` (the results the paper cites, in their sources' terms) and the paper's own |
+| Project | sets up a Lean project on a Mathlib release, with the module system, in the standard layout (below), with three layers: `Basic/` (general mathematics, for later contribution to Mathlib), `External/` (the results the paper cites, in their sources' terms) and the paper's own library |
 | Statements | states every result first, and checks each statement against the paper's TeX source |
 | Proofs | proves what the paper proves, by the paper's own arguments, then the results it cites. A proof departs from the paper's only when it must, and every departure is reported to you with its reason. A cited result that no Lean library can yet support becomes a visible hypothesis, and the result is reported as conditional |
 | Verification | checks the axioms of every declaration, checks that each proof uses the results that the paper's proof cites (extracted from the TeX source), and runs Comparator |
@@ -21,12 +21,15 @@ files to submit it to the [Palomar](https://palomar-registry.org) registry.
 | Next papers | writes a private `NEXT.md`, kept out of git: directions that would each make a paper of their own, explored to the step where the paper's method stops and checked for novelty |
 | Packaging | prepares the Challenge/Solution pair, `comparator.json` and `formalization.yaml` for Palomar, and, with your permission, publishes the project and runs Palomar's preflight |
 
-Every project has the same layout ([`references/lean-project.md`](references/lean-project.md),
-Section 2): the Lean code under one root, `ProjectName/`, with `Common/` and one directory per
-paper; each paper's Palomar submission in `palomar/PaperName/`; its documents in `docs/PaperName/`;
-the README and the licence at the root. A related paper (a sequel, the other case of one problem, a
-refutation) can then join the repository later without moving anything: the papers share code, each
-keeps its own Challenge, Palomar submission and documents, and an umbrella README connects them.
+A project with one paper ([`references/lean-project.md`](references/lean-project.md), Section 2)
+has its Lean code under one root named after the paper, `PaperName/`, with `Basic/`, `External/`
+and the paper's sections; its Palomar submission in `palomar/PaperName/`; its documents in
+`docs/PaperName/`; the README and the licence at the root. A related paper (a sequel, the other
+case of one problem, a refutation) can join the repository later. The first paper's code then moves
+once, under a root named after the project, with the shared code in `ProjectName/Common/` and one
+directory per paper ([`references/multi-paper.md`](references/multi-paper.md)); the Palomar files
+and the documents stay. The papers share code, each keeps its own Challenge, Palomar submission and
+documents, and an umbrella README connects them.
 
 ## Made with this skill
 

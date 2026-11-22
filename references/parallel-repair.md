@@ -129,7 +129,7 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
    two builds in one checkout delete each other's outputs.
 2. Check the axioms and the routes. Once `scripts/Audit.lean` exists (Phase 6), run it and the route
    check (SKILL.md, Phase 6). Before that, check the axioms of the main theorems with `#print
-   axioms` (during Stage 1, only the axioms of cited results in `Common/External/` may appear), and
+   axioms` (during Stage 1, only the axioms of cited results in `External/` may appear), and
    read the routes of the integrated results against `docs/PaperName/paper_routes.tsv`. Every route
    difference is a proof to rewrite or a departure to report.
 3. Run `python3 <skill-dir>/scripts/stmt_diff.py <baseline commit>`. It lists every declaration

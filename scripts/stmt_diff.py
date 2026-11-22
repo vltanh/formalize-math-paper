@@ -11,11 +11,11 @@ files) at REV with the working tree:
 
 Declarations are identified by their full names (`namespace` blocks included), and a change to a
 file's `variable` commands, which changes the statements that use them, is reported too. A file
-that git sees as renamed since REV (moved with `git mv`, as when a project moves to the standard
-layout) is compared with its old path. Whitespace is ignored. Prints RENAMED, CHANGED (old and new,
-abbreviated), REMOVED, VARIABLES, and the number of declarations ADDED per file. Use it after
-parallel repair, cleanup or a move, to catch statement changes that nobody reported. A paper result
-must never appear here unless the change was intended and documented.
+that git sees as renamed since REV (moved with `git mv`, as when a second paper joins a project and
+the first paper's code moves) is compared with its old path. Whitespace is ignored. Prints RENAMED,
+CHANGED (old and new, abbreviated), REMOVED, VARIABLES, and the number of declarations ADDED per
+file. Use it after parallel repair, cleanup or a move, to catch statement changes that nobody
+reported. A paper result must never appear here unless the change was intended and documented.
 """
 import argparse
 import re

@@ -79,8 +79,8 @@ change; whether every proof follows the paper's, and how many depart from it (Se
 finding in a line, with its E-number.>
 
 ## 2. Results from prior work and how the paper uses them
-### Proved in `Common/External/`
-| Result | Where the paper uses it | Source | Theorem in `Common/External/` |
+### Proved in `External/`
+| Result | Where the paper uses it | Source | Theorem in `External/` |
 ### Assumed (a conditional formalization only)
 | Result | Where the paper uses it | Source | Hypothesis in the formalization | What Lean lacks | Plan, if any |
 <Check each hypothesis against its source as carefully as a statement: an assumption stated more
@@ -197,8 +197,8 @@ here. A simpler proof that has been published belongs in Section 10. If there is
 <What would extend the formalization itself. Point to the assumed results of Section 2 and the
 items of Section 9 instead of repeating them, and add what they lack: the generality to reach, and
 the contributions to Mathlib or other libraries that would make the work feasible. List what
-`Common/Basic/` holds, where each part would go, and what it still depends on, and what
-`Common/External/` holds that other formalizations citing the same sources could reuse.>
+`Basic/` holds, where each part would go, and what it still depends on, and what `External/`
+holds that other formalizations citing the same sources could reuse.>
 ```
 
 ## 3. `README.md` structure
@@ -231,7 +231,7 @@ shows what a reader needs first. In order:
 7. Dependencies (packages and libraries beyond Mathlib, with what each provides); Palomar, briefly
    (the files in `palomar/PaperName/`, and how to run Comparator on their configuration); Building
    (the commands, the toolchain); Layout, with one row per top-level directory (module-by-module
-   tables belong in `Common/Basic/README.md`, `Common/External/README.md` or the report).
+   tables belong in `Basic/README.md`, `External/README.md` or the report).
 8. Related work and credits, a few bullets each, with links to the report's Section 10 and to
    `CREDITS.md`. The credits say who and what wrote the code, at whose request, by which
    procedure (with a link to this skill's repository), whether a person has reviewed the proofs,

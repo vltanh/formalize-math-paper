@@ -8,8 +8,11 @@ instead of assuming them. Each paper still keeps everything a reader or a regist
 that paper on its own: its statements of record, its audit, its credits, its Palomar submission.
 A central README ties them together.
 
-Every project already has the layout that several papers need (`lean-project.md`, Section 2). This
-guide says only what changes when there are several.
+A project with one paper has all its code under `PaperName/` (`lean-project.md`, Section 2). With
+several papers, the code is under one root named after the project, with the code that the papers
+share in `Common/`; `palomar/` and `docs/` have one directory per paper, as they do for one paper.
+This guide gives that layout, what else changes when there are several papers, and how a project
+of one paper takes a second (Section 9).
 
 ## Contents
 
@@ -21,7 +24,7 @@ guide says only what changes when there are several.
 6. Documents
 7. Palomar
 8. Tools
-9. Moving an older repository to the standard layout
+9. From one paper to several
 
 ## 1. When to combine papers
 
@@ -31,22 +34,82 @@ cases of one problem, a survey of claims on one question. Keep unrelated papers 
 repositories, even by the same author: a shared repository only adds coupling.
 
 The user decides. When a second paper arrives for an existing project, ask whether it joins the
-repository or starts a new one (Phase 0), unless the request already says so.
+repository or starts a new one (Phase 0), unless the request already says so. A paper that joins a
+project of one paper starts with the move of Section 9.
 
 ## 2. Layout
 
-The standard layout (`lean-project.md`, Section 2) already has a place for every paper. Each paper
-adds its library `ProjectName/PaperName/`, its Palomar submission `palomar/PaperName/` and its
-documents `docs/PaperName/`; nothing else moves. `ProjectName/Common/`, `scripts/`, the licence and
-the lakefile stay shared, and a result that two papers cite is formalized once, in
+```text
+README.md                    -- the umbrella README (Section 6)
+LICENSE, lakefile.toml, lean-toolchain, lake-manifest.json
+ProjectName/                 -- all the Lean code, under one root named after the project
+  Common/Basic/              -- general mathematics, shared, in Mathlib's namespaces
+  Common/External/Source/    -- cited results, shared, with a README.md; namespace External.Source
+  PaperA/                    -- paper A's library, in namespace PaperA
+    Defs.lean, Introduction.lean, …, Main.lean
+  PaperB/
+palomar/PaperA/              -- paper A's submission: Challenge.lean (module PaperA.Challenge),
+                                Solution.lean (PaperA.Solution), comparator.json, formalization.yaml
+palomar/PaperB/
+docs/PaperA/                 -- paper A's documents: README.md, REPORT.md, CREDITS.md, the routes,
+                                NEXT.md (private), numerics/
+docs/PaperB/
+scripts/                     -- one Audit.lean for the repository, and the tools
+.github/workflows/           -- lean_action_ci.yml; palomar_preflight_papera.yml, …_paperb.yml
+```
+
+Each paper has its library `ProjectName/PaperName/`, laid out as the library of one paper
+(`Defs.lean`, the sections, `Main.lean`; `lean-project.md`, Section 2), its Palomar submission
+`palomar/PaperName/` and its documents `docs/PaperName/`. `ProjectName/Common/`, `scripts/`, the
+licence and the lakefile are shared, and a result that two papers cite is formalized once, in
 `Common/External/`. Two documents change: the root README becomes the umbrella document
 (Section 6), and each paper's README goes to `docs/PaperName/README.md`.
 
-For each paper, the lakefile (`lean-project.md`, Section 3) gains a `lean_lib` for its library
-(`name = "PaperB"`, `globs = ["ProjectName.PaperB.+"]`) among the default targets, and the paper's
-name in the `globs` of the `Palomar` library once `palomar/PaperB/` exists. Name each paper after
-the paper, not after the subject (`lean-project.md`, Section 2): two papers on one subject need
-different names.
+Name the root after the project: its question or subject (`Morrey/`), or one of its papers, as
+when a second paper joins a project of one paper and the first paper's name stays the root
+(`Smith/Common/`, `Smith/Smith/`, `Smith/Jones/`; Section 9). Name each paper after the paper, not
+after the subject (`lean-project.md`, Section 2): two papers on one subject need different names.
+The modules of `ProjectName/PaperA/` are `ProjectName.PaperA.…`, and their declarations are in the
+namespace `PaperA`; `Common/Basic/` is in Mathlib's namespaces, and `Common/External/Source/` in
+`External.Source`. Each paper's Challenge and Solution are the modules `PaperA.Challenge` and
+`PaperA.Solution` of the source directory `palomar/`, and the Challenge's theorems are in the
+namespace `PaperAChallenge`, as for one paper. The layers are those of one paper, with
+`Common/Basic/` and `Common/External/` shared (Section 4).
+
+The lakefile (`lean-project.md`, Section 3) has a library for `Common/` and one per paper, and the
+`Palomar` library lists every paper's two modules:
+
+```toml
+name = "ProjectName"
+defaultTargets = ["Common", "PaperA", "PaperB", "Palomar"]
+
+[[lean_lib]]
+name = "Common"
+globs = ["ProjectName.Common.+"]     # Common/Basic/ and Common/External/
+
+[[lean_lib]]
+name = "PaperA"
+globs = ["ProjectName.PaperA.+"]     # every module of paper A's library
+
+[[lean_lib]]
+name = "PaperB"
+globs = ["ProjectName.PaperB.+"]
+
+# Last, as for one paper (lean-project.md, Section 3).
+[[lean_lib]]
+name = "Palomar"
+srcDir = "palomar"
+roots = ["PaperA.Challenge", "PaperA.Solution", "PaperB.Challenge", "PaperB.Solution"]
+```
+
+Every library is a default target. The `Palomar` library lists its modules by name: when a paper
+is named as the project, its Challenge (`Smith.Challenge`, in `palomar/`) and the shared code
+(`Smith.Common.Basic.…`, at the root) are modules of one root, and a glob `Smith.+` in `Palomar`
+would match both (`lean-project.md`, Section 3). Declare it last, as for one paper: Lake gives a
+module to the last library whose patterns match it, so no other library can then take a Challenge
+or a Solution. Lake fails on a glob whose directory, or a root whose file, does not exist: add a
+paper's library, or its two modules to the `roots`, only once they exist (a `README.md` in
+`Common/Basic/` is enough to create that directory).
 
 ## 3. Definitions and Challenges
 
@@ -97,9 +160,10 @@ talk about the same thing.
 - One `scripts/Audit.lean` covers the whole repository. It imports, with `import all`, every module
   of `ProjectName/` and every paper's Solution, but no Challenge: a Challenge holds a copy of its
   paper's definitions under the library's names, and the two copies clash. The command that
-  generates these lines (in `assets/Audit.lean`) and CI's check of them already cover every paper;
-  add each paper's name to the check's `grep` pattern, and each paper's Solution module to
-  `isLibraryModule`. The audit lists every paper's numbered results (with the paper in the label:
+  generates these lines (in `assets/Audit.lean`) and CI's check of them cover every paper once
+  they `find ProjectName` instead of `PaperName`; add each paper's name to the check's `grep`
+  pattern, and let `isLibraryModule` accept the root `ProjectName` and each paper's Solution
+  module. The audit lists every paper's numbered results (with the paper in the label:
   "Šverák Lemma 1") and every paper's Comparator theorems, and checks every declaration's axioms.
   It writes one `.lake/route_deps.tsv`; run the route check once per paper, with that paper's two
   files:
@@ -164,9 +228,9 @@ module header, at most 10,000 lines, no symbolic links), so a paper still in pro
 them too; its `sorry`s do not fail them. But they fail the shared audit, and so the CI of the
 finished papers: keep the default branch building and audited, and develop a new paper on a branch
 until its proofs are done (its statements, once checked, are that branch's baseline). A paper
-already registered stays pinned to the commit it was submitted at: moving it to the standard layout
-(Section 9) does not change that entry, and whether to resubmit it from the new layout is the
-user's decision.
+already registered stays pinned to the commit it was submitted at: moving its code (Section 9)
+does not change that entry, and whether to resubmit it from the new layout is the user's
+decision.
 
 ## 8. Tools
 
@@ -185,47 +249,94 @@ user's decision.
   README. Links are relative to each document's directory. A short name of fewer than four
   characters is never looked up (it reads as a variable): write it qualified (`PaperA.jac`).
 - `check_md_tables.py`: run it on every document.
-- CI (`assets/lean_action_ci.yml`): every paper's name in the `grep` pattern of the audit-import
-  check; the route check once per paper; the sync check, the links and the tables for every paper.
+- CI (`assets/lean_action_ci.yml`): in the check of the audit's imports, `find ProjectName` and
+  every paper's name in the `grep` pattern; the route check once per paper; the sync check, the
+  links and the tables for every paper.
 
-## 9. Moving an older repository to the standard layout
+## 9. From one paper to several
+
+When a second paper joins a project of one paper, the first paper's code moves under a root for
+the project (Section 2). Make the move before the second paper's statements are written:
+
+1. Choose the root: a new name for the question, or the first paper's name, which then names the
+   project and the paper (`Smith/Smith/`). Move the files with `git mv`, so that history follows
+   them:
+   - `PaperName/Basic/` to `ProjectName/Common/Basic/`, and `PaperName/External/` to
+     `ProjectName/Common/External/`; their modules `PaperName.Basic.…` and `PaperName.External.…`
+     become `ProjectName.Common.Basic.…` and `ProjectName.Common.External.…`, and their namespaces
+     stay;
+   - the rest of `PaperName/` to `ProjectName/PaperName/`; its modules `PaperName.X` become
+     `ProjectName.PaperName.X`, and its namespace stays `PaperName`.
+
+   With a new root:
+
+   ```sh
+   mkdir -p ProjectName/Common
+   git mv PaperName/Basic PaperName/External ProjectName/Common/
+   git mv PaperName ProjectName/PaperName
+   ```
+
+   With the paper's name as the root:
+
+   ```sh
+   mkdir -p PaperName/Common PaperName/PaperName
+   git mv PaperName/Basic PaperName/External PaperName/Common/
+   for f in PaperName/*; do
+     case $f in PaperName/Common|PaperName/PaperName) ;; *) git mv "$f" PaperName/PaperName/ ;; esac
+   done
+   ```
+
+   `palomar/PaperName/` and `docs/PaperName/` do not move, and the Challenge and the Solution keep
+   their module names: `comparator.json`, `formalization.yaml` and the preflight workflow do not
+   change.
+2. Rename the moved modules in every `.lean` file, scripts included, and in the documents (the
+   README, `REPORT.md`, `CREDITS.md`, the READMEs of `Basic/` and `External/`). Rename each module
+   by its exact old name, from the list of moved files (`git diff --cached -M --name-status`), not
+   by a prefix: the declarations keep their names, and `PaperName.theorem1_1` must not become
+   `ProjectName.PaperName.theorem1_1`. Rewrite the paths that the documents name the same way
+   (`PaperName/Basic/` becomes `ProjectName/Common/Basic/`).
+3. Point the tools at the new paths: the lakefile, with the library `Common`, one library per
+   paper, and `Palomar` last (Section 2); the audit's `import all` lines, generated again, and
+   `isLibraryModule`; CI's check of the audit's imports (`find ProjectName`, and every paper's name
+   in the `grep` pattern); `sync_challenge_defs.py`; and the configuration of `linkify_docs.py`
+   (Section 8). Delete the old build outputs under `.lake/build`: stale `.ilean` files make
+   `linkify_docs.py` link to the old paths.
+4. Check the move. Rebuild, and build `Palomar` and the Solution alone
+   (`lake build PaperName.Solution`), as Comparator does. Rerun every check of Phase 6 (audit,
+   route check, Comparator, Palomar's local checks), and `linkify_docs.py`, which recomputes every
+   link to a line of the code and warns about a code span that names nothing any more. Run
+   `scripts/stmt_diff.py` against the commit before the move; it follows renamed files. The move
+   must change no statement and no proof's route: `stmt_diff.py` lists only renames.
+5. Commit the move on its own, with a message that lists the renames, before any new mathematics.
+   A branch that already holds work on the new paper takes the move by a merge: git places most
+   moved files by its rename detection, but files the branch added in a moved directory need to be
+   moved by hand, and their imports rewritten.
+
+Then the second paper joins. Move the first paper's README to `docs/PaperName/README.md` and
+rewrite its relative links: resolve each link against the root, and make it relative to
+`docs/PaperName/`. Write the umbrella README (Section 6), list every paper's documents in the
+configuration of `linkify_docs.py`, and rerun it. Split any definitions that the second paper also
+needs into that paper's own `Defs.lean` (Section 3): the first paper's Challenge must not grow
+definitions it does not use.
 
 An older repository may keep `Basic/`, `External/` and `PaperName/` at the root, with
 `Challenge.lean`, `Solution.lean`, `comparator.json`, `formalization.yaml`, `REPORT.md`,
-`CREDITS.md` and `NEXT.md` beside them, and the routes in `docs/`. Move it to the standard layout
-before a second paper's statements are written, or whenever the user asks:
+`CREDITS.md` and `NEXT.md` beside them, and the routes in `docs/`. Move it to the layout of one
+paper (`lean-project.md`, Section 2) whenever the user asks, with these moves in place of step 1,
+and then steps 2 to 5 with the lakefile of `lean-project.md`, Section 3. When a second paper is
+joining, move it straight to the layout of Section 2 instead (`Basic/` and `External/` to
+`ProjectName/Common/`, `PaperName/` to `ProjectName/PaperName/`).
 
-1. Move the files with `git mv`, so that history follows them:
-   - `PaperName/` to `ProjectName/PaperName/`; its modules become `ProjectName.PaperName.…`. If its
-     namespace was named after the subject, rename it after the paper, and its Challenge namespace
-     to `PaperNameChallenge`;
-   - `Basic/` and `External/` to `ProjectName/Common/`; their modules become
-     `ProjectName.Common.Basic.…` and `ProjectName.Common.External.…`, and their namespaces stay;
-   - `Challenge.lean`, `Solution.lean`, `comparator.json` and `formalization.yaml` to
-     `palomar/PaperName/`; the modules become `PaperName.Challenge` and `PaperName.Solution`;
-   - `REPORT.md`, `CREDITS.md`, the two routes files and any numerics scripts (into `numerics/`) to
-     `docs/PaperName/`, and `NEXT.md` there with a plain `mv`, since git does not track it. The
-     README stays at the root while the repository holds one paper.
-2. Rewrite the imports of every `.lean` file, scripts included, and the module names in
-   `comparator.json`. Point the tools at the new paths: the lakefile (`lean-project.md`,
-   Section 3), the audit's `import all` lines and `isLibraryModule`, CI, `sync_challenge_defs.py`,
-   the configuration of `linkify_docs.py`, and the preflight workflow, renamed
-   `palomar_preflight_papername.yml`, whose `options` name both paths. Ignore `NEXT.md` in every
-   directory (`NEXT.md` in `.gitignore`, without a leading slash). Delete the old build outputs
-   under `.lake/build`: stale `.ilean` files make `linkify_docs.py` link to the old paths.
-3. Rewrite every relative link of the moved documents, and of the README, which now points into
-   `docs/PaperName/` and `palomar/PaperName/`: resolve each link against the document's old
-   directory, map the target to its new path, and make it relative to the document's new
-   directory. Then rerun `linkify_docs.py`.
-4. Check the move. Rebuild, rerun every check of Phase 6 (audit, route check, Comparator, Palomar's
-   local checks), and run `scripts/stmt_diff.py` against the commit before the move; it follows
-   renamed files. The move must change no statement and no proof's route, apart from the renames.
-5. Commit the move on its own, with a message that lists the renames, before any new mathematics.
-   A branch that already holds work on a new paper takes the move by a merge: git places most moved
-   files by its rename detection, but files the branch added in a moved directory need to be moved
-   by hand, and their imports rewritten.
-
-When the second paper then joins, move the first paper's README to `docs/PaperName/README.md`
-(rewriting its links as in step 3), write the umbrella README (Section 6), and split any
-definitions that the second paper also needs into that paper's own `Defs.lean` (Section 3): the
-first paper's Challenge must not grow definitions it does not use.
+- `Basic/` and `External/` to `PaperName/Basic/` and `PaperName/External/`; their modules become
+  `PaperName.Basic.…` and `PaperName.External.…`, their namespaces stay, and the paper's library
+  stays where it is. If its namespace was named after the subject, rename it after the paper, and
+  its Challenge namespace to `PaperNameChallenge`;
+- `Challenge.lean`, `Solution.lean`, `comparator.json` and `formalization.yaml` to
+  `palomar/PaperName/`; the modules become `PaperName.Challenge` and `PaperName.Solution`, and
+  `comparator.json` names them so. Rename the preflight workflow `palomar_preflight_papername.yml`,
+  and let its `options` name both paths;
+- `REPORT.md`, `CREDITS.md`, the two routes files and any numerics scripts (into `numerics/`) to
+  `docs/PaperName/`, and `NEXT.md` there with a plain `mv`, since git does not track it (`NEXT.md`
+  in `.gitignore`, without a leading slash). Rewrite every relative link of the moved documents,
+  and of the README, which stays at the root: resolve each link against the document's old
+  directory, map the target to its new path, and make it relative to the document's new directory.

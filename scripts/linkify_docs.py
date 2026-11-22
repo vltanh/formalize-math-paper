@@ -42,17 +42,21 @@ NAMESPACES = ['PaperName', 'PaperNameChallenge']
 # directory that contains the document is used. Example:
 # {'docs/PaperA': ['PaperA', 'PaperAChallenge'], 'docs/PaperB': ['PaperB', 'PaperBChallenge']}.
 NAMESPACES_BY_DIR = {}
-# Top-level module names of the project: a code span naming such a module links to its file. The
-# library's modules are under `ProjectName`; the Challenge and the Solution are `PaperName.Challenge`
-# and `PaperName.Solution`.
-MODULE_ROOTS = ('ProjectName', 'PaperName')
+# Top-level module names of the project: a code span naming such a module links to its file. With
+# one paper, every module is under `PaperName`: the library's (`PaperName.Main`,
+# `PaperName.Basic.…`) and the Challenge and the Solution (`PaperName.Challenge`,
+# `PaperName.Solution`). With several papers, the project's root and every paper's name (the root
+# of its Challenge and Solution): ('ProjectName', 'PaperA', 'PaperB').
+MODULE_ROOTS = ('PaperName',)
 # The module whose declarations win when a name is declared in several modules: the Challenge,
 # whose theorems the Solution restates. With several papers, a tuple of modules, one per paper
 # (each Challenge repeats its own paper's definitions): ('PaperA.Challenge', 'PaperB.Challenge').
 PREFERRED_MODULE = 'PaperName.Challenge'
 # The source directory of each module root whose `lean_lib` has a `srcDir` other than the
 # repository root: the Challenges and Solutions are in `palomar/`. With several papers, one entry
-# per paper: {'PaperA': 'palomar', 'PaperB': 'palomar'}.
+# per paper: {'PaperA': 'palomar', 'PaperB': 'palomar'}. A root can have modules in both places
+# (with one paper, `PaperName.Challenge` in `palomar/` and `PaperName.Main` at the root): a module
+# is looked for in its root's source directory first, then at the repository root.
 SOURCE_DIRS = {'PaperName': 'palomar'}
 # Directories, besides the document's own and the repository root, against which the paths in the
 # documents of a given directory are resolved: a code span `REPORT.md` in the README names
@@ -105,9 +109,15 @@ def warn(message):
 
 
 def module_file(module):
+    """The file of `module`, relative to the repository root: in the source directory of its root
+    (`SOURCE_DIRS`) when the file is there, otherwise at the repository root. Both hold modules of
+    one root when the root is a paper's name (`PaperName.Challenge` in `palomar/`,
+    `PaperName.Basic.X` at the root)."""
     path = '/'.join(module.split('.')) + '.lean'
     base = SOURCE_DIRS.get(module.split('.')[0])
-    return base + '/' + path if base else path
+    if base and (ROOT / base / path).is_file():
+        return base + '/' + path
+    return path
 
 
 def dir_namespaces(doc_dir):

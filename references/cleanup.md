@@ -87,12 +87,12 @@ proofs drift away from the paper while no statement changes:
   with a script that moves the files (`git mv`), rewrites the imports, rewrites qualified
   references to the declarations of the renamed namespace, and leaves the truly external names
   alone. Then fix the module docstrings by hand, and rebuild.
-- Move general lemmas that grew inside the paper's files to `ProjectName/Common/Basic/` (SKILL.md,
-  Phase 2), in a round of their own: keep each statement, give the lemma the name and namespace that
-  Mathlib would give it, update its callers, and rerun the route check. Move cited results that grew
-  inside the paper's library to `ProjectName/Common/External/` the same way: keep each statement,
-  restate it in its source's terms if it uses the paper's definitions, prove the bridge in the
-  paper's library, and update the audit's lists, `isLibraryModule` and the documents' links.
+- Move general lemmas that grew inside the paper's files to `Basic/` (SKILL.md, Phase 2), in a round
+  of their own: keep each statement, give the lemma the name and namespace that Mathlib would give
+  it, update its callers, and rerun the route check. Move cited results that grew inside the paper's
+  library to `External/` the same way: keep each statement, restate it in its source's terms if it
+  uses the paper's definitions, prove the bridge in the paper's library, and update the audit's
+  lists, `isLibraryModule` and the documents' links.
 - A draft's own notes are deleted in Phase 8 (SKILL.md, Phase 0). Your own working notes (the
   inventory, the run log) are untracked and stay until the end.
 - After moving or renaming modules, delete their old build outputs under `.lake/build`: stale
