@@ -12,12 +12,12 @@
 
 ## 1. What it is for
 
-`NEXT.md` answers one question for the user: what paper could they write next, following this one?
-The report's Section 11 records what the work showed about the paper: hypotheses it does not need,
-variants its proofs cover, simpler arguments, extensions of the formalization. These are worth
-having, but most of them make a remark in a revised version, not a paper. `NEXT.md` is for the
-directions that would make a paper of their own, explored far enough that the user can judge
-whether to spend months on one.
+`NEXT.md`, in `docs/PaperName/`, answers one question for the user: what paper could they write
+next, following this one? The report's Section 11 records what the work showed about the paper:
+hypotheses it does not need, variants its proofs cover, simpler arguments, extensions of the
+formalization. These are worth having, but most of them make a remark in a revised version, not a
+paper. `NEXT.md` is for the directions that would make a paper of their own, explored far enough
+that the user can judge whether to spend months on one.
 
 Formalizing the paper gave you the most thorough reading it will get. You know which hypothesis
 each step uses, which estimates are tight and which have room, which steps are generic and which
@@ -26,8 +26,8 @@ wrong. Use that knowledge. A list of directions that anyone could write from the
 nothing.
 
 For a project formalized before this step existed, or when the user asks for it on its own, start
-from the project's `REPORT.md`, its inventory if it kept one, the paper's TeX source and the Lean
-library, and refresh the literature search of the report's Section 10 first.
+from the project's `docs/PaperName/REPORT.md`, its inventory if it kept one, the paper's TeX source
+and the Lean library, and refresh the literature search of the report's Section 10 first.
 
 One candidate explored in depth is worth more than several sketched. If no candidate meets the bar
 (Section 3), say so, and say what came closest and why it falls short.
@@ -183,8 +183,9 @@ the bar, say so, and what came closest.>
 ## 7. Keeping it private
 
 `NEXT.md` holds unpublished research ideas, and the formalization is usually published. Add
-`/NEXT.md` and `/notes/next/` to the project's `.gitignore` before writing it, never commit it, and
-leave it out of every package and pull request. Publish it only if the user asks.
+`NEXT.md`, without a leading slash so that it is ignored in `docs/PaperName/` (and in every
+paper's directory), and `/notes/next/` to the project's `.gitignore` before writing it, never
+commit it, and leave it out of every package and pull request. Publish it only if the user asks.
 
 The public report states, in one line at the start of its Section 11, that plans for follow-up
 papers are kept in `NEXT.md`, which is not published. Write the file name in a code span, not as a

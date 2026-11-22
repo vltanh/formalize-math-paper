@@ -1,5 +1,8 @@
 # The paper audit, `REPORT.md` and `README.md`
 
+The report is `docs/PaperName/REPORT.md`, beside the paper's other documents, and the README is
+the front page at the root (`lean-project.md`, Section 2).
+
 ## Contents
 
 1. Auditing the paper
@@ -76,8 +79,8 @@ change; whether every proof follows the paper's, and how many depart from it (Se
 finding in a line, with its E-number.>
 
 ## 2. Results from prior work and how the paper uses them
-### Proved in `External/`
-| Result | Where the paper uses it | Source | Theorem in `External/` |
+### Proved in `Common/External/`
+| Result | Where the paper uses it | Source | Theorem in `Common/External/` |
 ### Assumed (a conditional formalization only)
 | Result | Where the paper uses it | Source | Hypothesis in the formalization | What Lean lacks | Plan, if any |
 <Check each hypothesis against its source as carefully as a statement: an assumption stated more
@@ -115,14 +118,14 @@ proved. If a statement of the paper had to be corrected, a second list: the corr
 departure is necessary: one of the three reasons of SKILL.md's Rules (the paper's step is wrong or
 has a gap that cannot be repaired along its lines; it needs mathematics that Lean lacks and the
 project cannot build; it has no meaning in the formalization's representation). Keep this section
-consistent with the docstrings, `formalization.yaml` and `docs/route_differences.tsv`. If there are
-none, say that every proof follows the paper's.>
+consistent with the docstrings, `formalization.yaml` and `docs/PaperName/route_differences.tsv`. If
+there are none, say that every proof follows the paper's.>
 | Result | The paper's argument | The formalization's | Why it is necessary | E-item |
 
 ## 8. What each result depends on
 <Generated from scripts/Audit.lean.> | Result | Lean | Results from prior work used |
 <One sentence on the route check: every proof uses the results that the paper's proof cites,
-except the differences recorded in docs/route_differences.tsv, each with its reason.>
+except the differences recorded in docs/PaperName/route_differences.tsv, each with its reason.>
 
 ## 9. Not formalized
 <Everything in the paper that is not formalized: deductions that combine the paper with
@@ -194,8 +197,8 @@ here. A simpler proof that has been published belongs in Section 10. If there is
 <What would extend the formalization itself. Point to the assumed results of Section 2 and the
 items of Section 9 instead of repeating them, and add what they lack: the generality to reach, and
 the contributions to Mathlib or other libraries that would make the work feasible. List what
-`Basic/` holds, where each part would go, and what it still depends on, and what `External/`
-holds that other formalizations citing the same sources could reuse.>
+`Common/Basic/` holds, where each part would go, and what it still depends on, and what
+`Common/External/` holds that other formalizations citing the same sources could reuse.>
 ```
 
 ## 3. `README.md` structure
@@ -226,16 +229,17 @@ shows what a reader needs first. In order:
 6. Trust, in a few bullets: the build, `sorry` and `axiom` status; the audit script; the route
    check; who reviewed the statements and the proofs, and whether any person did.
 7. Dependencies (packages and libraries beyond Mathlib, with what each provides); Palomar, briefly
-   (the files, how to run `lake comparator`); Building (the commands, the toolchain); Layout, with
-   one row per top-level directory (module-by-module tables belong in `Basic/README.md`,
-   `External/README.md` or the report).
+   (the files in `palomar/PaperName/`, and how to run Comparator on their configuration); Building
+   (the commands, the toolchain); Layout, with one row per top-level directory (module-by-module
+   tables belong in `Common/Basic/README.md`, `Common/External/README.md` or the report).
 8. Related work and credits, a few bullets each, with links to the report's Section 10 and to
    `CREDITS.md`. The credits say who and what wrote the code, at whose request, by which
    procedure (with a link to this skill's repository), whether a person has reviewed the proofs,
    and when. No links to old drafts. Then the license.
 
-With several papers in one repository, each paper's README follows this structure for its paper
-and links to the umbrella README at the root, which `multi-paper.md`, Section 6, describes.
+With several papers in one repository, each paper's README, in `docs/PaperName/README.md`, follows
+this structure for its paper and links to the umbrella README at the root, which `multi-paper.md`,
+Section 6, describes.
 
 When the repository is published, keep its GitHub description in step with the README: update it
 (`gh repo edit --description`) in the same step as the push that changes what the repository
@@ -263,6 +267,6 @@ proves.
   the count: its text shows up in the wrong cell, or not at all.
 
   ```sh
-  python3 -c 'import json,sys; print(json.dumps({"text": open(sys.argv[1]).read(), "mode": "markdown"}))' REPORT.md \
+  python3 -c 'import json,sys; print(json.dumps({"text": open(sys.argv[1]).read(), "mode": "markdown"}))' docs/PaperName/REPORT.md \
     | gh api -X POST markdown --input - > <scratch dir>/REPORT.html
   ```

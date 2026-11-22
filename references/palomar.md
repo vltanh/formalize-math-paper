@@ -78,21 +78,24 @@ decides to.
   in the repository. Check this by comparing the files with the source, not from memory: a file
   that copied part of one proof is adapted code too.
 - No build outputs, no Git submodules, no Git LFS.
-- Several papers in one repository are several submissions: each names its own Comparator
-  configuration and metadata file (`comparator_config_path`, `formalization_metadata_path`,
-  repository-relative), with its own Challenge and Solution modules; the licence stays the single
-  root file (`multi-paper.md`, Section 7).
+- The submission's files are in `palomar/PaperName/` (`lean-project.md`, Section 2). A submission
+  names its Comparator configuration and its metadata file (`comparator_config_path`,
+  `formalization_metadata_path`, repository-relative), and the configuration names the Challenge
+  and Solution modules. Palomar takes a Challenge's source root from its path, so the source
+  directory `palomar/` is accepted. Only the licence must be the single root file. Several papers
+  in one repository are several submissions (`multi-paper.md`, Section 7).
 
 ## 2. Challenge and Solution
 
-- `Challenge.lean` contains only the statements of record, which are the paper's main results,
-  with `sorry` proofs, in Mathlib's vocabulary. It imports nothing from the project. Use Tau Ceti's
-  or CSLib's vocabulary only when restating its definitions would cost more than the qualified
-  mark (Section 1). Restate project definitions inline with Mathlib constructions. For example, a
-  probability over a finite set becomes a count divided by a cardinality. Write the module docstring as a
-  plain-language account of each theorem, with every convention it uses. State the results exactly
-  as the paper does, including quantifiers and constants, except for obvious misprints, which are
-  corrected and documented (SKILL.md, Rules).
+- The Challenge, `palomar/PaperName/Challenge.lean` (module `PaperName.Challenge`), contains only
+  the statements of record, which are the paper's main results, with `sorry` proofs, in Mathlib's
+  vocabulary. It imports nothing from the project. Use Tau Ceti's or CSLib's vocabulary only when
+  restating its definitions would cost more than the qualified mark (Section 1). Restate project
+  definitions inline with Mathlib constructions. For example, a probability over a finite set
+  becomes a count divided by a cardinality. Write the module docstring as a plain-language account
+  of each theorem, with every convention it uses. State the results exactly as the paper does,
+  including quantifiers and constants, except for obvious misprints, which are corrected and
+  documented (SKILL.md, Rules).
 - A conditional result states each assumed result as a hypothesis, never as an axiom. Several may
   be bundled in a class of hypotheses, named for what it is. Write the class in the signature of
   each theorem that needs it. Do not declare it with `variable`, which hides which theorems use it.
@@ -100,35 +103,39 @@ decides to.
   lists the assumed results, with their sources. Since the Challenge imports nothing from the
   project, the hypotheses' definitions, and the objects they mention, belong to the block of
   shared definitions below, and the library's statements use the same names.
-- When the statements need definitions too large to restate inline, keep them in one
-  module of the library, between two marker comments. Copy that block word for word into the
-  Challenge with `scripts/sync_challenge_defs.py`; CI runs it with `--check`. Comparator requires
-  the constants that the statements use to be the same in the Challenge and in the Solution's
-  environment, and the exact copy makes them the same without bridge lemmas. Keep the block in a
-  module that imports exactly what the Challenge imports, and put in it every definition that the
-  Challenge defines, in the same order. Lean stores some proofs that elaborating a definition needs
-  as auxiliary lemmas, named after the first declaration of the module that needs them and reused
-  by later ones: a numeral such as `(2 : ℝ)` needs a proof of `Nat.AtLeastTwo 2`. A definition
-  elaborated in another module, or after other declarations, can then refer to an auxiliary lemma
-  of another name, and Comparator rejects it with "Const does not match between challenge and
-  target". Put the Challenge's theorems in a namespace of their own. Then the Solution, which
-  imports the library, can restate them without clashing with the library's names.
-- The solution module repeats each Challenge theorem word for word, with the same names and types,
-  and proves it from the rest of the project. Bridge lemmas translate between the project's
-  definitions and the Challenge's vocabulary. `Solution.lean` can import the whole project and
-  serve as its entry point.
-- Put both in the lakefile: `Challenge` and `Solution` as `lean_lib`s and default targets.
+- When the statements need definitions too large to restate inline, keep them in one module of the
+  paper's library, `ProjectName/PaperName/Defs.lean`, between two marker comments. Copy that block
+  word for word into the Challenge with `scripts/sync_challenge_defs.py`; CI runs it with `--check`.
+  Comparator requires the constants that the statements use to be the same in the Challenge and in
+  the Solution's environment, and the exact copy makes them the same without bridge lemmas. Keep the
+  block in a module that imports exactly what the Challenge imports, and put in it every definition
+  that the Challenge defines, in the same order. Lean stores some proofs that elaborating a
+  definition needs as auxiliary lemmas, named after the first declaration of the module that needs
+  them and reused by later ones: a numeral such as `(2 : ℝ)` needs a proof of `Nat.AtLeastTwo 2`. A
+  definition elaborated in another module, or after other declarations, can then refer to an
+  auxiliary lemma of another name, and Comparator rejects it with "Const does not match between
+  challenge and target". Put the Challenge's theorems in a namespace of their own,
+  `PaperNameChallenge`. Then the Solution, which imports the library, can restate them without
+  clashing with the library's names.
+- The Solution, `palomar/PaperName/Solution.lean` (module `PaperName.Solution`), repeats each
+  Challenge theorem word for word, with the same names and types, and proves it from the rest of
+  the project. Bridge lemmas translate between the project's definitions and the Challenge's
+  vocabulary. The Solution imports the paper's library and serves as its entry point.
+- Both belong to the lakefile's library `Palomar`, whose source directory is `palomar/`, a default
+  target (`lean-project.md`, Section 3).
 - The editorial review checks that every definition of the Challenge has its ordinary meaning.
   The compared theorem that ties an unfamiliar definition to something known (SKILL.md, Phase 3)
   is the evidence.
 
 ## 3. `comparator.json`
 
+The configuration is `palomar/PaperName/comparator.json`, and it names the modules, not the files:
+
 ```json
 {
-  "challenge_module": "Challenge",
-  "solution_module": "Solution",
-  "theorem_names": ["PaperNamespace.theorem1_1", "PaperNamespace.theorem1_2"],
+  "challenge_module": "PaperName.Challenge",
+  "solution_module": "PaperName.Solution",
+  "theorem_names": ["PaperNameChallenge.theorem1_1", "PaperNameChallenge.theorem1_2"],
   "definition_names": [],
   "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
   "enable_nanoda": true
@@ -137,8 +144,9 @@ decides to.
 
 ## 4. `formalization.yaml`
 
-Start from the current template, `tests/fixtures/palomar-template-formalization.yaml` in
-PalomarSubmission, and replace every `TEMPLATE` value. The rules that matter most:
+The metadata is `palomar/PaperName/formalization.yaml`. Start from the current template,
+`tests/fixtures/palomar-template-formalization.yaml` in PalomarSubmission, and replace every
+`TEMPLATE` value. The rules that matter most:
 
 - `project.authors` and `project.responsible_maintainers` are people only: the user, or whoever
   they name. Credit AI systems in `automation.methods`, one entry per system, with `method:
@@ -197,7 +205,7 @@ import sys; sys.path.insert(0, '.')
 from pathlib import Path
 from scripts import submission_contract as sc, source_requirements as sr
 R = Path('<scratch dir>/check')
-sc.load_formalization_metadata(R / 'formalization.yaml'); print('metadata OK')
+sc.load_formalization_metadata(R / 'palomar/PaperName/formalization.yaml'); print('metadata OK')
 summary, issues = sr.inspect_lean_sources(R); print(summary['files_checked'], 'files', issues)"
 ```
 
@@ -205,7 +213,7 @@ Run Comparator from the project root, in a bubblewrap sandbox (Lake's built-in c
 puts the toolchain's `bin/` directory, which holds the NanoDa kernel (`nanoda_bin`), on the path:
 
 ```sh
-lake env lake comparator --config=comparator.json    # expect "Your solution is okay!"
+lake env lake comparator --config=palomar/PaperName/comparator.json    # expect "Your solution is okay!"
 ```
 
 If the toolchain has no `nanoda_bin`, run a copy of the configuration with
@@ -239,17 +247,17 @@ Palomar asks you to run its full verification workflow on the exact commit befor
 to submit only when the report says `status: pass`. The preflight does not render the Challenge or
 run the editorial review (Section 1).
 
-1. Copy `assets/palomar_preflight.yml` to `.github/workflows/`. Pin both the `uses:` reference
-   and `pipeline_commit` to the same full PalomarSubmission commit
+1. Copy `assets/palomar_preflight.yml` to `.github/workflows/palomar_preflight_papername.yml`,
+   one workflow per paper. Pin both the `uses:` reference and `pipeline_commit` to the same full
+   PalomarSubmission commit
    (`git ls-remote https://github.com/PalomarRegistry/PalomarSubmission.git HEAD`). `request_id`
-   must be exactly 12 lowercase letters or digits.
-   With several papers, make one workflow per paper and add
-   `"formalization_metadata_path":"palomar/PaperA/formalization.yaml"` to its `options`, with that paper's
-   `comparator_config_path`.
-2. The workflow's `options` declare the authorization relationship, which the public report
+   must be exactly 12 lowercase letters or digits. Its `options` always name both files of the
+   paper, since neither is at the root:
+   `"comparator_config_path":"palomar/PaperName/comparator.json","formalization_metadata_path":"palomar/PaperName/formalization.yaml"`.
+2. The workflow's `options` also declare the authorization relationship, which the public report
    records. Check with the user that it is accurate, and ask before running the workflow.
-3. Run it on the commit to submit (`gh workflow run palomar_preflight.yml --ref main`). If you push
-   again, run it again: the submitted commit must be the one that passed.
+3. Run it on the commit to submit (`gh workflow run palomar_preflight_papername.yml --ref main`).
+   If you push again, run it again: the submitted commit must be the one that passed.
 4. Download the report, whose artifact is named after the `request_id`, and read it:
 
    ```sh
@@ -267,7 +275,8 @@ Submissions go to https://submit.palomar-registry.org only. Before submitting, s
 
 - the repository (`owner/name`);
 - the full 40-character commit (the one that passed the preflight);
-- the path of the Comparator configuration (`comparator.json`);
+- the paths of the Comparator configuration (`palomar/PaperName/comparator.json`) and of the
+  metadata (`palomar/PaperName/formalization.yaml`);
 - the authorization relationship. This is a claim about the user ("I am a responsible author or
   maintainer"), and Palomar records it permanently.
 

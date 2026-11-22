@@ -4,7 +4,8 @@ A formalization sometimes has to prove a theorem that no Lean library has and th
 import on its own. Such a development can be a Lake package of its own, in its own repository,
 required by the project at a pinned commit. The default is not to split: every repository adds CI,
 Mathlib upgrades and one more place where a reader has to look. Keep general mathematics in
-`Basic/` and cited results in `External/` (SKILL.md, Phase 2).
+`ProjectName/Common/Basic/` and cited results in `ProjectName/Common/External/` (SKILL.md,
+Phase 2).
 
 ## 1. The bar
 
@@ -21,10 +22,10 @@ Propose a package of its own only when all of these hold:
   and other such packages.
 - Reusable. Someone outside this project could plausibly import it.
 
-Otherwise it stays in `Basic/` or `External/`, and small general lemmas are offered to Mathlib,
-the long-term home of general mathematics. Expect at most one or two packages for a paper, often
-none. Propose one during the inventory (Phase 1), so that the code is written in the package from
-the start rather than moved there later. The user decides whether to split, the name, the
+Otherwise it stays in `Common/Basic/` or `Common/External/`, and small general lemmas are offered to
+Mathlib, the long-term home of general mathematics. Expect at most one or two packages for a paper,
+often none. Propose one during the inventory (Phase 1), so that the code is written in the package
+from the start rather than moved there later. The user decides whether to split, the name, the
 visibility and when to publish; creating and pushing a repository needs permission (Rules).
 
 ## 2. One package per area
@@ -68,8 +69,9 @@ Others will import the package without knowing the project, so it reads as a lib
   Mathlib entries of its manifest. The project's builds also build the package through the path
   dependency, so agents working in both at once check files without building
   (`scripts/check_file.py`) and build only when their files are done.
-- A cited result keeps its place in the project: `External/` states it in its source's terms and
-  proves it from the package. The route check and the audit treat it like any other cited result.
+- A cited result keeps its place in the project: `Common/External/` states it in its source's terms
+  and proves it from the package. The route check and the audit treat it like any other cited
+  result.
 - The project's README, `REPORT.md` (Section 2) and `formalization.yaml` say where it uses the
   package; the dependency runs one way.
 - Palomar restricts only the Challenge's imports (`references/palomar.md`, Section 1): the Solution

@@ -39,10 +39,10 @@ A passing build proves only what the statements say. Ask of the formalization:
   assumed result. Every assumed result must be a declared hypothesis, named after its source and
   listed in the report.
 - Is every object that a statement takes as a parameter tied to its defining property?
-- Is each result in `External/` really cited by the paper, rather than proved in it?
+- Is each result in `Common/External/` really cited by the paper, rather than proved in it?
 - Does each library theorem used for a cited result imply exactly the paper's form? Does each
   bridge from the paper's objects to a source's, in the paper's library, prove the
-  identification that the paper makes, and does `External` import nothing of the paper's?
+  identification that the paper makes, and does `Common/External/` import nothing of the paper's?
 - Does each proof follow the paper's argument, and is every departure necessary and reported?
 - Are sums, counts and unions taken over exactly the paper's index sets?
 - Are the constants exact?
@@ -56,7 +56,7 @@ repository / branch / head:
 phase:
 elapsed:          time since the start; sub-agents running / finished
 build:            passes / fails (first error)
-sorry / axiom:    counts (excluding Challenge.lean)
+sorry / axiom:    counts (excluding the Challenge)
 statements:       changes to paper results (only documented ones), helper lemmas found false
 proofs:           departures from the paper's proofs, each with its reason (reported every time
                   until the user has seen it); route-check differences still open
@@ -72,42 +72,42 @@ needs from user:  decisions or permissions
 - Statements: every numbered result stated; Challenge written, with the main results only and
   within Palomar's size limits; the statements checked against the paper independently;
   representation bridges proved; baseline committed.
-- Stage 1: every internal result proved by the paper's argument; cited results isolated in the
-  library `External`, with citations, stated in their sources' terms, and importing nothing from
-  the paper's library.
+- Stage 1: every internal result proved by the paper's argument; cited results isolated in
+  `ProjectName/Common/External/`, with citations, stated in their sources' terms, and importing
+  nothing from the paper's library.
 - Stage 2: every cited result proved or derived from a library, or, when out of reach, a declared
   hypothesis named after its source; zero project axioms.
-- Proof routes: `docs/paper_routes.tsv` committed and checked against the paper; the route check
-  passes on the final commit, and every difference it records has its reason; every departure
-  from the paper's proofs is necessary (Rules) and reported in its docstring, in the report's
-  table of departures, in `formalization.yaml` and to the user; the formal proofs compared with
-  the paper's independently of their provers.
-- Verification: clean build; `scripts/Audit.lean` passes for every declaration; `Solution.lean`
-  and `comparator.json` written, and Comparator accepts the solution; no assumption hidden in a
-  parameter; every structure or class of hypotheses has an instance, or the reason it cannot have
-  one yet is recorded.
+- Proof routes: `docs/PaperName/paper_routes.tsv` committed and checked against the paper; the route
+  check passes on the final commit, and every difference it records has its reason; every departure
+  from the paper's proofs is necessary (Rules) and reported in its docstring, in the report's table
+  of departures, in `formalization.yaml` and to the user; the formal proofs compared with the
+  paper's independently of their provers.
+- Verification: clean build; `scripts/Audit.lean` passes for every declaration; the Solution and
+  `comparator.json` written in `palomar/PaperName/`, and Comparator accepts the solution; no
+  assumption hidden in a parameter; every structure or class of hypotheses has an instance, or the
+  reason it cannot have one yet is recorded.
 - Cleanup: the build prints only the Challenge's `sorry` warnings; unused hypotheses removed, and
   those of paper results recorded; misleading names fixed; the route check passes as before.
 - Documentation:
-  - `REPORT.md` written, its findings checked against the source, and every departure from the
-    paper's proofs listed in it; a conditional formalization says so in the README's first
+  - `docs/PaperName/REPORT.md` written, its findings checked against the source, and every departure
+    from the paper's proofs listed in it; a conditional formalization says so in the README's first
     paragraph, in `formalization.yaml` and in the report, which lists what it assumes;
   - the report's literature section written from a dated search for the work before, alongside
     and after the paper (or, without network access, saying that no search could be made), with
     every source linked and its summary and date checked against it, and earlier formalizations
     cited; its "What's next" section with every simpler argument recorded during the work checked
     and either listed or set aside as wrong;
-  - `README.md` rewritten for the current state, short, with status, results and findings in
-    tables and a link to the report's departures (`audit-report.md`, Section 3); the repository
-    description in step with it;
-  - `CREDITS.md` reports the procedure, the agents and models, the elapsed time and the effort
-    from the run log, round by round, and the README's credits sum it up with a link;
+  - `README.md`, at the root, rewritten for the current state, short, with status, results and
+    findings in tables and a link to the report's departures (`audit-report.md`, Section 3); the
+    repository description in step with it;
+  - `docs/PaperName/CREDITS.md` reports the procedure, the agents and models, the elapsed time and
+    the effort from the run log, round by round, and the README's credits sum it up with a link;
   - links up to date, tables valid; a draft's own notes deleted.
-- Follow-up papers: `NEXT.md` written (`references/next-papers.md`), with each candidate above the
-  bar, explored to the step where the paper's method stops, its claims marked as proved, checked
-  or conjectured, and checked independently for novelty and substance, or with the statement that
-  none meets the bar and what came closest; `NEXT.md` and `notes/next/` ignored by git and absent
-  from every commit; the user told where they are.
+- Follow-up papers: `docs/PaperName/NEXT.md` written (`references/next-papers.md`), with each
+  candidate above the bar, explored to the step where the paper's method stops, its claims marked as
+  proved, checked or conjectured, and checked independently for novelty and substance, or with the
+  statement that none meets the bar and what came closest; `NEXT.md` and `notes/next/` ignored by
+  git and absent from every commit; the user told where they are.
 - Packaging (unless declined): every file that adapts code from another project keeps that
   project's notice; `formalization.yaml` written; Palomar's metadata and source checks pass on a
   clean clone; the dependencies shared with Verso pinned at Verso's revisions for the toolchain;

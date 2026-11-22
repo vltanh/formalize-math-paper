@@ -12,26 +12,30 @@ files to submit it to the [Palomar](https://palomar-registry.org) registry.
 | Step | What the skill does |
 | --- | --- |
 | Inventory | records the paper's results, constants, citations and suspected typos |
-| Project | sets up a Lean project on a Mathlib release, with the module system, in three layered libraries: `Basic` (general mathematics, for later contribution to Mathlib), `External` (the results the paper cites, in their sources' terms) and the paper's own |
+| Project | sets up a Lean project on a Mathlib release, with the module system, in the standard layout (below), with three layered libraries: `Common/Basic` (general mathematics, for later contribution to Mathlib), `Common/External` (the results the paper cites, in their sources' terms) and the paper's own |
 | Statements | states every result first, and checks each statement against the paper's TeX source |
 | Proofs | proves what the paper proves, by the paper's own arguments, then the results it cites. A proof departs from the paper's only when it must, and every departure is reported to you with its reason. A cited result that no Lean library can yet support becomes a visible hypothesis, and the result is reported as conditional |
 | Verification | checks the axioms of every declaration, checks that each proof uses the results that the paper's proof cites (extracted from the TeX source), and runs Comparator |
 | Cleanup | removes unused hypotheses and other warnings without changing any proof's argument |
-| Documents | writes `REPORT.md` (errors and gaps, missing and redundant hypotheses, use of cited results, departures, the paper in the literature, what comes next), a short `README.md`, and `CREDITS.md` (how the formalization was made, from a run log) |
+| Documents | writes a short `README.md`, and, in `docs/PaperName/`, `REPORT.md` (errors and gaps, missing and redundant hypotheses, use of cited results, departures, the paper in the literature, what comes next) and `CREDITS.md` (how the formalization was made, from a run log) |
 | Next papers | writes a private `NEXT.md`, kept out of git: directions that would each make a paper of their own, explored to the step where the paper's method stops and checked for novelty |
 | Packaging | prepares the Challenge/Solution pair, `comparator.json` and `formalization.yaml` for Palomar, and, with your permission, publishes the project and runs Palomar's preflight |
+
+Every project has the same layout ([`references/lean-project.md`](references/lean-project.md),
+Section 2): the Lean code under one root, `ProjectName/`, with `Common/` and one directory per
+paper; each paper's Palomar submission in `palomar/PaperName/`; its documents in `docs/PaperName/`;
+the README and the licence at the root. A related paper (a sequel, the other case of one problem, a
+refutation) can then join the repository later without moving anything: the papers share code, each
+keeps its own Challenge, Palomar submission and documents, and an umbrella README connects them.
 
 ## Made with this skill
 
 | Repository | What it formalizes |
 | --- | --- |
 | [lean4-smoothed-polygon](https://github.com/vltanh/lean4-smoothed-polygon) | Hales and Vajjha, *Packings of Smoothed Polygons* (arXiv:2405.04331): Chapters 2–8, with an audit of the book (61 findings, among them false statements refuted in Lean); Mahler's First conjecture (Theorem 16.3.1) proved conditionally on one named hypothesis |
+| [lean4-morrey](https://github.com/vltanh/lean4-morrey) | three papers on Morrey's problem in one repository: Šverák's counterexample on `ℝ^{3×2}` (1992) and Cassese's on `ℝ^{2×m}`, `m ≥ 3` (arXiv:2608.03488; every result, a few conditional on named hypotheses), and an audit of Pedregal's claimed proof for `2 × 2` (arXiv:1905.06571), whose Corollary 7.2 is refuted in Lean |
 | [lean4-optimal-control](https://github.com/vltanh/lean4-optimal-control) | the Pontryagin maximum principle by Agrachev and Sachkov's proof, and Filippov's theorem, including the form with a state constraint |
 | [lean4-fixed-point](https://github.com/vltanh/lean4-fixed-point) | Brouwer's fixed-point theorem, by the analytic proof of Milnor and Rogers |
-
-A repository may hold several related papers (a theorem and its sequel, complementary cases of
-one problem, a claim and its refutation): they share code, each keeps its own Challenge, Palomar
-submission and documents, and an umbrella README connects them.
 
 ## Install
 

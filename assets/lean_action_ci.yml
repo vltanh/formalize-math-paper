@@ -15,29 +15,34 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: leanprover/lean-action@v1
-      # The audit sees a module's proofs only through its own `import all` line. PaperName, External
-      # and Basic are the libraries' root directories. With several papers (references/multi-paper.md),
-      # compare `{ find <Project> -name '*.lean'; cd palomar && find . -name Solution.lean; }` with
-      # the audit's `import all` lines of `<Project>` and of the papers' Solutions.
+      # The audit sees a module's proofs only through its own `import all` line: every module of
+      # ProjectName/ (Common/ and the paper's library) and the paper's Solution in palomar/, but no
+      # Challenge (it holds a copy of the paper's definitions). With several papers
+      # (references/multi-paper.md), add each paper's name to the grep pattern.
       - name: Check that the audit imports every module of the libraries
         run: >-
-          diff <(find PaperName External Basic -name '*.lean' | sed 's/\.lean$//; s#/#.#g' | sort)
-          <(grep -E '^import all (PaperName|External|Basic)\.' scripts/Audit.lean
+          diff <({ find ProjectName -name '*.lean'; cd palomar && find . -name Solution.lean; }
+          | sed 's#^\./##; s/\.lean$//; s#/#.#g' | sort)
+          <(grep -E '^import all (ProjectName|PaperName)\.' scripts/Audit.lean
           | sed 's/^import all //' | sort)
       - name: Audit axioms and dependencies
         run: lake env lean scripts/Audit.lean
-      # The routes of the paper's proofs (docs/paper_routes.tsv, from route_check.py extract) and the
-      # reviewed differences (docs/route_differences.tsv); see SKILL.md, "Faithful proofs".
-      # With several papers (references/multi-paper.md), run this step once per paper, with the
-      # paper's docs/<Paper>/paper_routes.tsv and docs/<Paper>/route_differences.tsv.
+      # The routes of the paper's proofs (docs/PaperName/paper_routes.tsv, from route_check.py
+      # extract) and the reviewed differences (docs/PaperName/route_differences.tsv); see SKILL.md,
+      # "Faithful proofs". With several papers, one such step per paper, with its own two files.
       - name: Check that the proofs follow the routes of the paper's proofs
         run: >-
-          python3 scripts/route_check.py check docs/paper_routes.tsv
-          --accept docs/route_differences.tsv
-      # Delete this step if the Challenge carries no copy of shared definitions.
+          python3 scripts/route_check.py check docs/PaperName/paper_routes.tsv
+          --accept docs/PaperName/route_differences.tsv
+      # The copy of ProjectName/PaperName/Defs.lean in palomar/PaperName/Challenge.lean. Delete this
+      # step if the Challenge carries no copy of shared definitions.
       - name: Check that the Challenge's copy of the shared definitions is current
         run: python3 scripts/sync_challenge_defs.py --check
       - name: Check that the documentation's links to the code are current
         run: python3 scripts/linkify_docs.py --check
+      # With several papers, list every document: README.md and each paper's README.md, REPORT.md
+      # and CREDITS.md in its docs/PaperName/.
       - name: Check the Markdown tables
-        run: python3 scripts/check_md_tables.py README.md REPORT.md CREDITS.md
+        run: >-
+          python3 scripts/check_md_tables.py README.md
+          docs/PaperName/REPORT.md docs/PaperName/CREDITS.md

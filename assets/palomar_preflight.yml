@@ -1,14 +1,14 @@
-name: Palomar preflight
+name: Palomar preflight (PaperName)
 
 # Runs Palomar's complete mechanical verification on this commit, as the registry does after a
 # submission, and publishes its report as an artifact. The verifier fetches the repository
 # anonymously, so the repository must be public. A run can take hours, so it only runs on demand.
+# Copy this file to .github/workflows/palomar_preflight_papername.yml, one per paper. `options`
+# names the paper's Comparator configuration and metadata, both in palomar/PaperName/: neither is
+# at the root, so name both.
 # Pin `uses` and `pipeline_commit` to the same full PalomarSubmission commit:
 #   git ls-remote https://github.com/PalomarRegistry/PalomarSubmission.git HEAD
 # `request_id` must be exactly 12 lowercase letters or digits.
-# With several papers in one repository, make one copy per paper and add
-# "formalization_metadata_path":"palomar/PaperA/formalization.yaml" to `options`, with that paper's
-# "comparator_config_path":"palomar/PaperA/comparator.json".
 on:
   workflow_dispatch:
 
@@ -25,4 +25,4 @@ jobs:
       request_id: preflight001
       mode: full
       execution_profile: palomar-standard-v1
-      options: '{"comparator_config_path":"comparator.json","authorization_relationship":"I am a responsible author or maintainer"}'
+      options: '{"comparator_config_path":"palomar/PaperName/comparator.json","formalization_metadata_path":"palomar/PaperName/formalization.yaml","authorization_relationship":"I am a responsible author or maintainer"}'

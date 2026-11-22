@@ -1,10 +1,10 @@
 # Cleanup: warnings, redundant hypotheses, names, stale files
 
-The goal is a build that prints nothing but the intended `sorry` warnings of `Challenge.lean`.
-Warnings do not affect correctness, but a clean build is easier to review, and unused hypotheses
-often reveal redundant hypotheses of the paper. Cleanup changes how proofs are written, never which
-argument they make: afterwards, every proof still follows the paper's (SKILL.md, Rules, "Faithful
-proofs").
+The goal is a build that prints nothing but the intended `sorry` warnings of the Challenge
+(`palomar/PaperName/Challenge.lean`). Warnings do not affect correctness, but a clean build is
+easier to review, and unused hypotheses often reveal redundant hypotheses of the paper. Cleanup
+changes how proofs are written, never which argument they make: afterwards, every proof still
+follows the paper's (SKILL.md, Rules, "Faithful proofs").
 
 ## Procedure
 
@@ -43,11 +43,12 @@ proofs").
    - "automatically included section variable(s) unused": add `omit [Inst] in` before the
      theorem.
    - Deprecations: use the replacement that the warning names.
-4. Rerun the checks: `lake build`, `scripts/Audit.lean`, the route check
-   (`scripts/route_check.py check docs/paper_routes.tsv --accept docs/route_differences.tsv`)
-   and `lake comparator`. If the documents already link to the code, also rerun
-   `scripts/linkify_docs.py`, since line numbers move. A route difference that appears during the
-   cleanup is a regression: undo the change that caused it.
+4. Rerun the checks: `lake build`, `scripts/Audit.lean`, the route check (`scripts/route_check.py
+   check docs/PaperName/paper_routes.tsv --accept docs/PaperName/route_differences.tsv`) and
+   Comparator (`lake env lake comparator --config=palomar/PaperName/comparator.json`). If the
+   documents already link to the code, also rerun `scripts/linkify_docs.py`, since line numbers
+   move. A route difference that appears during the cleanup is a regression: undo the change that
+   caused it.
 5. Record, and commit:
    - Run `python3 <skill-dir>/scripts/stmt_diff.py <commit before the cleanup>`.
    - For each paper result that lost a hypothesis, the Lean statement is now more general than
@@ -86,12 +87,12 @@ proofs drift away from the paper while no statement changes:
   with a script that moves the files (`git mv`), rewrites the imports, rewrites qualified
   references to the declarations of the renamed namespace, and leaves the truly external names
   alone. Then fix the module docstrings by hand, and rebuild.
-- Move general lemmas that grew inside the paper's files to `Basic/` (SKILL.md, Phase 2), in a
-  round of their own: keep each statement, give the lemma the name and namespace that Mathlib
-  would give it, update its callers, and rerun the route check. Move cited results that grew
-  inside the paper's library to the library `External` the same way: keep each statement, restate
-  it in its source's terms if it uses the paper's definitions, prove the bridge in the paper's
-  library, and update the audit's lists, `isLibraryModule` and the documents' links.
+- Move general lemmas that grew inside the paper's files to `ProjectName/Common/Basic/` (SKILL.md,
+  Phase 2), in a round of their own: keep each statement, give the lemma the name and namespace that
+  Mathlib would give it, update its callers, and rerun the route check. Move cited results that grew
+  inside the paper's library to `ProjectName/Common/External/` the same way: keep each statement,
+  restate it in its source's terms if it uses the paper's definitions, prove the bridge in the
+  paper's library, and update the audit's lists, `isLibraryModule` and the documents' links.
 - A draft's own notes are deleted in Phase 8 (SKILL.md, Phase 0). Your own working notes (the
   inventory, the run log) are untracked and stay until the end.
 - After moving or renaming modules, delete their old build outputs under `.lake/build`: stale

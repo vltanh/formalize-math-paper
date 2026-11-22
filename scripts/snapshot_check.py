@@ -12,8 +12,10 @@ agent can work against its own copy of the build outputs instead:
 - `take` copies `.lake/build/lib/lean` to SNAPDIR, which must be new, empty, or an earlier
   snapshot. It refuses when `lake build --no-build` says the build is out of date, because the copy
   would mix versions; rebuild first, or pass --force.
-- `check` runs `lean` on FILE with the lakefile's `[leanOptions]`. The snapshot replaces the
-  project's own build directory; Mathlib and the other packages come from `.lake/packages`.
+- `check` runs `lean` on FILE with the lakefile's `[leanOptions]`, as the module that the build
+  makes of it (a file in a library's `srcDir`, such as `palomar/PaperName/Solution.lean`, is
+  `PaperName.Solution`). The snapshot replaces the project's own build directory; Mathlib and the
+  other packages come from `.lake/packages`.
 - `--emit` also writes the file's `.olean` and `.ilean` into the snapshot, so that the agent's
   later files can import its new version.
 
@@ -28,7 +30,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from check_file import lean_options  # noqa: E402
+from check_file import lean_options, source_root  # noqa: E402
 
 BUILD = Path('.lake/build/lib/lean')
 MARKER = '.snapshot_check'
@@ -67,10 +69,11 @@ def check(snap, file, emit):
     if not snap.is_dir():
         sys.exit(f'no snapshot at {snap}: run "snapshot_check.py take {snap}" first')
     env = dict(os.environ, LEAN_PATH=lean_path(snap))
-    cmd = ['lean', *lean_options(), '-R', '.']
+    root = Path(source_root(file))
+    cmd = ['lean', *lean_options(), '-R', str(root)]
     if emit:
         try:
-            rel = Path(file).resolve().relative_to(Path.cwd().resolve())
+            rel = Path(file).resolve().relative_to(root.resolve())
         except ValueError:
             sys.exit(f'--emit needs a file inside the project: {file}')
         stem = snap / rel.with_suffix('')

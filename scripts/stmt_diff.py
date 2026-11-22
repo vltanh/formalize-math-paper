@@ -10,11 +10,12 @@ files) at REV with the working tree:
 - definitions, abbreviations, structures, instances: the whole declaration.
 
 Declarations are identified by their full names (`namespace` blocks included), and a change to a
-file's `variable` commands, which changes the statements that use them, is reported too.
-Whitespace is ignored. Prints CHANGED (old and new, abbreviated), REMOVED, VARIABLES, and the
-number of declarations ADDED per file. Use it after parallel repair or cleanup, to catch statement
-changes that nobody reported. A paper result must never appear here unless the change was
-intended and documented.
+file's `variable` commands, which changes the statements that use them, is reported too. A file
+that git sees as renamed since REV (moved with `git mv`, as when a project moves to the standard
+layout) is compared with its old path. Whitespace is ignored. Prints RENAMED, CHANGED (old and new,
+abbreviated), REMOVED, VARIABLES, and the number of declarations ADDED per file. Use it after
+parallel repair, cleanup or a move, to catch statement changes that nobody reported. A paper result
+must never appear here unless the change was intended and documented.
 """
 import argparse
 import re
@@ -73,6 +74,20 @@ def declarations(text):
     return out, variables
 
 
+def renamed_from(rev):
+    """{path now: path at REV} for the .lean files that git sees as renamed since REV."""
+    out = subprocess.run(['git', 'diff', '-M', '--name-status', '-z', rev, '--', '*.lean'],
+                         capture_output=True, text=True).stdout.split('\0')
+    renames, i = {}, 0
+    while i + 1 < len(out):
+        if out[i].startswith('R') and i + 2 < len(out):
+            renames[out[i + 2]] = out[i + 1]
+            i += 3
+        else:
+            i += 2
+    return renames
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument('rev')
@@ -87,10 +102,14 @@ def main():
     files = subprocess.run(['git', 'ls-files', '-z', '--', *(args.paths or ['*.lean'])],
                            capture_output=True, text=True, check=True).stdout.split('\0')
     files = [f for f in files if f.endswith('.lean') and Path(f).is_file()]
-    # A file that did not exist at REV (for example, a renamed one) is reported as NEW FILE.
+    renames = renamed_from(args.rev)
+    # A file that did not exist at REV, and is not a renamed one, is reported as NEW FILE.
     for f in files:
-        old = subprocess.run(['git', 'show', f'{args.rev}:./{f}'], capture_output=True,
+        src = renames.get(f, f)
+        old = subprocess.run(['git', 'show', f'{args.rev}:./{src}'], capture_output=True,
                              text=True).stdout
+        if src != f:
+            print(f'RENAMED {src} -> {f}')
         new = Path(f).read_text(encoding='utf-8')
         (a, va), (b, vb) = declarations(old), declarations(new)
         if old and va != vb:

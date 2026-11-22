@@ -27,8 +27,9 @@ algebra, `numpy` and `scipy` for exploration):
 - the points where an inequality becomes tight (a zero, or a tangency), and its order there.
 
 The margins decide the method. A margin of 10⁻² needs only crude bounds. A margin of 10⁻⁶, or a
-tangency, needs an argument first (Sections 7 and 8), not a finer grid. Keep the scripts with the
-project's notes, and give an agent the numbers together with the task.
+tangency, needs an argument first (Sections 7 and 8), not a finer grid. Keep the exploratory
+scripts with the project's notes, and those behind a claim that the report or a proof relies on in
+`docs/PaperName/numerics/`, and give an agent the numbers together with the task.
 
 ## 2. Interval arithmetic with `norm_num`
 
@@ -64,8 +65,8 @@ Hundreds of interval steps are best generated. Write a Python generator that pri
 (exact rationals with `fractions.Fraction`, derivatives and antiderivatives with `sympy`, each
 inequality checked by `norm_num`), and:
 
-- commit the generator with the project, and check that it reproduces the committed Lean file
-  byte for byte;
+- commit the generator with the project, in `docs/PaperName/numerics/`, and check that it
+  reproduces the committed Lean file byte for byte;
 - say in the README how to run it;
 - keep each generated file within Palomar's limit on file length, split into modules if needed;
 - name the template fragments that the generator assembles `*.lean.in`, because Palomar rejects

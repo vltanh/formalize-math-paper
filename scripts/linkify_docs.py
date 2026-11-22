@@ -32,27 +32,35 @@ from pathlib import Path
 
 # ---- configuration -------------------------------------------------------------------------
 # The Markdown documents to process.
-DOCS = ['README.md', 'REPORT.md', 'CREDITS.md']
-# Namespaces in which the documents name declarations without their prefix, most specific last.
-NAMESPACES = ['PaperName', 'ChallengeNamespace']
+DOCS = ['README.md', 'docs/PaperName/REPORT.md', 'docs/PaperName/CREDITS.md']
+# Namespaces in which the documents name declarations without their prefix, most specific last:
+# the paper's library, then its Challenge.
+NAMESPACES = ['PaperName', 'PaperNameChallenge']
 # With several papers in one repository (references/multi-paper.md): the namespaces of the documents
 # in each top-level directory, tried before `NAMESPACES`, so that a short name in a paper's documents
 # names that paper's declaration; the first namespace that declares a name wins, and the longest
 # directory that contains the document is used. Example:
-# {'PaperA': ['PaperA', 'PaperAChallenge'], 'docs/PaperB': ['PaperB', 'PaperBChallenge']}.
+# {'docs/PaperA': ['PaperA', 'PaperAChallenge'], 'docs/PaperB': ['PaperB', 'PaperBChallenge']}.
 NAMESPACES_BY_DIR = {}
-# Top-level module names of the project: a code span naming such a module links to its file.
-MODULE_ROOTS = ('PaperName', 'External', 'Basic', 'Challenge', 'Solution')
-# The module whose declarations win when a name is declared in several modules. With several
-# papers, a tuple of modules, one per paper (each Challenge repeats its own paper's definitions):
-# ('PaperA.Challenge', 'PaperB.Challenge').
-PREFERRED_MODULE = 'Challenge'
+# Top-level module names of the project: a code span naming such a module links to its file. The
+# library's modules are under `ProjectName`; the Challenge and the Solution are `PaperName.Challenge`
+# and `PaperName.Solution`.
+MODULE_ROOTS = ('ProjectName', 'PaperName')
+# The module whose declarations win when a name is declared in several modules: the Challenge,
+# whose theorems the Solution restates. With several papers, a tuple of modules, one per paper
+# (each Challenge repeats its own paper's definitions): ('PaperA.Challenge', 'PaperB.Challenge').
+PREFERRED_MODULE = 'PaperName.Challenge'
 # The source directory of each module root whose `lean_lib` has a `srcDir` other than the
-# repository root (for example Challenges kept in `palomar/`: {'PaperA': 'palomar'}).
-SOURCE_DIRS = {}
-# Directories, besides the repository root, against which the paths in the documents of a
-# given directory are resolved.
-PATH_BASES = {'': ['.github/workflows']}
+# repository root: the Challenges and Solutions are in `palomar/`. With several papers, one entry
+# per paper: {'PaperA': 'palomar', 'PaperB': 'palomar'}.
+SOURCE_DIRS = {'PaperName': 'palomar'}
+# Directories, besides the document's own and the repository root, against which the paths in the
+# documents of a given directory are resolved: a code span `REPORT.md` in the README names
+# `docs/PaperName/REPORT.md`, and `Challenge.lean` names `palomar/PaperName/Challenge.lean`. With
+# several papers, give each paper's document directory its own Palomar directory, and the umbrella
+# README none: {'': ['.github/workflows'], 'docs/PaperA': ['palomar/PaperA'], …}.
+PATH_BASES = {'': ['.github/workflows', 'docs/PaperName', 'palomar/PaperName'],
+              'docs/PaperName': ['palomar/PaperName']}
 # Paths that are never linked, whether or not git ignores them: the private follow-up notes, which
 # are not published (SKILL.md, Phase 8). Any other path that git ignores is not linked either.
 PRIVATE = ('NEXT.md', 'notes')
@@ -167,8 +175,8 @@ class Linker:
         """The repository path or URL that `text` names, or None."""
         path = text.rstrip('/')
         if path and not path.startswith(('/', '.')) and ' ' not in path:
-            # A document's own directory comes first: `REPORT.md` in `PaperA/README.md` is
-            # `PaperA/REPORT.md`.
+            # A document's own directory comes first: `REPORT.md` in `docs/PaperA/README.md` is
+            # `docs/PaperA/REPORT.md`.
             for base in ([doc_dir] if doc_dir else []) + [''] + PATH_BASES.get(doc_dir, []):
                 candidate = os.path.normpath(os.path.join(base, path))
                 if (ROOT / candidate).exists() and not private(candidate):

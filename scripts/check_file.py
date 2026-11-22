@@ -4,7 +4,9 @@
 usage: check_file.py FILE.lean [--log LOG] [--autosorry [ROUNDS]]
 
 Run from the project root, after the file's imports have been built. `lake env lean` ignores the
-`[leanOptions]` of lakefile.toml, so this script reads them and passes each one with `-D`.
+`[leanOptions]` of lakefile.toml, so this script reads them and passes each one with `-D`. A file
+under a library's `srcDir` (the Challenge and the Solution in `palomar/`) is checked as the module
+that the build makes of it (`PaperName.Challenge`), with that directory as Lean's root (`-R`).
 Prints the number of errors and of `sorry` warnings, and writes Lean's output to LOG (default:
 /tmp/check_<file>.log).
 
@@ -39,8 +41,34 @@ def lean_options(lakefile='lakefile.toml'):
     return opts
 
 
+def source_dirs(lakefile='lakefile.toml'):
+    """The `srcDir`s of the lakefile's libraries, other than the project root (e.g. `palomar`)."""
+    try:
+        text = pathlib.Path(lakefile).read_text(encoding='utf-8')
+    except FileNotFoundError:
+        return []
+    dirs = [pathlib.PurePath(d) for d in re.findall(r'^\s*srcDir\s*=\s*"([^"]*)"', text, re.M)]
+    return [d for d in dirs if d.parts]
+
+
+def source_root(path):
+    """The directory from which Lean names the module of `path`: the `srcDir` that contains it, or
+    the project root. Without it, `palomar/PaperName/Challenge.lean` would be the module
+    `palomar.PaperName.Challenge` instead of `PaperName.Challenge`."""
+    try:
+        rel = pathlib.Path(path).resolve().relative_to(pathlib.Path.cwd().resolve())
+    except ValueError:
+        return pathlib.PurePath('.')
+    for d in source_dirs():
+        if rel.parts[:len(d.parts)] == d.parts:
+            return d
+    return pathlib.PurePath('.')
+
+
 def check(path, log):
-    cmd = ['lake', 'env', 'lean', *lean_options(), path]
+    root = source_root(path)
+    cmd = ['lake', 'env', 'lean', *lean_options(), *(['-R', str(root)] if root.parts else []),
+           path]
     out = subprocess.run(cmd, capture_output=True, text=True)
     text = out.stdout + out.stderr
     pathlib.Path(log).write_text(text, encoding='utf-8')

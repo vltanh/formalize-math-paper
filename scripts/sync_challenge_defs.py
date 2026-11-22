@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Copy the shared definitions of a library module into `Challenge.lean`, or check the copy.
+"""Copy the shared definitions of a library module into the Challenge, or check the copy.
 
 Comparator requires every constant that a Challenge statement uses to be the same in the
 Challenge and in the Solution's environment. When the statements need definitions too large to
-restate inline, keep them in one module of the library between the two marker lines below, and
-let this script copy that block verbatim into `Challenge.lean`, which may not import the project.
+restate inline, keep them in one module of the library, `ProjectName/PaperName/Defs.lean`, between
+the two marker lines below, and let this script copy that block verbatim into the Challenge,
+`palomar/PaperName/Challenge.lean`, which may not import the project.
 The Solution imports the library, so both environments then contain the same definitions.
 
 Run from the repository root:
@@ -22,10 +23,11 @@ from pathlib import Path
 
 # ---- configuration -------------------------------------------------------------------------
 # The library module that holds the shared definitions, and the Challenge file.
-DEFS = 'PaperName/Defs.lean'
-CHALLENGE = 'Challenge.lean'
+DEFS = 'ProjectName/PaperName/Defs.lean'
+CHALLENGE = 'palomar/PaperName/Challenge.lean'
 # With several papers, one (definitions module, Challenge) pair per paper, e.g.
-#   PAIRS = [('PaperA/Defs.lean', 'PaperA/Challenge.lean'), ('PaperB/Defs.lean', 'PaperB/Challenge.lean')]
+#   PAIRS = [('ProjectName/PaperA/Defs.lean', 'palomar/PaperA/Challenge.lean'),
+#            ('ProjectName/PaperB/Defs.lean', 'palomar/PaperB/Challenge.lean')]
 # When PAIRS is empty, the single pair (DEFS, CHALLENGE) is used.
 PAIRS = []
 # The marker lines around the shared block, in both files.

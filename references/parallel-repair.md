@@ -16,7 +16,7 @@ against the compiled interfaces of the files they import, without waiting for up
    `python3 <skill-dir>/scripts/snapshot_check.py take <scratch dir>/snap-base`.
 3. Count the `sorry`s per file (`grep -cw sorry`).
 4. For each agent, collect the TeX of the paper's proofs of its results (with the TeX line
-   numbers), and the routes from `docs/paper_routes.tsv`: the agent follows these proofs.
+   numbers), and the routes from `docs/PaperName/paper_routes.tsv`: the agent follows these proofs.
 5. Check the free memory. Elaborating a file that uses much of Mathlib can take several GB, so many
    agents running Lean at once can run out of memory. Tell every agent to run at most one Lean
    process at a time, and let the available memory decide how many agents run at once.
@@ -127,10 +127,10 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
 1. Run a full `lake build` and fix the integration errors. They usually come from signature
    changes that did not reach a caller, or from stale `.olean`s. Wait until no agent is building:
    two builds in one checkout delete each other's outputs.
-2. Check the axioms and the routes. Once `scripts/Audit.lean` exists (Phase 6), run it and the
-   route check (SKILL.md, Phase 6). Before that, check the axioms of the main theorems with
-   `#print axioms` (during Stage 1, only the axioms of cited results in `External/` may appear),
-   and read the routes of the integrated results against `docs/paper_routes.tsv`. Every route
+2. Check the axioms and the routes. Once `scripts/Audit.lean` exists (Phase 6), run it and the route
+   check (SKILL.md, Phase 6). Before that, check the axioms of the main theorems with `#print
+   axioms` (during Stage 1, only the axioms of cited results in `Common/External/` may appear), and
+   read the routes of the integrated results against `docs/PaperName/paper_routes.tsv`. Every route
    difference is a proof to rewrite or a departure to report.
 3. Run `python3 <skill-dir>/scripts/stmt_diff.py <baseline commit>`. It lists every declaration
    whose statement or definition body changed. Compare the list with the agents' reports.

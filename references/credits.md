@@ -28,10 +28,10 @@ paper, and the umbrella README sums them up in one line per paper (`multi-paper.
 
 ## 2. `CREDITS.md`
 
-`CREDITS.md` says how the formalization was made, from the run log and the session transcripts
-(Section 1). The README's credits sum it up in a few bullets and link to it (`audit-report.md`,
-Section 3, item 8). Write it in bullets, with one section for each round of work: the first
-formalization, then each later round that the user asked for.
+`docs/PaperName/CREDITS.md` says how the formalization was made, from the run log and the session
+transcripts (Section 1). The README's credits sum it up in a few bullets and link to it
+(`audit-report.md`, Section 3, item 8). Write it in bullets, with one section for each round of
+work: the first formalization, then each later round that the user asked for.
 
 ```markdown
 # Credits

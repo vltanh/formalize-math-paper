@@ -3,12 +3,14 @@ module
 public meta import Lean.Elab.Command
 public meta import Lean.DocString
 -- One `import all` line per module of the libraries, so that proofs are visible to the dependency
--- traversal (the module system hides them from a plain `import`). Generate the lines with
---   find PaperName External Basic -name '*.lean' | sort | sed 's/\.lean$//; s#/#.#g; s/^/import all /'
--- With several papers (references/multi-paper.md), list every module of `<Project>/` and every
--- paper's Solution in `palomar/`, and no Challenge.
-import all PaperName.Main
-import all Solution
+-- traversal (the module system hides them from a plain `import`): every module of `ProjectName/`
+-- (`Common/` and the paper's library) and the paper's Solution in `palomar/`, but no Challenge,
+-- which holds a copy of the paper's definitions under the library's names. Generate the lines with
+--   { find ProjectName -name '*.lean'; cd palomar && find . -name Solution.lean; } |
+--     sed 's#^\./##; s/\.lean$//; s#/#.#g; s/^/import all /' | sort
+-- With several papers (references/multi-paper.md), the same command lists every paper's modules.
+import all ProjectName.PaperName.Main
+import all PaperName.Solution
 
 /-!
 # Axiom and dependency audit
@@ -16,7 +18,7 @@ import all Solution
 Run with `lake env lean scripts/Audit.lean` after `lake build`.
 
 For every numbered result of the paper, this prints the axioms it depends on and the results from
-prior work (`External/`) that it uses, whether proved there or, in a conditional
+prior work (`Common/External/`) that it uses, whether proved there or, in a conditional
 formalization, assumed as hypotheses of its statement. It then checks every declaration
 of the library and the theorems that Palomar's comparator checks. The run fails if any of them
 depends on an axiom other than Lean's standard `propext`, `Classical.choice` and `Quot.sound` (a
@@ -34,9 +36,9 @@ available: the module system does not export them otherwise. The traversal tests
 precomputed set of the library's constants; looking up each constant's module instead
 (`Environment.getModuleIdxFor?`) makes the interpreted script take minutes.
 
-To adapt: generate the `import all` lines, fill in the three lists, and set the libraries' root
-names in `isLibraryModule`: the paper's library, `External`, the results it cites, and `Basic`,
-the library of general mathematics.
+To adapt: generate the `import all` lines, fill in the three lists, and set `isLibraryModule`:
+the root `ProjectName` (`Common/Basic/`, `Common/External/` and the paper's library) and the
+paper's Solution module, one per paper when there are several.
 Keep one `import all` line per module of the libraries, each on its own line: a module that is
 missing is still imported through the others, but without its proofs, and the audit then misses the
 axioms and the routes inside them. The CI template checks the list.
@@ -46,28 +48,29 @@ open Lean Elab Command
 
 namespace Audit
 
-/-- The results from prior work, with a short label: the theorems proved in `External/`
-or, when general, in `Basic/`, and, in a conditional formalization, the propositions assumed as
-hypotheses. The traversal
-stops at them. -/
+/-- The results from prior work, with a short label: the theorems proved in `Common/External/`
+or, when general, in `Common/Basic/`, and, in a conditional formalization, the propositions
+assumed as hypotheses. The traversal stops at them. -/
 meta def externalResults : List (String × Name) :=
-  [("<cited theorem, short label>", ``External.Topic.citedTheorem)]
+  [("<cited theorem, short label>", ``External.Source.citedTheorem)]
 
 /-- The numbered results of the paper, in the order of the paper. -/
 meta def paperResults : List (String × Name) :=
   [("Thm 1.1", ``PaperName.theorem1_1),
    ("Lemma 2.1", ``PaperName.lemma2_1)]
 
-/-- The theorems that Palomar's comparator checks (`theorem_names` of `comparator.json`). -/
+/-- The theorems that Palomar's comparator checks (`theorem_names` of
+`palomar/PaperName/comparator.json`), as the Solution restates them. -/
 meta def solutionResults : List Name :=
-  [``ChallengeNamespace.theorem_1_1]
+  [``PaperNameChallenge.theorem1_1]
 
 /-- Lean's standard axioms. -/
 meta def standardAxioms : List Name := [``propext, ``Classical.choice, ``Quot.sound]
 
-/-- Whether `m` is a module of the libraries: the paper's, `External` or `Basic`. -/
+/-- Whether `m` is a module of the libraries: under the root `ProjectName` (`Common/` and the
+paper's library), or the paper's Solution. -/
 meta def isLibraryModule (m : Name) : Bool :=
-  (`PaperName).isPrefixOf m || (`External).isPrefixOf m || (`Basic).isPrefixOf m
+  (`ProjectName).isPrefixOf m || m == `PaperName.Solution
 
 /-- The constants declared in the library. -/
 meta def libraryConstants (env : Environment) : NameSet := Id.run do

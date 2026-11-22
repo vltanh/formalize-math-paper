@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: single-paper-project-layout
+expected_outcome: |
+  A layout in which all Lean code is under one root directory (named after the project), with
+  Common/Basic and Common/External for shared general mathematics and cited results and a
+  subdirectory for the paper's library; the Challenge, Solution, comparator.json and
+  formalization.yaml in palomar/<Paper>/, with the Challenge and Solution as modules
+  <Paper>.Challenge and <Paper>.Solution of a lean_lib whose source directory is palomar/; the
+  report, credits, routes and private NEXT.md in docs/<Paper>/; the README at the root; and the
+  reason: a second paper can join later without moving anything.
