@@ -73,7 +73,16 @@ Others will import the package without knowing the project, so it reads as a lib
 - To avoid rebuilding Mathlib for the package, hard-link the project's `.lake/packages` and copy the
   Mathlib entries of its manifest. The project's builds also build the package through the path
   dependency, so agents working in both at once check files without building
-  (`scripts/check_file.py`) and build only when their files are done.
+  (`scripts/check_file.py`) and build only when their files are done. To integrate a package
+  into the project while the package is still changing, give the project a frozen copy: a git
+  worktree of the package at a fixed commit, required by path, swapped for the package itself
+  when the package's work is done. Several packages can then be worked on and integrated at once.
+- Require only what some module imports: a package that no module imports is a dependency to
+  drop, not to publish.
+- Comparator runs in a sandbox that mounts only the project's directory, so it cannot see a
+  dependency required by `path`. Until the package is published and pinned, run Comparator with
+  temporary copies of the packages under `.lake/` and the lakefile and manifest pointed at them,
+  then restore both files and commit none of it; after pinning, the plain command works.
 - A cited result keeps its place in the project: `External/` states it in its source's terms and
   proves it from the package. The route check and the audit treat it like any other cited result.
 - The project's README, `REPORT.md` (Section 2) and `formalization.yaml` say where it uses the

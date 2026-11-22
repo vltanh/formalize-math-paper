@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "4.2.0"
+  version: "4.2.1"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -177,7 +177,9 @@ spaces, distributions). Build it, and keep the paper's argument. Where it goes i
 test in `references/separate-packages.md`: a general theory in a package of its own, a lemma or a
 development that only this paper needs in `Basic/` or `External/` (Phase 2). Prove each cited
 result in its source's terms, by its source's argument, from that theory; when the source's proof
-is not accessible, by a standard argument from the literature, and name it.
+is not accessible, by a standard argument from the literature, and name it. An argument of your
+own is not a named argument: search for an open source that proves the result (a later paper,
+lecture notes, an appendix) and follow it.
 
 The size of the work is not a reason to skip it, but the user must know it. As soon as the
 inventory shows a missing theory, estimate it (what must be built, in what order, roughly how many

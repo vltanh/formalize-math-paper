@@ -13,7 +13,9 @@ against the compiled interfaces of the files they import, without waiting for up
 2. Run a full `lake build`, so that every `.olean` exists. Agents check their files with
    `lake env lean` against those outputs. While this build is fresh, also take a snapshot of it
    for agents that will need one (see the brief):
-   `python3 <skill-dir>/scripts/snapshot_check.py take <scratch dir>/snap-base`.
+   `python3 <skill-dir>/scripts/snapshot_check.py take <scratch dir>/snap-base`. When several
+   coordinators share a scratch directory (several packages, or several papers), prefix every
+   snapshot name with the coordinator's (`snap-<package>-base`), or they overwrite each other.
 3. Count the `sorry`s per file (`grep -cw sorry`).
 4. For each agent, collect the TeX of the paper's proofs of its results (with the TeX line
    numbers), and the routes from `docs/PaperName/paper_routes.tsv`: the agent follows these proofs.
