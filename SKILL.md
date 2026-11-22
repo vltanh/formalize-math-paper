@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "4.3.2"
+  version: "4.3.3"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -179,7 +179,17 @@ development that only this paper needs in `Basic/` or `External/` (Phase 2). Pro
 result in its source's terms, by its source's argument, from that theory; when the source's proof
 is not accessible, by a standard argument from the literature, and name it. An argument of your
 own is not a named argument: search for an open source that proves the result (a later paper,
-lecture notes, an appendix) and follow it.
+lecture notes, an appendix) and follow it. Before you call a source inaccessible, try its open
+archives, then ask the user for it, with its link, and go on meanwhile; their library may have what
+refuses automated access. Compare every proof with the source when it arrives, and redo what
+differs. Do not say what a source contains, or what its proof would need, before reading it.
+
+The source's proof may take facts from other works in turn. Treat them alike, level by level: follow
+the work it cites when you can read it. A fact that it only recalls, states without proof, or takes
+from a work that stays out of reach may be proved by a named argument or by a theorem of the
+library. List these in a table of the report (the step, the work cited and whether it was obtained,
+the substitute), apart from the departures. Keep the proofs that are shorter than the sources'
+in the report's list of simpler proofs, with their status.
 
 The size of the work is not a reason to skip it, but the user must know it. As soon as the
 inventory shows a missing theory, estimate it (what must be built, in what order, roughly how many
@@ -533,9 +543,9 @@ extracts.
 
 ## Run log
 
-Keep an untracked log (for example `notes/runlog.md`) from Phase 0: the start time with its time
-zone, the agent, harness, model(s) and this skill's version, each sub-agent (task, start, end,
-resumptions), and the end of each phase. `references/credits.md`, Section 1, says what figures to
+Keep an untracked log (for example `notes/runlog.md`) from Phase 0, with times read from the clock
+(`date`), never estimated: the start time with its time zone, the agent, harness, model(s) and this
+skill's version, each sub-agent (task, start, end, resumptions), and the end of each phase. `references/credits.md`, Section 1, says what figures to
 report and how to take them from the session transcripts; they go in `CREDITS.md`, one section per
 round, in `formalization.yaml` and in status reports.
 

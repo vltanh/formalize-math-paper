@@ -106,6 +106,8 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
 
 ## While agents run
 
+- An agent that must stop a process stops its own, by process id, and never by a name or a command
+  pattern, which also matches what other agents run.
 - Record each agent in the run log: what it works on, when it started, and when it finished. Take
   its effort from the transcripts afterwards (SKILL.md, Run log).
 - When an agent finishes, diff its files' statements at once
