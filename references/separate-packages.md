@@ -51,8 +51,11 @@ Others will import the package without knowing the project, so it reads as a lib
   that exist elsewhere, in Lean and other systems, with the date of the search and only verified
   references); a short list of simpler or shorter proofs noticed while following the sources, each
   with a one-line sketch, its scope, and whether it was checked in Lean or only on paper; and
-  credits (its maintainers, and the AI systems that wrote it, as the Rules require). The README is
-  short, as the project's is (`audit-report.md`, Section 3); long explanations go in a `docs/` file
+  credits (its maintainers, and the AI systems that wrote it, as the Rules require). Link everything
+  a reader may want to open, as in the project's documents: every Lean name to its line
+  (`scripts/linkify_docs.py`, configured for the package and checked in CI), every project of the
+  literature section to its repository or registry entry, and every reference to its DOI, arXiv or
+  zbMATH page, each checked to be the work it names. The README is short, as the project's is (`audit-report.md`, Section 3); long explanations go in a `docs/` file
   it links. It states only
   what is true of the package: where a fact is not settled yet (a commit hash, the exact form of a
   statement, a file name), it leaves a marked placeholder rather than a plausible guess. While

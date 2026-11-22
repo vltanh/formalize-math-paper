@@ -167,7 +167,10 @@ say so.>
 ### Formalizations
 <Formalizations of the paper, of its main results, or of the results it cites, in Lean or in other
 systems, found in Phase 0 and in this search, whether earlier or later than this one: where, what
-they cover, and whether this work consulted or used them. If there are none, say so.>
+they cover, and whether this work consulted or used them. If there are none, say so. When the
+user or the documents say that a formalization is not consulted, the search is no exception: survey
+it from the paper and the repository's public description, do not open its code, and say so in the
+brief of every agent with network access, literature reviewers included.>
 
 ## 11. What's next
 <One line: plans for follow-up papers are kept in `NEXT.md`, which is not published (a code span,
