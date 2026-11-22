@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: paper-step-keeps-its-theory
+expected_outcome: |
+  An answer that declines the second-difference argument: Lean lacking distributions is not a
+  reason to depart from the paper's proof, so the formalization keeps the paper's step and builds
+  the missing theory (in a package of its own if general), recording the shorter argument for the
+  report's "What's next"; a departure is acceptable only for an error or gap in the paper, a forced
+  representation, or the user's own decision; until the theory is built the step is a temporary
+  named assumption and the corollary's statement does not change.

@@ -1,31 +1,37 @@
 # Packages of their own
 
-A formalization sometimes has to prove a theorem that no Lean library has and that others would
-import on its own. Such a development can be a Lake package of its own, in its own repository,
-required by the project at a pinned commit. The default is not to split: every repository adds CI,
-Mathlib upgrades and one more place where a reader has to look. Keep general mathematics in
-`Basic/` and cited results in `External/` (SKILL.md, Phase 2).
+Research papers use theory that no Lean library has yet, and the project builds it (SKILL.md,
+Rules, "Mathematics that Lean lacks"). A theory that others could use goes in a Lake package of its
+own, in its own repository, required by the project at a pinned commit: it outlasts the project,
+others can import it, and it can move to Mathlib later. A lemma, or a short development that only
+fills a gap of this paper, stays in the project: general mathematics in `Basic/`, cited results in
+`External/` (SKILL.md, Phase 2).
 
-## 1. The bar
+## 1. The test
 
-Propose a package of its own only when all of these hold:
+Put the missing mathematics in a package of its own when all of these hold:
 
-- Famous by name. It proves a theorem, or a small theory around one, that mathematicians outside
-  the paper's area know by name. A lemma that only this paper needs, however long, does not
-  qualify.
 - Missing. Neither Mathlib nor another maintained public Lean library has it, and no Mathlib
   pull request for it is close to merging.
-- Substantial. It is more than one quick contribution to Mathlib: a theory of its own that the
-  proof builds on, or as a rough guide several hundred lines or more.
+- A theory. It is more than one quick contribution to Mathlib: definitions and the results around
+  them that the proof builds on, as a rough guide several hundred lines or more. A theorem known
+  by name, with the theory under it, qualifies (Kakutani's fixed-point theorem, the
+  Kahane–Khintchine inequality, the `L^p` boundedness of the Hilbert transform); one long lemma
+  that only this paper needs does not.
 - General. Its statements say nothing about the paper's objects, and it imports only Mathlib
   and other such packages.
 - Reusable. Someone outside this project could plausibly import it.
 
 Otherwise it stays in `Basic/` or `External/`, and small general lemmas are offered to Mathlib, the
-long-term home of general mathematics. Expect at most one or two packages for a paper, often none.
-Propose one during the inventory (Phase 1), so that the code is written in the package from the
-start rather than moved there later. The user decides whether to split, the name, the visibility and
-when to publish; creating and pushing a repository needs permission (Rules).
+long-term home of general mathematics. Decide during the inventory (Phase 1), so that the code is
+written in the package from the start rather than moved there later. Build the package by default
+and say so in the next status report, with the plan and its estimate. The user decides its name,
+its visibility and when to publish it, and may prefer to keep it in the project. Building it
+locally needs no permission; creating and pushing its repository does (Rules).
+
+State the package's results in their general form, as a library would, when the general proof is
+not much harder than the case the paper needs. Otherwise prove the case needed, say so in the
+statement's docstring, and list the general form in the package's README as a planned extension.
 
 ## 2. One package per area
 

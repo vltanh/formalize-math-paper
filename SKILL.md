@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "4.1.0"
+  version: "4.2.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -32,9 +32,10 @@ the Lean code under `PaperName/`, the Palomar files in `palomar/PaperName/` and 
 - every result the paper proves is proved by the paper's own argument. A proof departs from
   the paper's only when it must, and every departure is reported (Rules, "Faithful proofs");
 - every result the paper cites in its proofs is proved too: in Mathlib, in another public library,
-  or in `PaperName/External/`. A cited result may need mathematics that no Lean library has yet and
-  that the project cannot reasonably build. Such a result becomes a named hypothesis of every
-  statement that uses it, and the formalization then says plainly that it is conditional;
+  or in `PaperName/External/`, from a package of the project's own when it needs a theory that no
+  Lean library has (Rules, "Mathematics that Lean lacks"). A cited result stays assumed only if the
+  user decides so or there is no proof of it to formalize. It is then a named hypothesis of every
+  statement that uses it, and the formalization says plainly that it is conditional;
 - the statements say what the paper says, and every deviation is documented;
 - `lake build` succeeds with no `sorry` (except in the Challenge's statements, by design), no
   `admit` and no project `axiom`. Every declaration of the library depends only on `propext`,
@@ -57,8 +58,8 @@ project, with the shared code in `ProjectName/Common/`, and they add an umbrella
 results that cross papers, and one Palomar submission per paper (`references/multi-paper.md`).
 
 The work has two stages. In Stage 1, formalize everything the paper itself proves. Results it takes
-from the literature may be temporary axioms. In Stage 2, remove those axioms: prove them, or
-turn the ones out of reach into stated hypotheses. Setup comes before the two stages, and
+from the literature may be temporary axioms. In Stage 2, remove those axioms by proving them,
+building any theory that Lean lacks. Setup comes before the two stages, and
 verification, cleanup, the audit and packaging come after.
 
 ## Principles
@@ -76,6 +77,11 @@ These explain the rules below. Use them when no rule covers a situation.
   is unverified.
 - "Standard", "obvious", "by symmetry" and "routine" still need proofs. Mathlib may have the fact;
   if not, prove it. Only what the paper itself takes from another source may become an axiom.
+- Missing mathematics is work to do, not a reason to do something else. Research papers routinely
+  use theory that Mathlib does not have yet. Building it is part of formalizing the paper: a proof
+  that avoids it checks a different argument, and a hypothesis in its place leaves the paper's
+  claim unchecked. Theory that others could use goes in a package of its own, so that the work
+  outlasts the project.
 - External means where a result comes from, not that it is trusted. A cited result lives in
   `External/` because of its source, and it is proved like everything else.
 - An assumption is an assumption, whatever its form. A cited result that is not proved is assumed,
@@ -144,17 +150,18 @@ These explain the rules below. Use them when no rule covers a situation.
   other:
   1. the paper's argument is wrong at that step, or has a gap there, and cannot be repaired along
      its own lines (the step is also an E-item);
-  2. the step needs mathematics that Lean lacks and that the project cannot reasonably build (as
-     for cited results out of reach, below), and another argument avoids it;
-  3. the step has no meaning in a representation that the formalization must use (Principles), so
+  2. the step has no meaning in a representation that the formalization must use (Principles), so
      a faithful translation of it is a different argument.
 
-  A shorter, more elegant, more general or more automatic proof is not a reason. Neither is a proof
-  that is easier to formalize or faster to build. A simpler argument that you find is still worth
-  keeping: record it, with a sketch, for the report's "What's next" section (Phase 8), and prove
-  the result by the paper's argument. Depart as little as the reason requires: repair the step,
-  not the proof. If a departure would replace the whole argument of a numbered result, propose it
-  to the user first, with the reason; other work continues meanwhile.
+  Lean or Mathlib lacking the mathematics that a step needs is not a reason: build that
+  mathematics (below), however large. A shorter, more elegant, more general or more automatic proof
+  is not a reason either, nor is a proof that is easier to formalize or faster to build. A simpler
+  argument that you find is still worth keeping: record it, with a sketch, for the report's
+  "What's next" section (Phase 8), and prove the result by the paper's argument. Depart as little
+  as the reason requires: repair the step, not the proof. If a departure would replace the whole
+  argument of a numbered result, propose it to the user first, with the reason; other work continues
+  meanwhile. The user may also choose a departure for reasons of their own (to release sooner,
+  say); record it as their decision.
 - Report every departure, always. For each one, record what the paper does, what the
   formalization does instead, and which reason forces the change: in the declaration's docstring
   ("Departure from the paper: …"), in the report's table of departures, in `formalization.yaml`
@@ -162,18 +169,29 @@ These explain the rules below. Use them when no rule covers a situation.
   differences when the route changes, and in the next status report. A departure missing from any
   of these is a defect: find and fix it as you would a statement that was changed silently.
 
-### Cited results out of reach
+### Mathematics that Lean lacks
 
-A cited result may need mathematics that no Lean library has. If building that mathematics in the
-project is a moderate effort, build it. Otherwise the default is a conditional formalization: the
-result becomes a named hypothesis of every statement whose proof uses it. Apply the default without
-asking, and report it in the next status report. Ask the user only when building the missing
-mathematics would be a large but feasible effort: whether to spend that effort is their decision.
-Meanwhile, continue the other work under the default. If they choose to build it, plan the work in
-layers. Each layer replaces some hypotheses with constructions and proofs from more basic ones, and
-ends in a state that can be released. These hypotheses are the only ones that may be added to a
-paper result without a counterexample. Never present a conditional formalization as complete: its
-README, `formalization.yaml` and report say that it is conditional and list what it assumes.
+A cited result, or a step of the paper's own proof, may need mathematics that no Lean library has:
+one theorem, or a whole theory (Banach-space-valued martingales, singular integrals, Sobolev
+spaces, distributions). Build it, and keep the paper's argument. Where it goes is decided by the
+test in `references/separate-packages.md`: a general theory in a package of its own, a lemma or a
+development that only this paper needs in `Basic/` or `External/` (Phase 2). Prove each cited
+result in its source's terms, by its source's argument, from that theory; when the source's proof
+is not accessible, by a standard argument from the literature, and name it.
+
+The size of the work is not a reason to skip it, but the user must know it. As soon as the
+inventory shows a missing theory, estimate it (what must be built, in what order, roughly how many
+lines), plan it in layers, tell the user in the next status report, and start without waiting.
+Each layer replaces some assumptions with constructions and proofs from more basic ones, and ends in
+a state that can be released: until the last layer, each result not yet reached is a named
+hypothesis, under its source's name, of the statements that use it.
+
+At the end, a result stays assumed only when the user decides so after seeing the plan, or when
+there is nothing to formalize: its source gives no proof (a conjecture, an unpublished claim) and
+none is known. These hypotheses, and the temporary ones of an unfinished layer, are the only ones
+that may be added to a paper result without a counterexample. Never present a conditional
+formalization as complete: its README, `formalization.yaml` and report say that it is conditional,
+list what it assumes, and say why each is still assumed.
 
 ### Lean
 
@@ -235,10 +253,9 @@ Lean / Mathlib:   the newest Lean release or release candidate (at least Palomar
                   project needs requires a specific Mathlib commit
 libraries:        the public libraries beyond Mathlib that prove results the paper cites
                   (references/palomar.md, Section 1, says which may appear in statements)
-packages:         none by default; a package of its own for a famous result is proposed during the
-                  inventory, and the user decides (references/separate-packages.md)
-out of reach:     cited results that no library supports and the project cannot build, and how
-                  each is handled (Rules)
+missing theory:   what the paper's proofs and cited results need that no Lean library has, the
+                  theory to build for each, its estimate, and its package (Rules; packages are
+                  named for their area, references/separate-packages.md)
 compile allowed:  yes (the default whenever a toolchain exists)
 publishing:       push? create a repository? make it public? (default: ask each time)
 target:           Palomar packaging (default yes; skip it only if the user declines)
@@ -284,12 +301,11 @@ Read the whole paper before you write any Lean. Keep a working checklist outside
   compare the file with your own reading, add by hand the rows that it cannot see
   (`references/tools.md`, Section 2), and commit it;
 - each citation, marked as used in a proof or only for context. For each one used in a proof, note
-  where its proof can come from: Mathlib, another public library, the project itself, or nowhere
-  yet, because the mathematics it needs is missing from Lean. Survey the libraries before you
-  decide, and decide now how to handle the last kind (Rules), because it sets the scope. If the
-  project must build a famous result that no library has, check it against the bar in
-  `references/separate-packages.md`, and propose a package of its own to the user only if it
-  clears it;
+  where its proof can come from: Mathlib, another public library, or the project, and in the last
+  case what it needs that no Lean library has. Survey the libraries before you decide. Note the
+  same for each step of the paper's own proofs that uses a theory Lean lacks. Group what is missing
+  into theories, decide where each goes (`references/separate-packages.md`), estimate it, and plan
+  it in layers (Rules, "Mathematics that Lean lacks"): this sets the scope;
 - suspected typos, inconsistencies and gaps, with the TeX line, and the corrections that errata or
   later versions make (Phase 0). These become the audit's E-items, so record them as you go. Settle
   a correction that changes a statement before the baseline (Phase 3, Rules);
@@ -326,10 +342,10 @@ Palomar submission each (`references/multi-paper.md`). When a second paper joins
 paper, the first paper's code moves to this layout, once, before the second paper's statements are
 written (`references/multi-paper.md`, Section 9).
 
-Rarely, a theorem known by name that no library has and that others would import deserves a Lake
-package of its own, required at a pinned commit. The default is not to split.
-`references/separate-packages.md` gives the bar, one package per area, and what such a package must
-be: it stands alone, with no provenance and no reference back to the project.
+Missing theory that the paper needs (Rules) goes in a Lake package of its own, required at a
+pinned commit, when it passes the test in `references/separate-packages.md`, which also gives one
+package per area and what such a package must be: it stands alone, with no provenance and no
+reference back to the project.
 
 Name declarations after the paper's numbering (`theorem1_2`, `lemma3_4`, `equation3_1`), so that
 readers and scripts can find them. Begin the docstring of every numbered result with its number and
@@ -401,16 +417,16 @@ For each cited result:
    (parameters, notation, finite versus infinite, bundled versus unbundled).
 3. Otherwise, formalize it under `External/Source/`, with a `README.md` that gives the source, the
    statement, and how its Lean forms relate to the paper's use of it. Proving a different standard
-   form is fine if it gives exactly the estimates the paper needs; say so.
-4. If neither is feasible, follow the rule on cited results out of reach: by default the result
-   becomes a proposition in `External/Source/`, named after its source, with no proof, and a
-   hypothesis of every statement whose proof uses it, the Challenge's included (several may be
-   bundled in a class of hypotheses, written in each theorem's signature). The source's `README.md`
-   says what Lean lacks. If the user chose to build the missing mathematics, write down the layers
-   first, and keep the end state of every layer releasable.
+   form is fine if it gives exactly the estimates the paper needs; say so. When it needs a theory
+   that Lean lacks, prove it from that theory, built in the project or in a package of its own
+   (Rules, "Mathematics that Lean lacks").
+4. Until the layer that proves it is done, the result is a proposition in `External/Source/`, named
+   after its source, with no proof, and a hypothesis of every statement whose proof uses it, the
+   Challenge's included (several may be bundled in a class of hypotheses, written in each theorem's
+   signature). The source's `README.md` says what is still missing and which layer removes it.
 
-At the end, the project has no axioms, and every cited result is either proved or, when out of
-reach, a declared hypothesis.
+At the end, the project has no axioms, and every cited result is proved, except those that the user
+chose to leave assumed or that have no proof to formalize, each a declared hypothesis.
 
 ### Phase 6: Verify
 
@@ -470,7 +486,7 @@ against the TeX source, and every arithmetic claim recomputed, independently of 
 some of the inventory's own claims, and can show that a statement was changed without need. When it
 does, restore the paper's statement, rerun the Phase 6 checks, and update the Challenge and the
 report to match. A conditional formalization says so in the README's first paragraph, and the
-report lists every assumed result.
+report lists every assumed result and why it is still assumed.
 
 The report ends with two sections, checked like the findings: the paper in the literature (the work
 before it, alongside it and after it, and its formalizations, from the paper's own account and a

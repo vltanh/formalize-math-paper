@@ -62,10 +62,11 @@ compiled; use them by name, and do not prove their content again). You choose th
 Mathlib lemmas for routine steps, and the helper lemmas that package a step of the paper. You do
 not choose the argument: use the paper's, not another one, even a shorter or easier one. If you
 see a simpler argument, still use the paper's, and describe the simpler one in your report. Depart
-from the paper's proof only if its step is wrong or has a gap you cannot repair along its lines,
-or if the step needs mathematics that Lean lacks. Then change as little as the step requires, say
-so in the docstring ("Departure from the paper: …"), and report it. If a whole proof would have to
-be replaced, stop and report instead.
+from the paper's proof only if its step is wrong or has a gap you cannot repair along its lines;
+then change as little as the step requires, say so in the docstring ("Departure from the paper:
+…"), and report it. If a whole proof would have to be replaced, stop and report instead. If a step
+needs mathematics that Lean lacks, do not argue around it: state what is missing as a lemma with
+`sorry`, use it, and report it, so that it can be built.
 [For each result: its Lean name, its TeX label, the TeX of its proof, the results it cites.]
 
 Statements: keep every existing statement exactly as it is. The paper's results, listed here,

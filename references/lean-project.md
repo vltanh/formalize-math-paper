@@ -193,7 +193,7 @@ not match `PaperName.lean` itself.
 
 A library beyond Mathlib that proves a cited result is required the same way, pinned to a full
 commit hash (`git = "…"`, `rev = "<commit>"`). A package of the project's own, split out for a
-famous result (`references/separate-packages.md`), is required by `path = "../package"` while it is
+theory that Lean lacks (`references/separate-packages.md`), is required by `path = "../package"` while it is
 developed and by its published commit before the project is pushed.
 
 With several papers, the lakefile has a library `Common` and one library per paper, and the

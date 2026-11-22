@@ -14,7 +14,7 @@ files to submit it to the [Palomar](https://palomar-registry.org) registry.
 | Inventory | records the paper's results, constants, citations and suspected typos |
 | Project | sets up a Lean project on a Mathlib release, with the module system, in the standard layout (below), with three layers: `Basic/` (general mathematics, for later contribution to Mathlib), `External/` (the results the paper cites, in their sources' terms) and the paper's own library |
 | Statements | states every result first, and checks each statement against the paper's TeX source |
-| Proofs | proves what the paper proves, by the paper's own arguments, then the results it cites. A proof departs from the paper's only when it must, and every departure is reported to you with its reason. A cited result that no Lean library can yet support becomes a visible hypothesis, and the result is reported as conditional |
+| Proofs | proves what the paper proves, by the paper's own arguments, then the results it cites. A proof departs from the paper's only when it must (an error in the paper, or a representation Lean forces), never because Lean lacks the mathematics: the skill builds the missing theory, in a Lake package of its own when it is general, and tells you its estimate. Every departure is reported to you with its reason |
 | Verification | checks the axioms of every declaration, checks that each proof uses the results that the paper's proof cites (extracted from the TeX source), and runs Comparator |
 | Cleanup | removes unused hypotheses and other warnings without changing any proof's argument |
 | Documents | writes a short `README.md`, and, in `docs/PaperName/`, `REPORT.md` (errors and gaps, missing and redundant hypotheses, use of cited results, departures, the paper in the literature, what comes next) and `CREDITS.md` (how the formalization was made, from a run log) |
@@ -93,7 +93,7 @@ faster, but they are not required.
 | Path | Contents |
 | --- | --- |
 | `SKILL.md` | The workflow: principles, rules, phases and completion gates |
-| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, follow-up papers, the credits, Palomar packaging, cleanup, rigorous numerics, packages of their own for famous results, several papers in one repository, checklists (statement review, verification, status reports, completion gates), the bundled tools |
+| `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, follow-up papers, the credits, Palomar packaging, cleanup, rigorous numerics, packages of their own for the theory that Lean lacks, several papers in one repository, checklists (statement review, verification, status reports, completion gates), the bundled tools |
 | `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; replacing failing proofs with `sorry`; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; checking that each proof follows the route of the paper's proof; copying shared definitions into the Challenge; linking documentation to the code; checking Markdown tables; summarizing a Claude Code session for the run log |
 | `assets/` | Templates: the axiom, dependency and route audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |
 

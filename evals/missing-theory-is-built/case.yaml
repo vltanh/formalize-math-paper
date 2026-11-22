@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: missing-theory-is-built
+expected_outcome: |
+  A plan that proves the cited results instead of assuming them: the missing theory (Rademacher sums
+  in Banach spaces, Kahane–Khintchine, UMD) is built in a Lake package of its own named for its area,
+  the cited results are stated in the project's External/ in their sources' terms and proved
+  from it, and the paper's proof keeps its route. The work is planned in layers that each end in a
+  releasable state, with the unproved results as temporary named hypotheses; the user is told the
+  estimate and the work starts by default, while creating or publishing the package's repository
+  needs permission.

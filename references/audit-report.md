@@ -82,7 +82,7 @@ finding in a line, with its E-number.>
 ### Proved in `External/`
 | Result | Where the paper uses it | Source | Theorem in `External/` |
 ### Assumed (a conditional formalization only)
-| Result | Where the paper uses it | Source | Hypothesis in the formalization | What Lean lacks | Plan, if any |
+| Result | Where the paper uses it | Source | Hypothesis in the formalization | Why it is still assumed (the user's decision, no proof to formalize, or a layer not yet done) |
 <Check each hypothesis against its source as carefully as a statement: an assumption stated more
 strongly than its source proves can make a theorem vacuous.>
 ### Standard facts used without citation
@@ -115,9 +115,10 @@ proved. If a statement of the paper had to be corrected, a second list: the corr
 
 ## 7. Departures from the paper's proofs
 <Every result whose formal proof does not follow the paper's argument, at any step, and why the
-departure is necessary: one of the three reasons of SKILL.md's Rules (the paper's step is wrong or
-has a gap that cannot be repaired along its lines; it needs mathematics that Lean lacks and the
-project cannot build; it has no meaning in the formalization's representation). Keep this section
+departure is necessary: one of the two reasons of SKILL.md's Rules (the paper's step is wrong or
+has a gap that cannot be repaired along its lines; it has no meaning in the formalization's
+representation), or the user's own decision, said as such. Mathematics that Lean lacks is not a
+reason: it is built (SKILL.md, Rules). Keep this section
 consistent with the docstrings, `formalization.yaml` and `docs/PaperName/route_differences.tsv`. If
 there are none, say that every proof follows the paper's.>
 | Result | The paper's argument | The formalization's | Why it is necessary | E-item |

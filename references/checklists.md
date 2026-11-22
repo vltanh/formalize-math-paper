@@ -75,8 +75,9 @@ needs from user:  decisions or permissions
 - Stage 1: every internal result proved by the paper's argument; cited results isolated in
   `External/`, with citations, stated in their sources' terms, and importing nothing from the
   paper's library.
-- Stage 2: every cited result proved or derived from a library, or, when out of reach, a declared
-  hypothesis named after its source; zero project axioms.
+- Stage 2: every cited result proved or derived from a library, the theory it needs built (in a
+  package of its own when general); a result still assumed only by the user's decision or for lack
+  of any proof, as a declared hypothesis named after its source; zero project axioms.
 - Proof routes: `docs/PaperName/paper_routes.tsv` committed and checked against the paper; the route
   check passes on the final commit, and every difference it records has its reason; every departure
   from the paper's proofs is necessary (Rules) and reported in its docstring, in the report's table
