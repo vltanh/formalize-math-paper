@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: package-palomar-entries
+expected_outcome: |
+  A plan that packages the probability package for Palomar in palomar/<Entry>/ directories (Challenge, Solution,
+  comparator.json, formalization.yaml), splits the headline theorems into several entries by theory so that each Challenge
+  stays around 300 lines (never near Palomar's 1,000-line limit) with its own definitions copied from a module the sync
+  script can read, names each entry for its topic with its own namespace and submission paths, relates each to the
+  mathematical sources it formalizes, mentions no paper or project, and leaves preflight and submission of each entry to
+  the user's permission.

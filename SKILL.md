@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "4.2.1"
+  version: "4.3.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -514,7 +514,9 @@ files, all in `palomar/PaperName/`, `formalization.yaml`, Palomar's validation s
 (`assets/lean_action_ci.yml`) and the preflight workflow (`assets/palomar_preflight.yml`, copied to
 `.github/workflows/palomar_preflight_papername.yml`, whose options always name both
 `comparator_config_path` and `formalization_metadata_path`). With several papers, each is a
-submission of its own (`references/multi-paper.md`, Section 7). Everything up to Palomar's local
+submission of its own (`references/multi-paper.md`, Section 7), and so is each package that was
+built for missing theory, split into several entries when its Challenge would be long
+(`references/separate-packages.md`, Section 5). Everything up to Palomar's local
 checks needs no permission; each later step needs the user's explicit go-ahead (Rules), and the
 preflight also a confirmed authorization relationship. Submit only a commit whose preflight report
 says `status: pass`, after checking the dependency pins that rendering with Verso needs

@@ -187,9 +187,11 @@ that `NEXT.md` records.>
 ### Simpler proofs
 <Where the paper's proofs could be simpler for a reader of the paper, from the work itself: the
 simpler arguments recorded while proving, which the formal proofs could not use (SKILL.md, Rules);
-departures whose argument is simpler than the paper's (Section 7); steps that the paper proves at
-length but that are special cases of a standard result; and cited results of which the paper needs
-only a special case with an elementary proof (Section 2). For each: the result or step, the paper's
+departures whose argument is simpler than the paper's (Section 7); cited results that the source
+proves at greater length than needed, with a shorter argument that the formalization did not use
+(it follows the source), or of which the paper needs only a special case with an elementary proof
+(Section 2); and steps that the paper proves at length but that are special cases of a standard
+result. For each: the result or step, the paper's
 argument and the simpler one, in a sentence or a short sketch, what it saves, and whether it was
 checked in Lean (in a scratch file, outside the library) or only on paper. A shorter Lean proof is
 not a simpler argument: a tactic or a Mathlib lemma that closes a routine step does not belong

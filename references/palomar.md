@@ -49,7 +49,8 @@ decides to.
   public Git repository pinned to a commit, including a project that Palomar has registered
   (PalomarSubmission's README: "arbitrary pinned dependencies remain available to the proof in
   `Solution.lean`"). A general library split out of a formalization (SKILL.md, Phase 2) can
-  therefore be registered on its own and still be imported by the formalization's proofs.
+  therefore be registered on its own and still be imported by the formalization's proofs. Package
+  it as an entry of its own, or several (`separate-packages.md`, Section 5).
 - A library that tracks Mathlib's `master`, as Tau Ceti does, requires a specific Mathlib commit:
   use the commit its manifest pins, and compare the resulting manifest with Verso's, as below.
 - The Challenge must render. After verification, Palomar renders it with the release of Verso

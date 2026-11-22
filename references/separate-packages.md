@@ -46,8 +46,10 @@ Others will import the package without knowing the project, so it reads as a lib
 
 - It is a Lake package with the project's `lean-toolchain` and Mathlib release, the module system,
   Mathlib's style, its own README (what it proves, with the exact statements; the method and its
-  references; how to depend on it; credits: its maintainers, and the AI systems that wrote it, as
-  the Rules require), licence, CI and axiom audit. The README is short, as the project's is
+  references; how to depend on it; a short list of simpler or shorter proofs noticed while following
+  the sources, each with a one-line sketch, its scope, and whether it was checked in Lean or only on
+  paper; credits: its maintainers, and the AI systems that wrote it, as the Rules require), licence,
+  CI and axiom audit. The README is short, as the project's is
   (`audit-report.md`, Section 3); long explanations go in a `docs/` file it links. It states only
   what is true of the package: where a fact is not settled yet (a commit hash, the exact form of a
   statement, a file name), it leaves a marked placeholder rather than a plausible guess. While
@@ -89,3 +91,32 @@ Others will import the package without knowing the project, so it reads as a lib
   package; the dependency runs one way.
 - Palomar restricts only the Challenge's imports (`references/palomar.md`, Section 1): the Solution
   may depend on the package, even when the package is registered as an entry of its own.
+
+## 5. Palomar entries
+
+Package each package for Palomar too, unless the user declines, so that readers of the registry
+find its theorems and Palomar's review checks their statements apart from the project that uses
+them. The layout, the files and the checks are a project's (`palomar.md`), with these differences.
+
+- The entry is in `palomar/<Entry>/`, with modules `<Entry>.Challenge` and `<Entry>.Solution`, the
+  Challenge's theorems in the namespace `<Entry>Challenge`, and its own `comparator.json` and
+  `formalization.yaml` (named by its preflight workflow and by the submission, as
+  `palomar.md`, Section 8). Name an entry for its topic (`Burkholder`, `Khintchine`), not after the
+  package or a paper.
+- What goes in: the package's headline theorems, each in its general, standard form, with the
+  definitions a reader needs. The sources of `formalization.yaml` are the mathematical sources
+  whose theorems are proved, with `relationship: formalizes`; nothing in the entry names the
+  project or its paper (Section 3). The package's definitions that the statements use must be in a
+  module that imports only what the Challenge imports; keep them there, or move them, with `rfl`
+  bridges for the old names, so that `scripts/sync_challenge_defs.py` can copy the block.
+- Length: Palomar refuses a Challenge over 1,000 lines or 100 KiB, and prefers at most about 300
+  lines (32 KiB) with definitions. When the headline theorems together would pass 300, split them
+  into several entries, one per theory or topic, each its own Palomar submission with its own
+  definitions block. Group related theorems in one entry rather than one entry per theorem: a
+  reviewer checks one circle of definitions per entry, and fewer entries need fewer permissions.
+  Split along the package's directories, so that each Challenge defines one circle of objects
+  (martingales and UMD; random sums and Schatten norms; …) and a reader can check it alone. Do not
+  split a theorem from the definitions it needs, and do not share one Challenge between entries. A
+  theorem that two entries would both state belongs to one of them.
+- Each entry is verified, and submitted, on its own: its preflight and its submission need the
+  user's permission separately, and the entries of one package may be at different commits.
