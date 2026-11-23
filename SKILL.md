@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "4.3.3"
+  version: "4.4.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -173,23 +173,23 @@ These explain the rules below. Use them when no rule covers a situation.
 
 A cited result, or a step of the paper's own proof, may need mathematics that no Lean library has:
 one theorem, or a whole theory (Banach-space-valued martingales, singular integrals, Sobolev
-spaces, distributions). Build it, and keep the paper's argument. Where it goes is decided by the
-test in `references/separate-packages.md`: a general theory in a package of its own, a lemma or a
-development that only this paper needs in `Basic/` or `External/` (Phase 2). Prove each cited
-result in its source's terms, by its source's argument, from that theory; when the source's proof
-is not accessible, by a standard argument from the literature, and name it. An argument of your
-own is not a named argument: search for an open source that proves the result (a later paper,
-lecture notes, an appendix) and follow it. Before you call a source inaccessible, try its open
-archives, then ask the user for it, with its link, and go on meanwhile; their library may have what
-refuses automated access. Compare every proof with the source when it arrives, and redo what
-differs. Do not say what a source contains, or what its proof would need, before reading it.
+spaces, distributions). Build it. Where it goes is decided by the test in
+`references/separate-packages.md`: a general theory in a package of its own, a lemma or a
+development that only this paper needs in `Basic/` or `External/` (Phase 2). For a step of the
+paper's own proof, keep the paper's argument.
 
-The source's proof may take facts from other works in turn. Treat them alike, level by level: follow
-the work it cites when you can read it. A fact that it only recalls, states without proof, or takes
-from a work that stays out of reach may be proved by a named argument or by a theorem of the
-library. List these in a table of the report (the step, the work cited and whether it was obtained,
-the substitute), apart from the departures. Keep the proofs that are shorter than the sources'
-in the report's list of simpler proofs, with their status.
+A cited result is different: the paper uses its statement, not its proof, and the statement is
+what the formalization must certify. State it in its source's terms, as the paper uses it (its
+constants, ranges and hypotheses), and check that statement against the source. Then prove it by
+any sound route, the cheapest first: a theorem of a library, a short argument from the literature
+(the source's own or another one), or an argument of your own. Name the argument in the docstring
+and in the report's table of cited results. The source's proof matters only where the paper uses
+more than the statement: an estimate from inside the proof, a construction, the form of a constant.
+That part is the paper's argument, and it follows the source like the rest of the paper's proofs.
+Ask the user for a source only when its statement is needed and you cannot read it (try its open
+archives first). Do not say what a source contains, or what its proof would need, before reading
+it. When a short proof of a cited result is known, prefer it to a long one that follows the source.
+Record in the report's list of simpler proofs any shorter argument that you notice and do not use.
 
 The size of the work is not a reason to skip it, but the user must know it. As soon as the
 inventory shows a missing theory, estimate it (what must be built, in what order, roughly how many
