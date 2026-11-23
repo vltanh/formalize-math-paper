@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "4.4.0"
+  version: "4.5.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -190,6 +190,15 @@ Ask the user for a source only when its statement is needed and you cannot read 
 archives first). Do not say what a source contains, or what its proof would need, before reading
 it. When a short proof of a cited result is known, prefer it to a long one that follows the source.
 Record in the report's list of simpler proofs any shorter argument that you notice and do not use.
+
+A package of its own is a library: it formalizes a theory for others to reuse, and it attributes
+its results to their sources. There, prove each result that the package attributes to a source by
+that source's argument when you can read it, and treat the works that the source cites in turn
+alike, level by level; ask the user for those you cannot get, and go on meanwhile. A fact that a
+source only recalls, states without proof, or takes from a work out of reach may be proved by a
+named argument or by a theorem of a library; list each one in the package README (the step, the
+work cited and whether it was read, the argument used). A shorter proof may sit next to the
+source's, as a second theorem. The project uses the package's statements like any library's.
 
 The size of the work is not a reason to skip it, but the user must know it. As soon as the
 inventory shows a missing theory, estimate it (what must be built, in what order, roughly how many
