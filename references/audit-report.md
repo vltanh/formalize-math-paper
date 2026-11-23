@@ -260,6 +260,11 @@ proves.
 
 - Write for mathematicians, in the paper's notation, with Lean names in code spans. Write plainly:
   say each thing once, and prefer a table or a short paragraph to a long one.
+- Lists: when a sentence enumerates more than two items, or items with clauses of their own, write a
+  bulleted list, not a run of commas and semicolons. Put one item in each bullet, as a phrase or a
+  sentence. A list of two or three plain words may stay inline. Markdown table cells cannot hold
+  lists, so keep each cell short and move a long enumeration below the table, as bullets. The notes
+  in `formalization.yaml` stay prose.
 - Before publishing, read the README as a newcomer would. Its first screen should say what is
   proved, what is conditional and what is not formalized.
 - The report describes only the paper and the current formalization. Leave out the history of the
