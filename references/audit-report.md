@@ -68,10 +68,11 @@ any hypothesis it assumes, against the paper and the source again.
 Paper: <authors>, *<title>*, <arXiv id with version>. The audit was made against the arXiv
 LaTeX source of that version. Section, result and equation numbers are the paper's.
 
-Status of the formalization: <bullets: what is proved; where the cited results are proved; what is
-assumed, if anything, which makes the result conditional; the build, sorry and axiom status, and
-how the audit script checks it; Challenge and Comparator; whether any statement of the paper had to
-change; whether every proof follows the paper's, and how many depart from it (Section 7)>
+Status of the formalization: <bullets: what is proved; where the cited results are proved, and by
+which arguments (Section 2); what is assumed, if anything, which makes the result conditional; the
+build, sorry and axiom status, and how the audit script checks it; Challenge and Comparator; whether
+any statement of the paper had to change; whether every proof follows the paper's, and how many
+depart from it (Section 7)>
 
 ## 1. Summary
 | Kind | Findings |
@@ -80,7 +81,11 @@ finding in a line, with its E-number.>
 
 ## 2. Results from prior work and how the paper uses them
 ### Proved in `External/`
-| Result | Where the paper uses it | Source | Theorem in `External/` |
+| Result | Where the paper uses it | Source | Theorem in `External/` | Argument |
+<The argument that its docstring names: a library theorem, the source's proof, another work's, or
+the formalization's own. Mark the results that the paper uses beyond their statements (an estimate
+from the proof, a construction, the form of a constant): that part follows the source, and a
+departure there belongs in Section 7.>
 ### Assumed (a conditional formalization only)
 | Result | Where the paper uses it | Source | Hypothesis in the formalization | Why it is still assumed (the user's decision, no proof to formalize, or a layer not yet done) |
 <Check each hypothesis against its source as carefully as a statement: an assumption stated more

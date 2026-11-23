@@ -162,7 +162,9 @@ The metadata is `palomar/PaperName/formalization.yaml`. Start from the current t
   Check them.
 - `sources`: the paper with `relationship: formalizes`, and with `author_endorsement:
   not-contacted` unless the authors were contacted. Cited works that the formalization proves go
-  under `background`, with a note; so do cited works that it assumes, with a note that says so. A
+  under `background`, with a note that names the argument used (the source's, another work's, a
+  library theorem, or the formalization's own); so does a work whose argument it uses, and so do
+  cited works that it assumes, with a note that says so. A
   source of `type: original-proof` declares that the formalization is where its result first
   appears, and Palomar then requires every source to be `background` or `other`. A project that
   formalizes a paper and adds a new result keeps the paper as `formalizes`, and records the

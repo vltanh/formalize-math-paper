@@ -46,7 +46,9 @@ Others will import the package without knowing the project, so it reads as a lib
 
 - It is a Lake package with the project's `lean-toolchain` and Mathlib release, the module system,
   Mathlib's style, its own README, licence, CI and axiom audit. The README says what the package
-  proves, with the exact statements; the method and its references; how to depend on it; a short
+  proves, with the exact statements; the method and its references; the facts that its sources only
+  recall, state without proof or take from a work out of reach, each with the step, the work cited,
+  whether it was read, and the argument used (SKILL.md, Rules); how to depend on it; a short
   literature section (the theorems' history, the main later developments, and the formalizations
   that exist elsewhere, in Lean and other systems, with the date of the search and only verified
   references); a short list of simpler or shorter proofs noticed while following the sources, each
@@ -61,6 +63,10 @@ Others will import the package without knowing the project, so it reads as a lib
   statement, a file name), it leaves a marked placeholder rather than a plausible guess. While
   proofs are still open, the audit may list the `sorry`s instead of failing on them; switch that off
   before publishing. Its library globs are `<Area>.*`, since Lake's `.+` would skip the root file.
+- Its proofs follow its sources (SKILL.md, Rules, "Mathematics that Lean lacks"): a result that it
+  attributes to a source is proved by that source's argument, and the works that the source cites
+  are treated alike, level by level, when they can be read. Another proof of the same result is a
+  theorem of its own beside it, attributed to its own argument.
 - It carries no provenance. It says what it proves and on which mathematical sources, not what it
   was written for, who asked for it, or how it was made. Code split out of the project needs no
   credit, and no README, docstring, comment, name or commit message of the package mentions the
@@ -92,7 +98,10 @@ Others will import the package without knowing the project, so it reads as a lib
   temporary copies of the packages under `.lake/` and the lakefile and manifest pointed at them,
   then restore both files and commit none of it; after pinning, the plain command works.
 - A cited result keeps its place in the project: `External/` states it in its source's terms and
-  proves it from the package. The route check and the audit treat it like any other cited result.
+  proves it by the cheapest sound route (SKILL.md, Rules), from the package's statement when the
+  package has it, and names the argument. The project is published only once the package's proofs
+  follow their sources, unless the user asks for an earlier release (SKILL.md, Rules). The route
+  check and the audit treat it like any other cited result.
 - The project's README, `REPORT.md` (Section 2) and `formalization.yaml` say where it uses the
   package; the dependency runs one way.
 - Palomar restricts only the Challenge's imports (`references/palomar.md`, Section 1): the Solution
@@ -111,9 +120,11 @@ them. The layout, the files and the checks are a project's (`palomar.md`), with 
   package or a paper.
 - What goes in: the package's headline theorems, each in its general, standard form, with the
   definitions a reader needs. The sources of `formalization.yaml` are the mathematical sources
-  whose theorems are proved, with `relationship: formalizes`; nothing in the entry names the
-  project or its paper (Section 3). The package's definitions that the statements use must be in a
-  module that imports only what the Challenge imports; keep them there, or move them, with `rfl`
+  whose arguments the Solution's proofs follow, with `relationship: formalizes`;
+  `fidelity.divergences` lists the facts proved by a named argument instead of their cited works
+  (the README's list). Nothing in the entry names the project or its paper (Section 3). The
+  package's definitions that the statements use must be in a module that imports only what the
+  Challenge imports; keep them there, or move them, with `rfl`
   bridges for the old names, so that `scripts/sync_challenge_defs.py` can copy the block.
 - Length: Palomar refuses a Challenge over 1,000 lines or 100 KiB, and prefers at most about 300
   lines (32 KiB) with definitions. When the headline theorems together would pass 300, split them

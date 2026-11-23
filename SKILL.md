@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "4.5.0"
+  version: "4.6.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -59,7 +59,7 @@ results that cross papers, and one Palomar submission per paper (`references/mul
 
 The work has two stages. In Stage 1, formalize everything the paper itself proves. Results it takes
 from the literature may be temporary axioms. In Stage 2, remove those axioms by proving them,
-building any theory that Lean lacks. Setup comes before the two stages, and
+building any theory that their proofs need and Lean lacks. Setup comes before the two stages, and
 verification, cleanup, the audit and packaging come after.
 
 ## Principles
@@ -79,11 +79,13 @@ These explain the rules below. Use them when no rule covers a situation.
   if not, prove it. Only what the paper itself takes from another source may become an axiom.
 - Missing mathematics is work to do, not a reason to do something else. Research papers routinely
   use theory that Mathlib does not have yet. Building it is part of formalizing the paper: a proof
-  that avoids it checks a different argument, and a hypothesis in its place leaves the paper's
-  claim unchecked. Theory that others could use goes in a package of its own, so that the work
-  outlasts the project.
+  of the paper's step that avoids it checks a different argument, and a hypothesis in its place
+  leaves the paper's claim unchecked. A cited result needs only a sound proof of its statement
+  (Rules). Theory that others could use goes in a package of its own, so that the work outlasts the
+  project.
 - External means where a result comes from, not that it is trusted. A cited result lives in
-  `External/` because of its source, and it is proved like everything else.
+  `External/` because of its source, and it is proved like everything else, by an argument that its
+  docstring names (Rules).
 - An assumption is an assumption, whatever its form. A cited result that is not proved is assumed,
   whether it is written as an axiom, a hypothesis or a field of a structure. Axioms are not
   allowed. Hypotheses are allowed when a reader of the statement can see each one, under the name
@@ -102,10 +104,11 @@ These explain the rules below. Use them when no rule covers a situation.
   versus weak inequalities, the endpoints of ranges and truncated subtraction on `ℕ` decide
   whether a statement is true.
 - Writers miss their own errors. Every check that the workflow asks for (of the statements, of the
-  proofs against the paper's, of the findings, of the report's account of the literature, of the
-  follow-up candidates) is made by someone other than the writer: a separate agent when the
-  harness has them, otherwise a separate pass of your own that starts again from the TeX source
-  rather than from your notes. "An independent check" below means this.
+  proofs against the paper's and against the sources they are attributed to, of the findings, of the
+  report's account of the literature, of the follow-up candidates) is made by someone other than the
+  writer: a separate agent when the harness has them, otherwise a separate pass of your own that
+  starts again from the TeX source rather than from your notes. "An independent check" below means
+  this.
 - Report honestly. If a step was skipped, a proof fails, a statement had to change, or a proof
   had to depart from the paper's, say so and give the reason. The audit is useful only if it can be
   trusted.
@@ -178,27 +181,31 @@ spaces, distributions). Build it. Where it goes is decided by the test in
 development that only this paper needs in `Basic/` or `External/` (Phase 2). For a step of the
 paper's own proof, keep the paper's argument.
 
-A cited result is different: the paper uses its statement, not its proof, and the statement is
-what the formalization must certify. State it in its source's terms, as the paper uses it (its
-constants, ranges and hypotheses), and check that statement against the source. Then prove it by
-any sound route, the cheapest first: a theorem of a library, a short argument from the literature
-(the source's own or another one), or an argument of your own. Name the argument in the docstring
-and in the report's table of cited results. The source's proof matters only where the paper uses
-more than the statement: an estimate from inside the proof, a construction, the form of a constant.
-That part is the paper's argument, and it follows the source like the rest of the paper's proofs.
-Ask the user for a source only when its statement is needed and you cannot read it (try its open
-archives first). Do not say what a source contains, or what its proof would need, before reading
-it. When a short proof of a cited result is known, prefer it to a long one that follows the source.
-Record in the report's list of simpler proofs any shorter argument that you notice and do not use.
+A cited result is different: the paper uses its statement, not its proof. In the project, state it
+in its source's terms, as the paper uses it (its constants, ranges and hypotheses), and check that
+statement against the source. Then prove it by the cheapest sound route: a theorem of a library, a
+short argument from the literature (the source's own or another one), or an argument of your own.
+Name the argument in the docstring and in the report's table of cited results. Where the paper
+uses more than the statement (an estimate from inside the proof, a construction, the form of a
+constant), that part is the paper's argument, and it follows the source like the rest of the
+paper's proofs. Ask the user for a source when you need its statement, or the part of its proof
+that the paper uses, and cannot read it (try its open archives first). Do not say what a source
+contains, or what its proof would need, before reading it. Record in the report's list of simpler
+proofs any shorter argument that you notice and do not use.
 
-A package of its own is a library: it formalizes a theory for others to reuse, and it attributes
-its results to their sources. There, prove each result that the package attributes to a source by
-that source's argument when you can read it, and treat the works that the source cites in turn
-alike, level by level; ask the user for those you cannot get, and go on meanwhile. A fact that a
-source only recalls, states without proof, or takes from a work out of reach may be proved by a
-named argument or by a theorem of a library; list each one in the package README (the step, the
-work cited and whether it was read, the argument used). A shorter proof may sit next to the
-source's, as a second theorem. The project uses the package's statements like any library's.
+A package of its own is a library: it formalizes the literature for others to reuse. For every
+result that it attributes to a source, formalize that source's argument, and treat the works that
+the source cites in turn alike, level by level, when they can be read; ask the user for those you
+cannot get, and go on meanwhile. A fact that a source only recalls, states without proof, or takes
+from a work out of reach gets a named argument or a theorem of a library; list each one in the
+package README (the step, the work cited and whether it was read, the argument used). Other proofs
+of the same result (shorter, sharper, more general) may sit beside the source's as separate
+theorems. Publish the paper's formalization only when this work is done too, unless the user asks
+for an earlier release: what is pushed should be finished. The project uses the package's
+statements like any library's.
+
+Everywhere, in the project and in the packages, a proof attributed to a source is that source's
+argument, and a proof by another argument is attributed to that argument.
 
 The size of the work is not a reason to skip it, but the user must know it. As soon as the
 inventory shows a missing theory, estimate it (what must be built, in what order, roughly how many
@@ -322,11 +329,13 @@ Read the whole paper before you write any Lean. Keep a working checklist outside
   compare the file with your own reading, add by hand the rows that it cannot see
   (`references/tools.md`, Section 2), and commit it;
 - each citation, marked as used in a proof or only for context. For each one used in a proof, note
-  where its proof can come from: Mathlib, another public library, or the project, and in the last
-  case what it needs that no Lean library has. Survey the libraries before you decide. Note the
-  same for each step of the paper's own proofs that uses a theory Lean lacks. Group what is missing
-  into theories, decide where each goes (`references/separate-packages.md`), estimate it, and plan
-  it in layers (Rules, "Mathematics that Lean lacks"): this sets the scope;
+  the form the paper uses (constants, ranges, hypotheses), whether it uses more than the statement
+  (an estimate from the proof, a construction, the form of a constant), which then follows the
+  source, and where its proof can come from: Mathlib, another public library, or the project, and
+  in the last case what it needs that no Lean library has. Survey the libraries before you decide.
+  Note the same for each step of the paper's own proofs that uses a theory Lean lacks. Group what is
+  missing into theories, decide where each goes (`references/separate-packages.md`), estimate it,
+  and plan it in layers (Rules, "Mathematics that Lean lacks"): this sets the scope;
 - suspected typos, inconsistencies and gaps, with the TeX line, and the corrections that errata or
   later versions make (Phase 0). These become the audit's E-items, so record them as you go. Settle
   a correction that changes a statement before the baseline (Phase 3, Rules);
@@ -394,8 +403,9 @@ glance, add a compared theorem that ties the object to something known about it,
 numerical value, so that readers and Palomar's review can tell that the definition is the intended
 one. A conditional result shows every assumed result in the signature of each theorem that uses it.
 
-Then review every statement, including the Challenge's, against the TeX source, with the list in
-`references/checklists.md`, Section 1, and prove a bridge lemma for each representation choice.
+Then review every statement, including the Challenge's, against the TeX source, and each cited
+result's also against its source, with the list in `references/checklists.md`, Section 1, and
+prove a bridge lemma for each representation choice.
 Have the statements and the Challenge checked independently (Principles), then commit. This commit
 is the baseline. Later changes to statements are measured against it, and after it a statement
 changes only by a documented decision.
@@ -437,10 +447,12 @@ For each cited result:
 2. If the result is there, prove that the library's form implies exactly what the paper uses
    (parameters, notation, finite versus infinite, bundled versus unbundled).
 3. Otherwise, formalize it under `External/Source/`, with a `README.md` that gives the source, the
-   statement, and how its Lean forms relate to the paper's use of it. Proving a different standard
-   form is fine if it gives exactly the estimates the paper needs; say so. When it needs a theory
-   that Lean lacks, prove it from that theory, built in the project or in a package of its own
-   (Rules, "Mathematics that Lean lacks").
+   statement, how its Lean forms relate to the paper's use of it, and the argument that proves it.
+   Check the statement against the source, then prove it by the cheapest sound route (Rules), and
+   name the argument in the docstring. Proving a different standard form is fine if it gives
+   exactly the estimates the paper needs; say so. What the paper takes from inside the source's
+   proof follows the source. When the route needs a theory that Lean lacks, prove it from that
+   theory, built in the project or in a package of its own (Rules, "Mathematics that Lean lacks").
 4. Until the layer that proves it is done, the result is a proposition in `External/Source/`, named
    after its source, with no proof, and a hypothesis of every statement whose proof uses it, the
    Challenge's included (several may be bundled in a class of hypotheses, written in each theorem's
@@ -468,6 +480,8 @@ chose to leave assumed or that have no proof to formalize, each a declared hypot
   check sees which results a proof uses, not how it argues, so also have the formal proofs compared
   with the paper's, against the TeX, independently of their provers (Principles): at least every
   proof that is long, that was written in parallel, or that changed since the last comparison.
+  Check each proof attributed to a source against that source the same way: it must be the
+  source's argument, and a proof by another argument is attributed to that one (Rules).
 - Complete `palomar/PaperName/Solution.lean`, which restates each Challenge theorem word for word
   and proves it from the library, and write `comparator.json` beside it (`references/palomar.md`,
   Sections 2 and 3). Then run `lake env lake comparator --config=palomar/PaperName/comparator.json`

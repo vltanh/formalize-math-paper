@@ -70,6 +70,11 @@ then change as little as the step requires, say so in the docstring ("Departure 
 needs mathematics that Lean lacks, do not argue around it: state what is missing as a lemma with
 `sorry`, use it, and report it, so that it can be built.
 [For each result: its Lean name, its TeX label, the TeX of its proof, the results it cites.]
+[For a cited result, in place of the paragraph above: prove its statement by the route given here
+(a library theorem, a short argument from the literature, or your own), name the argument in the
+docstring, and attribute the proof to the source only if it is the source's argument. Where the
+paper uses more than the statement, follow the source's proof, given below. In a package: the
+sources' proofs, given below, in place of the paper's.]
 
 Statements: keep every existing statement exactly as it is. The paper's results, listed here,
 must never change: [names]. Never add a hypothesis to one of them. If one looks false, or its

@@ -3,8 +3,9 @@
 The goal is a build that prints nothing but the intended `sorry` warnings of the Challenge
 (`palomar/PaperName/Challenge.lean`). Warnings do not affect correctness, but a clean build is
 easier to review, and unused hypotheses often reveal redundant hypotheses of the paper. Cleanup
-changes how proofs are written, never which argument they make: afterwards, every proof still
-follows the paper's (SKILL.md, Rules, "Faithful proofs").
+changes how proofs are written, never which argument they make: afterwards, every proof of a paper
+result still follows the paper's (SKILL.md, Rules, "Faithful proofs"), and every cited result's
+proof still makes the argument that its docstring names.
 
 ## Procedure
 
@@ -72,8 +73,9 @@ proofs drift away from the paper while no statement changes:
   result instead (as a corollary after it), and keep the step's lemma private.
 - A shorter proof of a paper result is acceptable only if it makes the same argument. Replacing
   the paper's argument with another one, even a better one, is a departure, and convenience is not
-  a reason for one (SKILL.md, Rules). If the other argument is simpler for a reader of the paper,
-  record it for the report's "What's next" section instead.
+  a reason for one (SKILL.md, Rules). A cited result may take a shorter sound proof, with its
+  docstring and the report's table of cited results renamed to the new argument. If the other
+  argument is simpler for a reader of the paper, record it for the report's "What's next" section.
 - Delete a `have` that nothing uses, even when it names a result that the paper cites. The route
   check then reports the difference, which is the truth about the proof. Then decide whether the
   proof should use that result after all.

@@ -22,6 +22,8 @@ Review every statement, including the Challenge's, against the TeX source. Check
   them (Lean leaves out of a statement every section variable that it does not mention: check with
   `#check`);
 - whether every hypothesis of a statement is either the paper's or a declared assumption;
+- for a cited result in `External/`, its statement against the source as well as against the
+  paper's use of it: the source's terms, and the constants, ranges and hypotheses the paper uses;
 - whether each representation choice has a bridge lemma.
 
 ## 2. Questions a passing build does not answer (Phase 6)
@@ -43,7 +45,11 @@ A passing build proves only what the statements say. Ask of the formalization:
 - Does each library theorem used for a cited result imply exactly the paper's form? Does each
   bridge from the paper's objects to a source's, in the paper's library, prove the
   identification that the paper makes, and does `External/` import nothing of the paper's?
-- Does each proof follow the paper's argument, and is every departure necessary and reported?
+- Does each proof of a paper result follow the paper's argument, and is every departure necessary
+  and reported?
+- Is each cited result's statement checked against its source, and does its docstring name the
+  argument that proves it? Is every proof attributed to a source that source's argument, and does
+  every part that the paper takes from inside a source's proof follow that proof?
 - Are sums, counts and unions taken over exactly the paper's index sets?
 - Are the constants exact?
 
@@ -64,7 +70,7 @@ stage 1 / 2:      remaining internal / cited results; results assumed as hypothe
 audit:            findings so far (E-items)
 packaging:        Comparator, Palomar checks, preflight
 next papers:      the candidates in NEXT.md (private), ranked, a line each; where the file is
-needs from user:  decisions or permissions
+needs from user:  decisions or permissions; sources that could not be read
 ```
 
 ## 4. Completion gates
@@ -75,9 +81,11 @@ needs from user:  decisions or permissions
 - Stage 1: every internal result proved by the paper's argument; cited results isolated in
   `External/`, with citations, stated in their sources' terms, and importing nothing from the
   paper's library.
-- Stage 2: every cited result proved or derived from a library, the theory it needs built (in a
-  package of its own when general); a result still assumed only by the user's decision or for lack
-  of any proof, as a declared hypothesis named after its source; zero project axioms.
+- Stage 2: every cited result, its statement checked against its source, proved or derived from a
+  library by an argument named in its docstring and in the report's table of cited results, the
+  theory that proof needs built (in a package of its own when general); a result still assumed only
+  by the user's decision or for lack of any proof, as a declared hypothesis named after its source;
+  zero project axioms.
 - Proof routes: `docs/PaperName/paper_routes.tsv` committed and checked against the paper; the route
   check passes on the final commit, and every difference it records has its reason; every departure
   from the paper's proofs is necessary (Rules) and reported in its docstring, in the report's table

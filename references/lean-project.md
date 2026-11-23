@@ -121,10 +121,10 @@ new field directory, named as Mathlib would name a new area (`Basic/NewArea/`), 
 first, or a library for that domain, as PhysLean is for physics.
 
 A cited result that is general is proved in `Basic/` too; its `External/Source/README.md` still
-gives the source and how the paper uses it, and points to the proof. The definitions that a
-Challenge statement uses are the exception: they stay in the paper's `Defs.lean` (`palomar.md`,
-Section 2), even the general ones, because Comparator needs them in one module, and the lemmas
-about them stay with them until they are contributed.
+gives the source, how the paper uses it and the argument that proves it, and points to the proof.
+The definitions that a Challenge statement uses are the exception: they stay in the paper's
+`Defs.lean` (`palomar.md`, Section 2), even the general ones, because Comparator needs them in one
+module, and the lemmas about them stay with them until they are contributed.
 
 Keep the results that the paper takes from other works apart too, in `PaperName/External/`. They
 are another paper's mathematics, not this one's: another formalization that cites the same source
