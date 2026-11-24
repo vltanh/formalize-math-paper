@@ -118,7 +118,9 @@ needs from user:  decisions or permissions; sources that could not be read
   statement that none meets the bar and what came closest; `NEXT.md` and `notes/next/` ignored by
   git and absent from every commit; the user told where they are.
 - Packaging (unless declined): every file that adapts code from another project keeps that
-  project's notice; `formalization.yaml` written; Palomar's metadata and source checks pass on a
+  project's notice; `formalization.yaml` written; `automation` names every system that
+  `CREDITS.md` names, `review.reviewers` lists the reviewing agents, and no coverage claim goes
+  beyond the cited results that the paper uses; Palomar's metadata and source checks pass on a
   clean clone; the dependencies shared with Verso pinned at Verso's revisions for the toolchain;
   with the user's permission for each step, the repository published, CI passing, and the
   preflight reporting `status: pass` on the exact commit to submit; the user decides about

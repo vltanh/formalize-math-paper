@@ -68,9 +68,9 @@ any hypothesis it assumes, against the paper and the source again.
 Paper: <authors>, *<title>*, <arXiv id with version>. The audit was made against the arXiv
 LaTeX source of that version. Section, result and equation numbers are the paper's.
 
-Status of the formalization: <bullets: what is proved; where the cited results are proved, and by
-which arguments (Section 2); what is assumed, if anything, which makes the result conditional; the
-build, sorry and axiom status, and how the audit script checks it; Challenge and Comparator; whether
+Status of the formalization: <bullets: what is proved; where the cited results that the paper uses
+are proved, and by which arguments (Section 2); what is assumed, if anything, which makes the result
+conditional; the build, sorry and axiom status, and how the audit script checks it; Challenge and Comparator; whether
 any statement of the paper had to change; whether every proof follows the paper's, and how many
 depart from it (Section 7)>
 
@@ -135,7 +135,8 @@ except the differences recorded in docs/PaperName/route_differences.tsv, each wi
 
 ## 9. Not formalized
 <Everything in the paper that is not formalized: deductions that combine the paper with
-unformalized prior work, surveys, remarks, experiments.>
+unformalized prior work, surveys, remarks, experiments, and the citations that only give context
+(Section 2).>
 
 ## 10. The paper in the literature
 <Where the paper stands in the work on its questions: what came before it, what appeared

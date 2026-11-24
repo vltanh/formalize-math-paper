@@ -180,6 +180,10 @@ there: `README.md`, `REPORT.md`, `CREDITS.md` and the private `NEXT.md`, written
 `audit-report.md`, `credits.md` and `next-papers.md` say, for that paper alone. A paper's README
 links to the umbrella README and to the sibling papers it uses.
 
+A paper's documents and metadata do not count the repository's papers ("one of three"). They say
+that the repository formalizes other papers on the problem too. The set of papers may change, and a
+Palomar entry is frozen at its commit.
+
 The umbrella `README.md` at the root is the repository's front page. It describes the question,
 not one paper:
 

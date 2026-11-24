@@ -177,16 +177,30 @@ The metadata is `palomar/PaperName/formalization.yaml`. Start from the current t
 - `automation`: fill it from the run log (SKILL.md): the model(s), the framework and harness with
   their versions, `tool_setup` naming the procedure (this skill, with its repository and commit) and
   the number of agents, `cost.wall_time` with the elapsed time and the total agent time, and
-  `spend_usd` if known, otherwise "not tracked". The figures must agree with `CREDITS.md`.
+  `spend_usd` if known, otherwise "not tracked". The figures must agree with `CREDITS.md`. Give
+  every AI system with a material role its own entry. The coordinating main session counts (one
+  that gave the tasks, relayed the user's decisions or wrote documents), and so does a model that
+  took over a session part-way, for example after a usage limit. Take the model of each step from
+  the transcripts, not from memory: in Claude Code, the `message.model` of each assistant line,
+  with the sub-agents' transcripts under `<session>/subagents/`. `CREDITS.md` and `automation`
+  name the same systems. End `automation.notes` with a pointer to `docs/PaperName/CREDITS.md` in
+  the repository at the submitted commit.
 - `status`: `sorry_count: 0`, `sorry_in_definitions: 0`, `axioms: []`. `scope` says exactly what
-  is and is not formalized. A conditional formalization says so at the start of `scope` and of
-  `project.description`, and names the assumed results; `fidelity.divergences` lists them.
+  is and is not formalized. Claim cited results only for the citations that the paper's proofs use
+  (Phase 1 marks each citation as used in a proof or only for context). Never write "every result
+  the paper cites" or "everything is proved" while the report lists citations that only give
+  context. `scope` and `project.description` say that those are not formalized, and name their
+  kinds (earlier bounds, earlier results). A conditional formalization says so at the start of
+  `scope` and of `project.description`, and names the assumed results; `fidelity.divergences` lists
+  them.
 - `fidelity.divergences`: every reading of the paper and every deviation from it, in the
   statements and in the proofs: the corrections of statements, the readings, and every departure
   from the paper's proofs with its reason (or a sentence saying that every proof follows the
   paper's). They must agree with the report.
 - `review.status`: honest. `agent-reviewed` if only AI systems reviewed it; never imply a human
-  review that did not happen.
+  review that did not happen. `review.reviewers` names the reviewers. For agent reviews, give one
+  entry for each reviewing agent (or group of agents), with its model, its round and what it
+  checked, as in `CREDITS.md`. Never write `none` beside notes that describe reviews.
 - `alignment.statements`: one entry for each Comparator theorem, giving its source, Lean name,
   module and status.
 
@@ -297,3 +311,9 @@ Section 1: a conflict there does not go away if you retry. Fix it, and, with the
 permission, submit the corrected commit as a new submission. Treat the access token as a secret,
 and do not post the review publicly. Registering publishes the review and is permanent. Show the
 user the review and what registering would publish, and register only when they decide to.
+Read the review with `GET /api/review` and the same token. The editorial review reads the README,
+the report, `CREDITS.md` and `formalization.yaml` together. It asks for changes when they disagree:
+a coverage claim that the report contradicts, a model in `CREDITS.md` missing from `automation`,
+or a reviewer list that contradicts the notes. Fix what it asks in the repository. With the user's
+permission, submit the corrected commit as a new submission. Registering or withdrawing the old one
+is the user's decision.

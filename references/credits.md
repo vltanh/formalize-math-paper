@@ -41,9 +41,11 @@ How this formalization was made, from the run log and the session transcripts.
 ## Who
 - Author and maintainer: <the people; who asked for the formalization and chose its scope>
 - Formalization: <each AI system: the model(s), and the agent and harness, with their versions;
-  how many sessions; who wrote the draft, if there was one>
+  how many sessions; who wrote the draft, if there was one; the main session's model in each
+  round, if it changed>
 - Procedure: <this skill, with a link to its repository and its version or commit>
-- Review: <whether a person has reviewed the proofs; which independent agents checked what>
+- Review: <whether a person has reviewed the proofs; which independent agents checked what, with
+  their models>
 
 ## <Round> (<dates>)
 <For a later round, what the user asked for.>
