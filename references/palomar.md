@@ -159,7 +159,9 @@ The metadata is `palomar/PaperName/formalization.yaml`. Start from the current t
   writes as two empty lines.
 - `classification.arxiv` takes 1–8 codes and `classification.msc2020` up to 8. Each must exist in
   PalomarSubmission's `taxonomies/arxiv-categories.json` or `taxonomies/msc2020-codes.json`.
-  Check them.
+  Check them. Codes classify the mathematics of the result. Do not use 68V15 or 68V20 (theorem
+  proving, formalization of mathematics): Palomar's editorial review rejects them, since
+  formalizing a result in Lean does not make theorem proving its subject.
 - `sources`: the paper with `relationship: formalizes`, and with `author_endorsement:
   not-contacted` unless the authors were contacted. Cited works that the formalization proves go
   under `background`, with a note that names the argument used (the source's, another work's, a
