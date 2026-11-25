@@ -1,4 +1,4 @@
-# Follow-up papers: `NEXT.md`
+# Follow-up papers: `notes/follow-up-papers.md`
 
 ## Contents
 
@@ -7,17 +7,19 @@
 3. The bar: a paper, not a remark
 4. Exploring a candidate
 5. Checking
-6. `NEXT.md` structure
+6. Structure of the follow-up file
 7. Keeping it private
 
 ## 1. What it is for
 
-`NEXT.md`, in `docs/PaperName/`, answers one question for the user: what paper could they write
-next, following this one? The report's Section 11 records what the work showed about the paper:
-hypotheses it does not need, variants its proofs cover, simpler arguments, extensions of the
-formalization. These are worth having, but most of them make a remark in a revised version, not a
-paper. `NEXT.md` is for the directions that would make a paper of their own, explored far enough
-that the user can judge whether to spend months on one.
+The follow-up file, `notes/follow-up-papers.md` in the project's private notes (with several
+papers, `notes/PaperName/follow-up-papers.md`; `multi-paper.md`, Section 6), answers one question
+for the user: what paper could they write next, following this one? The report's Section 11
+records what the work showed about the paper: hypotheses it does not need, variants its proofs
+cover, simpler arguments, extensions of the formalization. These are worth having, but most of them
+make a remark in a revised version, not a paper. The follow-up file is for the directions that
+would make a paper of their own, explored far enough that the user can judge whether to spend
+months on one.
 
 Formalizing the paper gave you the most thorough reading it will get. You know which hypothesis
 each step uses, which estimates are tight and which have room, which steps are generic and which
@@ -65,7 +67,7 @@ the Lean project, and pool what they return.
 
 ## 3. The bar: a paper, not a remark
 
-These are incremental. Record them in the report's Section 11, not in `NEXT.md`:
+These are incremental. Record them in the report's Section 11, not in the follow-up file:
 
 - a hypothesis that the proofs never use (it is already a finding of the audit);
 - a variant that the same proof covers with routine changes;
@@ -102,8 +104,8 @@ paragraph.
    fallback that would still be a paper.
 2. Novelty. Search for the target itself, not only for the paper's topic: arXiv full text,
    the papers that cite the paper and those it cites, MathOverflow, problem lists. Record the
-   queries and the date. A candidate that turns out to be known leaves `NEXT.md` (Section 5). If
-   the found work bears on the paper's results, tell the user.
+   queries and the date. A candidate that turns out to be known leaves the follow-up file
+   (Section 5). If the found work bears on the paper's results, tell the user.
 3. Where the paper's method stops. Run the paper's proof against the target, and find the
    first step that fails and why: a counterexample to the step, or the estimate that loses. A
    scratch Lean file that states the target and follows the paper's proof shows the failing goal
@@ -113,10 +115,11 @@ paragraph.
    and what failed and why. A special case proved, or a reduction to a clean statement, is often
    the most useful part of the file.
 5. Evidence. Compute small cases, search for counterexamples, check the boundary and
-   degenerate cases. Keep the scripts in `notes/next/`, and record what was checked and how far.
+   degenerate cases. Keep the scripts in `notes/follow-up/`, and record what was checked and how
+   far.
 6. What is proved. Prove each partial result carefully on paper. Check it in Lean when that is
-   cheap, in a scratch file in `notes/next/`, never in the library: the library is the paper's
-   formalization, and these results are unpublished.
+   cheap, in a scratch file in `notes/follow-up/`, never in the library: the library is the
+   paper's formalization, and these results are unpublished.
 7. Assessment. What is proved, what is evidence and what is hope; the main risk; a first
    milestone, a lemma whose proof would show that the approach works; and the scale: a short note,
    a full paper or a longer programme.
@@ -128,7 +131,7 @@ the key step needs, or say that you do not have one.
 ## 5. Checking
 
 Check each candidate independently of its writer (SKILL.md, Principles), and give the checker the
-inventory, the report and `NEXT.md`:
+inventory, the report and the follow-up file:
 
 - Novelty. Repeat the search independently and try to find the target in the literature.
 - The bar. Read the draft abstract as a referee would, and decide whether the candidate is an
@@ -143,7 +146,7 @@ A candidate that turns out to be known moves to the report's Section 10, under "
 incremental moves to Section 11, "Open directions". Correct a wrong claim, or mark it as
 conjectured.
 
-## 6. `NEXT.md` structure
+## 6. Structure of the follow-up file
 
 ```markdown
 # Follow-up papers to <authors>, *<title>*
@@ -167,7 +170,8 @@ the bar, say so, and what came closest.>
 ### Ideas to get past it
 <What was tried, what worked in part, what failed and why.>
 ### What was done here
-<Each result proved, on paper or in Lean, and each computation, with its files in `notes/next/`.>
+<Each result proved, on paper or in Lean, and each computation, with its files in
+`notes/follow-up/`.>
 ### Risks and first milestone
 ### Scale
 <A note, a paper or a programme, and where it might appear.>
@@ -182,16 +186,15 @@ the bar, say so, and what came closest.>
 
 ## 7. Keeping it private
 
-`NEXT.md` holds unpublished research ideas, and the formalization is usually published. Add
-`NEXT.md`, without a leading slash so that it is ignored in `docs/PaperName/` (and in every
-paper's directory), and `/notes/next/` to the project's `.gitignore` before writing it, never
-commit it, and leave it out of every package and pull request. Publish it only if the user asks.
+The follow-up file holds unpublished research ideas, and the formalization is usually published.
+It and its scratch files stay in `notes/`, which git ignores (`lean-project.md`, Section 1). Before
+writing it, check that git ignores it (`git check-ignore notes/follow-up-papers.md`). Never commit
+it, and leave it out of every package and pull request. Publish it only if the user asks.
 
-The public report states, in one line at the start of its Section 11, that plans for follow-up
-papers are kept in `NEXT.md`, which is not published. Write the file name in a code span, not as a
-link, since the link would be broken in the published repository. The report's "Open directions"
-may name a question that `NEXT.md` develops, as it would without it, but not the attack, the
-evidence or the partial results that `NEXT.md` records.
+No public file of the project, `.gitignore` and `formalization.yaml` included, mentions the
+follow-up file or says that a private file holds plans for follow-up papers. The report's "Open
+directions" may name a question that the follow-up file develops, as it would without it, but not
+the attack, the evidence or the partial results recorded there.
 
 An ignored file is in no backup that the repository provides. When you finish, tell the user where
-`NEXT.md` and `notes/next/` are, and give them the summary in the status report.
+the follow-up file and `notes/follow-up/` are, and give them the summary in the status report.

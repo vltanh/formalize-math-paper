@@ -6,8 +6,8 @@ expected_outcome: |
   with no project directory or Common/ above them; the Challenge, Solution, comparator.json and
   formalization.yaml in palomar/<Paper>/, with the Challenge and Solution as modules
   <Paper>.Challenge and <Paper>.Solution of a lean_lib whose source directory is palomar/, which
-  lists them by name and is declared after the library of the code; the report, credits, routes
-  and private NEXT.md in docs/<Paper>/; the README at the root; and the reason: the shortest paths
+  lists them by name and is declared after the library of the code; the report, credits and
+  routes in docs/<Paper>/; the README at the root; and the reason: the shortest paths
   for a project of one paper, while a second paper can join later by one move of the code (Basic/
   and External/ into a shared Common/, the paper's library into its own directory, under a root
   for the project), with palomar/ and docs/ unchanged.

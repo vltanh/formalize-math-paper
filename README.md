@@ -18,7 +18,7 @@ files to submit it to the [Palomar](https://palomar-registry.org) registry.
 | Verification | checks the axioms of every declaration, checks that each proof uses the results that the paper's proof cites (extracted from the TeX source), and runs Comparator |
 | Cleanup | removes unused hypotheses and other warnings without changing any proof's argument |
 | Documents | writes a short `README.md`, and, in `docs/PaperName/`, `REPORT.md` (errors and gaps, missing and redundant hypotheses, use of cited results, departures, the paper in the literature, what comes next) and `CREDITS.md` (how the formalization was made, from a run log) |
-| Next papers | writes a private `NEXT.md`, kept out of git: directions that would each make a paper of their own, explored to the step where the paper's method stops and checked for novelty |
+| Next papers | writes a private `notes/follow-up-papers.md`, kept out of git: directions that would each make a paper of their own, explored to the step where the paper's method stops and checked for novelty |
 | Packaging | prepares the Challenge/Solution pair, `comparator.json` and `formalization.yaml` for Palomar, and, with your permission, publishes the project and runs Palomar's preflight |
 
 A project with one paper ([`references/lean-project.md`](references/lean-project.md), Section 2)

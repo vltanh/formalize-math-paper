@@ -28,10 +28,9 @@ lake exe cache get                                      # download Mathlib's com
 
 Then replace the template's files (`PaperName.lean`, `PaperName/Basic.lean`) and its library with
 the layout of Section 2 and the lakefile of Section 3. Commit `lean-toolchain`, `lakefile.toml`
-and `lake-manifest.json`. Put `/.lake` in `.gitignore`, plus `NEXT.md` without a leading slash (so
-that it is ignored in `docs/PaperName/`, and in every paper's directory), `/notes` if the working
-notes live in the repository directory, and `__pycache__/` if it holds Python scripts. Never
-commit `.olean`, `.ilean` or other build outputs.
+and `lake-manifest.json`. Put `/.lake` and `/notes` in `.gitignore`: `notes/` holds the private
+working notes, among them the follow-up papers (SKILL.md, Phase 8). Add `__pycache__/` if the
+repository holds Python scripts. Never commit `.olean`, `.ilean` or other build outputs.
 
 ## 2. Layout of the project
 
@@ -64,7 +63,6 @@ palomar/PaperName/           -- the paper's Palomar submission
 docs/PaperName/              -- the paper's documents
   REPORT.md, CREDITS.md
   paper_routes.tsv, route_differences.tsv
-  NEXT.md                    -- private, ignored by git (SKILL.md, Phase 8)
   numerics/                  -- the scripts behind numerical claims, if any (numerics.md)
 scripts/                     -- Audit.lean and the tools
 .github/workflows/           -- lean_action_ci.yml; palomar_preflight_papername.yml

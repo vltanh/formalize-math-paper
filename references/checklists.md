@@ -69,7 +69,7 @@ proofs:           departures from the paper's proofs, each with its reason (repo
 stage 1 / 2:      remaining internal / cited results; results assumed as hypotheses
 audit:            findings so far (E-items)
 packaging:        Comparator, Palomar checks, preflight
-next papers:      the candidates in NEXT.md (private), ranked, a line each; where the file is
+next papers:      the candidates in the follow-up file (private), ranked, a line each; where it is
 needs from user:  decisions or permissions; sources that could not be read
 ```
 
@@ -112,11 +112,12 @@ needs from user:  decisions or permissions; sources that could not be read
   - `docs/PaperName/CREDITS.md` reports the procedure, the agents and models, the elapsed time and
     the effort from the run log, round by round, and the README's credits sum it up with a link;
   - links up to date, tables valid; a draft's own notes deleted.
-- Follow-up papers: `docs/PaperName/NEXT.md` written (`references/next-papers.md`), with each
-  candidate above the bar, explored to the step where the paper's method stops, its claims marked as
-  proved, checked or conjectured, and checked independently for novelty and substance, or with the
-  statement that none meets the bar and what came closest; `NEXT.md` and `notes/next/` ignored by
-  git and absent from every commit; the user told where they are.
+- Follow-up papers: `notes/follow-up-papers.md` written (`references/follow-up-papers.md`), with
+  each candidate above the bar, explored to the step where the paper's method stops, its claims
+  marked as proved, checked or conjectured, and checked independently for novelty and substance, or
+  with the statement that none meets the bar and what came closest; the file and `notes/follow-up/`
+  ignored by git, absent from every commit and mentioned in no public document; the user told where
+  they are.
 - Packaging (unless declined): every file that adapts code from another project keeps that
   project's notice; `formalization.yaml` written; `automation` names every system that
   `CREDITS.md` names, `review.reviewers` lists the reviewing agents, and no coverage claim goes

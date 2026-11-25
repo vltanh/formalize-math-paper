@@ -179,10 +179,8 @@ it from the paper and the repository's public description, do not open its code,
 brief of every agent with network access, literature reviewers included.>
 
 ## 11. What's next
-<One line: plans for follow-up papers are kept in `NEXT.md`, which is not published (a code span,
-not a link; references/next-papers.md). Then how the paper's results and proofs could be improved,
-and what the formalization could add. Draw on the audit and on the literature in Section 10, and
-do not repeat its summaries.>
+<How the paper's results and proofs could be improved, and what the formalization could add. Draw
+on the audit and on the literature in Section 10, and do not repeat its summaries.>
 ### Open directions
 <Ways to extend, generalize or strengthen the paper's results, drawn from: the paper's own remarks,
 open questions and conjectures, and the hypotheses it says it needs only for its method (SKILL.md,
@@ -190,9 +188,10 @@ Phase 1); the audit (hypotheses that the proofs do not use, gaps whose repair gi
 that hold more generally); the formalization (assumptions isolated as hypotheses, results proved
 more generally than the paper states them); and the later work (Section 10). Leave out a direction
 that later work has already taken, or say how far it got there. For each: the statement to aim
-for, what would have to be proved, and what stands in the way. A direction that `NEXT.md` develops
-appears here as it would without it, never with the attack, the evidence or the partial results
-that `NEXT.md` records.>
+for, what would have to be proved, and what stands in the way. A direction that the private
+follow-up file develops (references/follow-up-papers.md) appears here as it would without it,
+never with the attack, the evidence or the partial results recorded there, and the report does not
+mention that file.>
 ### Simpler proofs
 <Where the paper's proofs could be simpler for a reader of the paper, from the work itself: the
 simpler arguments recorded while proving, which the formal proofs could not use (SKILL.md, Rules);

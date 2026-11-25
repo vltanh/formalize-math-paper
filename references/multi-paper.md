@@ -52,7 +52,7 @@ palomar/PaperA/              -- paper A's submission: Challenge.lean (module Pap
                                 Solution.lean (PaperA.Solution), comparator.json, formalization.yaml
 palomar/PaperB/
 docs/PaperA/                 -- paper A's documents: README.md, REPORT.md, CREDITS.md, the routes,
-                                NEXT.md (private), numerics/
+                                numerics/
 docs/PaperB/
 scripts/                     -- one Audit.lean for the repository, and the tools
 .github/workflows/           -- lean_action_ci.yml; palomar_preflight_papera.yml, …_paperb.yml
@@ -176,9 +176,10 @@ talk about the same thing.
 ## 6. Documents
 
 Each paper keeps its documents in `docs/PaperName/`, as in every project, and its README joins them
-there: `README.md`, `REPORT.md`, `CREDITS.md` and the private `NEXT.md`, written as
-`audit-report.md`, `credits.md` and `next-papers.md` say, for that paper alone. A paper's README
-links to the umbrella README and to the sibling papers it uses.
+there: `README.md`, `REPORT.md` and `CREDITS.md`, written as `audit-report.md` and `credits.md`
+say, for that paper alone. A paper's README links to the umbrella README and to the sibling papers
+it uses. Each paper's follow-up papers go to the private `notes/PaperName/follow-up-papers.md`, with
+their scratch files in `notes/PaperName/follow-up/`, written as `follow-up-papers.md` says.
 
 A paper's documents and metadata do not count the repository's papers ("one of three"). They say
 that the repository formalizes other papers on the problem too. The set of papers may change, and a
@@ -205,9 +206,9 @@ not one paper:
 7. Credits: one line per paper and round, linking to each paper's `CREDITS.md`; the license.
 
 Rewrite the umbrella README whole at the end of each round, like a paper's README. When the user
-asks for follow-up papers across the question rather than one paper, a central private `NEXT.md`
-at the root may replace or complement the per-paper ones; the `.gitignore` line `NEXT.md`, without
-a leading slash, keeps every one of them out of git.
+asks for follow-up papers across the question rather than one paper, a central
+`notes/follow-up-papers.md` may replace or complement the per-paper ones. All of them are in
+`notes/`, which git ignores.
 
 ## 7. Palomar
 
@@ -318,18 +319,20 @@ the project (Section 2). Make the move before the second paper's statements are 
 
 Then the second paper joins. Move the first paper's README to `docs/PaperName/README.md` and
 rewrite its relative links: resolve each link against the root, and make it relative to
-`docs/PaperName/`. Write the umbrella README (Section 6), list every paper's documents in the
-configuration of `linkify_docs.py`, and rerun it. Split any definitions that the second paper also
-needs into that paper's own `Defs.lean` (Section 3): the first paper's Challenge must not grow
-definitions it does not use.
+`docs/PaperName/`. Move the first paper's follow-up papers, `notes/follow-up-papers.md` and
+`notes/follow-up/`, to `notes/PaperName/` with a plain `mv`, since git does not track them. Write
+the umbrella README (Section 6), list every paper's documents in the configuration of
+`linkify_docs.py`, and rerun it. Split any definitions that the second paper also needs into that
+paper's own `Defs.lean` (Section 3): the first paper's Challenge must not grow definitions it does
+not use.
 
 An older repository may keep `Basic/`, `External/` and `PaperName/` at the root, with
 `Challenge.lean`, `Solution.lean`, `comparator.json`, `formalization.yaml`, `REPORT.md`,
-`CREDITS.md` and `NEXT.md` beside them, and the routes in `docs/`. Move it to the layout of one
-paper (`lean-project.md`, Section 2) whenever the user asks, with these moves in place of step 1,
-and then steps 2 to 5 with the lakefile of `lean-project.md`, Section 3. When a second paper is
-joining, move it straight to the layout of Section 2 instead (`Basic/` and `External/` to
-`ProjectName/Common/`, `PaperName/` to `ProjectName/PaperName/`).
+`CREDITS.md` and a private file of follow-up papers beside them, and the routes in `docs/`. Move
+it to the layout of one paper (`lean-project.md`, Section 2) whenever the user asks, with these
+moves in place of step 1, and then steps 2 to 5 with the lakefile of `lean-project.md`, Section 3.
+When a second paper is joining, move it straight to the layout of Section 2 instead (`Basic/` and
+`External/` to `ProjectName/Common/`, `PaperName/` to `ProjectName/PaperName/`).
 
 - `Basic/` and `External/` to `PaperName/Basic/` and `PaperName/External/`; their modules become
   `PaperName.Basic.…` and `PaperName.External.…`, their namespaces stay, and the paper's library
@@ -340,7 +343,8 @@ joining, move it straight to the layout of Section 2 instead (`Basic/` and `Exte
   `comparator.json` names them so. Rename the preflight workflow `palomar_preflight_papername.yml`,
   and let its `options` name both paths;
 - `REPORT.md`, `CREDITS.md`, the two routes files and any numerics scripts (into `numerics/`) to
-  `docs/PaperName/`, and `NEXT.md` there with a plain `mv`, since git does not track it (`NEXT.md`
-  in `.gitignore`, without a leading slash). Rewrite every relative link of the moved documents,
-  and of the README, which stays at the root: resolve each link against the document's old
-  directory, map the target to its new path, and make it relative to the document's new directory.
+  `docs/PaperName/`, and the private file of follow-up papers to `notes/follow-up-papers.md` with a
+  plain `mv`, since git does not track it; delete its line in `.gitignore` and any mention of it in
+  the public documents. Rewrite every relative link of the moved documents, and of the README,
+  which stays at the root: resolve each link against the document's old directory, map the target
+  to its new path, and make it relative to the document's new directory.

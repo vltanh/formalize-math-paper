@@ -19,7 +19,7 @@ compatibility: >-
   help but are optional.
 metadata:
   author: The-Anh Vu-Le
-  version: "4.6.3"
+  version: "4.7.0"
   repository: https://github.com/vltanh/formalize-math-paper
 ---
 
@@ -45,10 +45,10 @@ the Lean code under `PaperName/`, the Palomar files in `palomar/PaperName/` and 
   generalized or strengthened, and how its proofs could be simpler. `README.md`, at the root,
   summarizes the formalization, and `docs/PaperName/CREDITS.md` says how it was made: the
   procedure, the agents and models, and the time and effort (the run log);
-- a private `docs/PaperName/NEXT.md`, never published unless the user asks, answers what paper the
-  user could write next following this one: a few candidates that would each make a paper of their
-  own, explored in depth (the obstacle, the attempts, the evidence, what is already proved), not a
-  list of incremental extensions;
+- a private `notes/follow-up-papers.md`, never published unless the user asks, answers what paper
+  the user could write next following this one: a few candidates that would each make a paper of
+  their own, explored in depth (the obstacle, the attempts, the evidence, what is already proved),
+  not a list of incremental extensions;
 - the project is packaged for Palomar, in `palomar/PaperName/`, and, with the user's permission,
   published and run through Palomar's preflight.
 
@@ -258,7 +258,7 @@ list what it assumes, and say why each is still assumed.
 | 5. Stage 2 | prove the cited results | zero axioms; every result still assumed is a named hypothesis |
 | 6. Verify | axiom audit, dependency table, route check, Solution and Comparator | `scripts/Audit.lean` and the route check pass; proofs compared with the paper's; Comparator accepts |
 | 7. Cleanup | no warnings, no unused hypotheses, no misleading names, routes unchanged | the build shows only the Challenge's `sorry`s; the route check still passes |
-| 8. Audit | `README.md`; in `docs/PaperName/`, `REPORT.md`, `CREDITS.md` and the private `NEXT.md` | every finding checked against the TeX source; every follow-up candidate checked for novelty and against the bar |
+| 8. Audit | `README.md`; in `docs/PaperName/`, `REPORT.md` and `CREDITS.md`; the private `notes/follow-up-papers.md` | every finding checked against the TeX source; every follow-up candidate checked for novelty and against the bar |
 | 9. Package | CI, Palomar files and checks; publishing and preflight, with permission | Palomar's local checks pass; after publishing, the preflight reports `status: pass` |
 
 Commit at each milestone, with a message that says what changed and why.
@@ -344,7 +344,7 @@ Read the whole paper before you write any Lean. Keep a working checklist outside
   the starting point of the report's literature section (Phase 8);
 - the paper's open questions, conjectures and remarks on what its method could give, and the
   hypotheses it says it needs only for its method. They are the starting point of the report's
-  "What's next" section and of the follow-up papers in `NEXT.md` (Phase 8).
+  "What's next" section and of the follow-up papers (Phase 8).
 
 ### Phase 2: Project
 
@@ -533,12 +533,13 @@ With several papers, each paper's documents, its README included, follow this ph
 alone in `docs/PaperName/`, and the umbrella README (`references/multi-paper.md`, Section 6) gives
 the state of the problem and the literature review that connects the papers, checked independently.
 
-Then write the private `docs/PaperName/NEXT.md`: the papers the user could write next, following
-`references/next-papers.md`. Only directions that would make a paper of their own pass its bar;
-explore the best few in depth, mark each claim as proved, checked or conjectured, and have each
-candidate checked independently. Keep `NEXT.md` and its scratch files out of git (`NEXT.md` in
-`.gitignore`, without a leading slash), of every package and pull request, and of the public
-report, which only says that the file exists.
+Then write the private `notes/follow-up-papers.md` (with several papers, one per paper,
+`notes/PaperName/follow-up-papers.md`): the papers the user could write next, following
+`references/follow-up-papers.md`. Only directions that would make a paper of their own pass its
+bar; explore the best few in depth, mark each claim as proved, checked or conjectured, and have each
+candidate checked independently. The file and its scratch files in `notes/follow-up/` stay out of
+git (`notes/` is ignored), out of every package and pull request, and out of every public document,
+none of which mentions them.
 
 ### Phase 9: Package and publish
 
