@@ -2,13 +2,8 @@
 
 ## 1. The run log
 
-Keep an untracked log (for example `notes/runlog.md`) from Phase 0. Record:
-
-- the start time with its time zone, and when each phase ends (the milestone commits record the
-  latter);
-- the agent and harness with their versions, the model(s), and this skill with its repository and
-  version or commit;
-- each sub-agent: what it worked on, when it started and finished, and how often it was resumed.
+Keep the run log that SKILL.md describes ("Run log") from Phase 0; the milestone commits also record
+when each phase ends.
 
 From the log, report the elapsed time to the audited formalization: from the start to the commit
 that completes `REPORT.md` (`CREDITS.md`, which reports this time, comes in a later commit). Also
@@ -24,7 +19,8 @@ section per round (Section 2), and in `formalization.yaml` (`automation.methods`
 in status reports.
 
 With several papers in one repository, each paper's `CREDITS.md` reports the rounds spent on that
-paper, and the umbrella README sums them up in one line per paper (`multi-paper.md`, Section 6).
+paper, and the umbrella README sums them up in one line per paper and round (`multi-paper.md`,
+Section 6).
 
 ## 2. `CREDITS.md`
 

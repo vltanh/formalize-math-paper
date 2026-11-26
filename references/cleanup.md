@@ -101,5 +101,6 @@ proofs drift away from the paper while no statement changes:
 - After moving or renaming modules, delete their old build outputs under `.lake/build`: stale
   `.ilean` files make `scripts/linkify_docs.py` link to the old paths.
 - A generated Lean file keeps its generator in the repository (`numerics.md`, Section 4).
-- Dead code (helper lemmas nothing uses) can stay unless the user asks for a minimal
-  repository. If you remove it, do so in its own commit.
+- Dead code (helper lemmas nothing uses) can stay unless the user asks for a minimal repository. If
+  you remove it, do so in its own commit. A proof by another argument, kept as a theorem of its own
+  (SKILL.md, Rules, "Faithful proofs"), is not dead code.

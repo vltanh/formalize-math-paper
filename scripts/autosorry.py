@@ -8,6 +8,7 @@ Errors inside a theorem/lemma/example/instance body (after its top-level `:=`)
 cause the body to be replaced by `by sorry`. Other errors are printed as
 "manual" so they can be fixed by hand. Prints a summary.
 """
+import os
 import re
 import sys
 
@@ -68,6 +69,16 @@ def strip_comments_and_strings(text):
     return ''.join(out)
 
 
+def same_file(logged, path):
+    """Whether the file that a log line names is `path`. Lean names files relative to the project
+    root (or absolutely); a build log names many files, some with the same base name, so the paths
+    must agree as paths, not only in their last component."""
+    if os.path.realpath(logged) == os.path.realpath(path):
+        return True
+    a, b = os.path.normpath(logged), os.path.normpath(path)
+    return a == b or a.endswith(os.sep + b) or b.endswith(os.sep + a)
+
+
 def main():
     if len(sys.argv) != 3 or sys.argv[1] in ('-h', '--help'):
         print(__doc__.strip())
@@ -77,10 +88,9 @@ def main():
     lines = src.split('\n')
     clean = strip_comments_and_strings(src).split('\n')
     errors = []
-    base = path.split('/')[-1]
     for l in open(errpath, encoding='utf-8'):
         m = re.match(r"^(?:error: )?(\S+?):(\d+):(\d+):(?: error)?", l) if ("error" in l[:200]) else None
-        if m and m.group(1).endswith(base):
+        if m and same_file(m.group(1), path):
             errors.append((int(m.group(2)), int(m.group(3)), l.strip()))
     # Find declarations: (start_line_idx, kind, end_line_idx_exclusive)
     decls = []

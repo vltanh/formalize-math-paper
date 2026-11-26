@@ -62,16 +62,16 @@ Each paper has its library `ProjectName/PaperName/`, laid out as the library of 
 (`Defs.lean`, the sections, `Main.lean`; `lean-project.md`, Section 2), its Palomar submission
 `palomar/PaperName/` and its documents `docs/PaperName/`. `ProjectName/Common/`, `scripts/`, the
 licence and the lakefile are shared, and a result that two papers cite is formalized once, in
-`Common/External/`. Two documents change: the root README becomes the umbrella document
+`Common/External/`. The documents change too: the root README becomes the umbrella document
 (Section 6), and each paper's README goes to `docs/PaperName/README.md`.
 
-Name the root after the project: its question or subject (`Morrey/`), or one of its papers, as
+Name the root after the project: its question or subject (`ProjectName/`), or one of its papers, as
 when a second paper joins a project of one paper and the first paper's name stays the root
-(`Smith/Common/`, `Smith/Smith/`, `Smith/Jones/`; Section 9). Name each paper after the paper, not
-after the subject (`lean-project.md`, Section 2): two papers on one subject need different names.
-The modules of `ProjectName/PaperA/` are `ProjectName.PaperA.…`, and their declarations are in the
-namespace `PaperA`; `Common/Basic/` is in Mathlib's namespaces, and `Common/External/Source/` in
-`External.Source`. Each paper's Challenge and Solution are the modules `PaperA.Challenge` and
+(`PaperA/Common/`, `PaperA/PaperA/`, `PaperA/PaperB/`; Section 9). Name each paper after the paper,
+not after the subject (`lean-project.md`, Section 2): two papers on one subject need different
+names. The modules of `ProjectName/PaperA/` are `ProjectName.PaperA.…`, and their declarations are
+in the namespace `PaperA`; `Common/Basic/` is in Mathlib's namespaces, and `Common/External/Source/`
+in `External.Source`. Each paper's Challenge and Solution are the modules `PaperA.Challenge` and
 `PaperA.Solution` of the source directory `palomar/`, and the Challenge's theorems are in the
 namespace `PaperAChallenge`, as for one paper. The layers are those of one paper, with
 `Common/Basic/` and `Common/External/` shared (Section 4).
@@ -103,8 +103,8 @@ roots = ["PaperA.Challenge", "PaperA.Solution", "PaperB.Challenge", "PaperB.Solu
 ```
 
 Every library is a default target. The `Palomar` library lists its modules by name: when a paper
-is named as the project, its Challenge (`Smith.Challenge`, in `palomar/`) and the shared code
-(`Smith.Common.Basic.…`, at the root) are modules of one root, and a glob `Smith.+` in `Palomar`
+is named as the project, its Challenge (`PaperA.Challenge`, in `palomar/`) and the shared code
+(`PaperA.Common.Basic.…`, at the root) are modules of one root, and a glob `PaperA.+` in `Palomar`
 would match both (`lean-project.md`, Section 3). Declare it last, as for one paper: Lake gives a
 module to the last library whose patterns match it, so no other library can then take a Challenge
 or a Solution. Lake fails on a glob whose directory, or a root whose file, does not exist: add a
@@ -125,9 +125,9 @@ such as `Challenge`: the audit imports every paper's Solution, and each Solution
 Challenge's theorems under their exact names, so two papers with one Challenge namespace clash.
 
 State each paper's definitions in that paper's own terms, even when two papers define the same
-notion. Papers often differ in the details (one tests quasiconvexity with smooth compactly
-supported maps, another with Lipschitz maps vanishing on the boundary; one asks convexity along
-lines, another on segments), and each paper's statements are faithful only in its own terms. Prove
+notion. Papers often differ in the details (the class of test objects, the domain, a boundary
+condition, a strict or a weak inequality), and each paper's statements are faithful only in its
+own terms. Prove
 the bridges between the two forms in the library (Section 4): they are the evidence that the papers
 talk about the same thing.
 
@@ -142,8 +142,8 @@ talk about the same thing.
   settles every case but one" owns that combined theorem), or, when no paper claims them, in the
   library of the later paper. Never under `Common/`, which imports no paper's library.
 - `Common/Basic/` and `Common/External/` keep their layering (`lean-project.md`, Section 2):
-  `Common/Basic/` imports only Mathlib, `Common/External/` only Mathlib and `Common/Basic/`, and no
-  paper's library is imported by them.
+  `Common/Basic/` imports only Mathlib and the libraries the project requires,
+  `Common/External/` only these and `Common/Basic/`, and no paper's library is imported by them.
 
 ## 5. Routes, audit and findings
 
@@ -152,11 +152,11 @@ talk about the same thing.
   maps every declaration to the label in its docstring, and a later paper's routes cite an earlier
   paper's results by label. TeX labels often collide (`thm:main`), so compare the papers' labels
   before writing a new paper's statements (`cut -f1` of the routes files), and when they collide,
-  prefix the new paper's labels (`jones:thm:main`) in its routes files and in its docstrings. For a
-  paper without TeX source (an old journal article) invent prefixed labels (`sv-lemma1`) and record
-  them in that paper's routes file with a comment. A sibling paper's result that a proof cites is a
-  row of the citing paper's routes file, added by hand (the TeX cites the sibling with `\cite`,
-  which the extractor does not see), with `proved = 0` and the sibling's label.
+  prefix the new paper's labels (`paperb:thm:main`) in its routes files and in its docstrings. For a
+  paper without TeX source (an old journal article) invent prefixed labels (`papera:lemma1`) and
+  record them in that paper's routes file with a comment. A sibling paper's result that a proof
+  cites is a row of the citing paper's routes file, added by hand (the TeX cites the sibling with
+  `\cite`, which the extractor does not see), with `proved = 0` and the sibling's label.
 - One `scripts/Audit.lean` covers the whole repository. It imports, with `import all`, every module
   of `ProjectName/` and every paper's Solution, but no Challenge: a Challenge holds a copy of its
   paper's definitions under the library's names, and the two copies clash. The command that
@@ -164,7 +164,7 @@ talk about the same thing.
   they `find ProjectName` instead of `PaperName`; add each paper's name to the check's `grep`
   pattern, and let `isLibraryModule` accept the root `ProjectName` and each paper's Solution
   module. The audit lists every paper's numbered results (with the paper in the label:
-  "Šverák Lemma 1") and every paper's Comparator theorems, and checks every declaration's axioms.
+  "PaperA Lemma 1") and every paper's Comparator theorems, and checks every declaration's axioms.
   It writes one `.lake/route_deps.tsv`; run the route check once per paper, with that paper's two
   files:
   `python3 scripts/route_check.py check docs/PaperA/paper_routes.tsv --accept docs/PaperA/route_differences.tsv`.
@@ -264,7 +264,7 @@ When a second paper joins a project of one paper, the first paper's code moves u
 the project (Section 2). Make the move before the second paper's statements are written:
 
 1. Choose the root: a new name for the question, or the first paper's name, which then names the
-   project and the paper (`Smith/Smith/`). Move the files with `git mv`, so that history follows
+   project and the paper (`PaperA/PaperA/`). Move the files with `git mv`, so that history follows
    them:
    - `PaperName/Basic/` to `ProjectName/Common/Basic/`, and `PaperName/External/` to
      `ProjectName/Common/External/`; their modules `PaperName.Basic.…` and `PaperName.External.…`
@@ -326,7 +326,7 @@ the umbrella README (Section 6), list every paper's documents in the configurati
 paper's own `Defs.lean` (Section 3): the first paper's Challenge must not grow definitions it does
 not use.
 
-An older repository may keep `Basic/`, `External/` and `PaperName/` at the root, with
+A repository may keep `Basic/`, `External/` and `PaperName/` at the root, with
 `Challenge.lean`, `Solution.lean`, `comparator.json`, `formalization.yaml`, `REPORT.md`,
 `CREDITS.md` and a private file of follow-up papers beside them, and the routes in `docs/`. Move
 it to the layout of one paper (`lean-project.md`, Section 2) whenever the user asks, with these

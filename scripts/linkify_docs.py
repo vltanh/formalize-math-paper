@@ -81,9 +81,12 @@ PRIVATE = ('notes',)
 # each package's name in `lake-manifest.json`, which is also the root of its modules, and the
 # address of its files on GitHub, up to the commit. Their names link to their lines at the commit
 # that the manifest pins, so build them in full first (`lake build <Library>`), in CI too. Example:
-# {'Convexity': 'https://github.com/<owner>/lean4-convexity/blob/'}.
+# {'<Area>': 'https://github.com/<owner>/lean4-<area>/blob/'}.
 LIBRARIES = {}
 # ---------------------------------------------------------------------------------------------
+
+# A configuration block without LIBRARIES links no library.
+LIBRARIES = globals().get('LIBRARIES', {})
 
 ROOT = Path(__file__).resolve().parent.parent
 

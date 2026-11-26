@@ -40,8 +40,8 @@ written alongside states exactly what the Lean proves
 
 | Repository | What it formalizes |
 | --- | --- |
-| [lean4-smoothed-polygon](https://github.com/vltanh/lean4-smoothed-polygon) | Hales and Vajjha, *Packings of Smoothed Polygons* (arXiv:2405.04331): Chapters 2–8, with an audit of the book (61 findings, among them false statements refuted in Lean); Mahler's First conjecture (Theorem 16.3.1) proved conditionally on one named hypothesis |
-| [lean4-morrey](https://github.com/vltanh/lean4-morrey) | three papers on Morrey's problem in one repository: Šverák's counterexample on `ℝ^{3×2}` (1992) and Cassese's on `ℝ^{2×m}`, `m ≥ 3` (arXiv:2608.03488; every result, a few conditional on named hypotheses), and an audit of Pedregal's claimed proof for `2 × 2` (arXiv:1905.06571), whose Corollary 7.2 is refuted in Lean |
+| [lean4-smoothed-polygon](https://github.com/vltanh/lean4-smoothed-polygon) | Hales and Vajjha, *Packings of Smoothed Polygons* (arXiv:2405.04331): Chapters 2–8, with an audit of the book whose findings include false statements refuted in Lean; Mahler's First conjecture (Theorem 16.3.1) proved conditionally on a named hypothesis |
+| [lean4-morrey](https://github.com/vltanh/lean4-morrey) | papers on Morrey's problem in one repository, among them Šverák's counterexample on `ℝ^{3×2}` (1992), Cassese's on `ℝ^{2×m}`, `m ≥ 3` (arXiv:2608.03488), and an audit of Pedregal's claimed proof for `2 × 2` (arXiv:1905.06571), whose Corollary 7.2 is refuted in Lean |
 | [lean4-optimal-control](https://github.com/vltanh/lean4-optimal-control) | the Pontryagin maximum principle by Agrachev and Sachkov's proof, and Filippov's theorem, including the form with a state constraint |
 | [lean4-fixed-point](https://github.com/vltanh/lean4-fixed-point) | Brouwer's fixed-point theorem, by the analytic proof of Milnor and Rogers |
 
@@ -97,7 +97,7 @@ faster, but they are not required.
 
 | Path | Contents |
 | --- | --- |
-| `SKILL.md` | The workflow: principles, rules, phases and completion gates |
+| `SKILL.md` | The workflow: principles, rules, phases, the run log and status reports |
 | `references/` | Detailed guides: Lean project setup, parallel repair, the audit report, follow-up papers, the credits, Palomar packaging, cleanup, rigorous numerics, packages of their own for the theory that Lean lacks, several papers in one repository, original results, checklists (statement review, verification, status reports, completion gates), the bundled tools |
 | `scripts/` | Helpers: checking one file, against the build or a private snapshot of it; replacing failing proofs with `sorry`; converting to the module system; statement diffs; removing unused hypotheses and the arguments that callers pass for them; checking that each proof follows the route of the paper's proof; copying shared definitions into the Challenge; linking documentation to the code and to the libraries it requires; checking Markdown tables; summarizing a Claude Code session for the run log |
 | `assets/` | Templates: the axiom, dependency and route audit (`Audit.lean`), the CI workflow, the Palomar preflight workflow |

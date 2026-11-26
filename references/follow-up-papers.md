@@ -27,9 +27,9 @@ depend on the special structure, and where the paper's own remarks about its met
 wrong. Use that knowledge. A list of directions that anyone could write from the abstract adds
 nothing.
 
-For a project formalized before this step existed, or when the user asks for it on its own, start
-from the project's `docs/PaperName/REPORT.md`, its inventory if it kept one, the paper's TeX source
-and the Lean library, and refresh the literature search of the report's Section 10 first.
+When the formalization is already finished, or the user asks for this file on its own, start from
+the project's `docs/PaperName/REPORT.md`, its inventory if it kept one, the paper's TeX source and
+the Lean library, and refresh the literature search of the report's Section 10 first.
 
 One candidate explored in depth is worth more than several sketched. If no candidate meets the bar
 (Section 3), say so, and say what came closest and why it falls short.
@@ -143,8 +143,8 @@ inventory, the report and the follow-up file:
 
 A candidate that turns out to be known moves to the report's Section 10, under "Before the paper",
 "Concurrent work" or "Since the paper" as its source's date decides, and one that turns out to be
-incremental moves to Section 11, "Open directions". Correct a wrong claim, or mark it as
-conjectured.
+incremental moves to Section 11, under "Open directions" or "Simpler proofs" as it fits. Correct a
+wrong claim, or mark it as conjectured.
 
 ## 6. Structure of the follow-up file
 
@@ -180,7 +180,7 @@ the bar, say so, and what came closest.>
 ## 2. …
 
 ## Considered and set aside
-<Every other idea, one line each, with why: incremental (now in the report's Section 11), known
+<Every other idea, one line each, with why: incremental (in the report's Section 11), known
 (Section 10), or out of reach (what it lacks).>
 ```
 
@@ -198,4 +198,5 @@ directions" may name a question that the follow-up file develops, as it would wi
 the attack, the evidence or the partial results recorded there.
 
 An ignored file is in no backup that the repository provides. When you finish, tell the user where
-the follow-up file and `notes/follow-up/` are, and give them the summary in the status report.
+the follow-up file and `notes/follow-up/` are, and give them the candidates, ranked, a line each, in
+the status report.

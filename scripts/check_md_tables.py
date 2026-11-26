@@ -6,7 +6,8 @@ usage: check_md_tables.py FILE.md... [--fix]
 In GitHub-flavored Markdown, every unescaped `|` in a table row ends a cell, even inside a code
 span. So `` `|S| ≥ 2` `` in a table cell breaks the row into extra cells. The script reports such
 rows. With --fix, it escapes the pipes inside code spans of table rows (`\\|`, which renders as
-`|`) and checks again. Exits with status 1 if a broken row remains.
+`|`) and checks again. Lines inside fenced code blocks are not tables, and are left alone. Exits
+with status 1 if a broken row remains.
 """
 import argparse
 import re
@@ -15,6 +16,41 @@ from pathlib import Path
 
 RULE = re.compile(r'^\|\s*:?-{3}')
 PIPE = re.compile(r'(?<!\\)\|')
+FENCE = re.compile(r'^\s*(`{3,}|~{3,})')
+
+
+def fenced(lines):
+    """For each line, whether it is inside a fenced code block (fences included)."""
+    out, fence = [], None
+    for line in lines:
+        m = FENCE.match(line)
+        if fence:
+            out.append(True)
+            if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence):
+                fence = None
+        elif m:
+            out.append(True)
+            fence = m.group(1)
+        else:
+            out.append(False)
+    return out
+
+
+def table_rows(lines):
+    """The indices of the rows of every table outside fenced code blocks: a header, its rule and
+    the rows that follow."""
+    code, rows, i = fenced(lines), [], 0
+    while i < len(lines):
+        if (not code[i] and lines[i].startswith('|') and i + 1 < len(lines)
+                and RULE.match(lines[i + 1])):
+            j = i + 2
+            while j < len(lines) and not code[j] and lines[j].startswith('|'):
+                j += 1
+            rows.append(range(i, j))
+            i = j
+        else:
+            i += 1
+    return rows
 
 
 def escape_code_spans(line):
@@ -22,18 +58,10 @@ def escape_code_spans(line):
 
 
 def broken_rows(lines):
-    out, i = [], 0
-    while i < len(lines):
-        if lines[i].startswith('|') and i + 1 < len(lines) and RULE.match(lines[i + 1]):
-            cells = len(PIPE.findall(lines[i]))
-            j = i + 2
-            while j < len(lines) and lines[j].startswith('|'):
-                if len(PIPE.findall(lines[j])) != cells:
-                    out.append(j)
-                j += 1
-            i = j
-        else:
-            i += 1
+    out = []
+    for table in table_rows(lines):
+        cells = len(PIPE.findall(lines[table[0]]))
+        out += [j for j in table[2:] if len(PIPE.findall(lines[j])) != cells]
     return out
 
 
@@ -46,7 +74,8 @@ def main():
     for f in args.files:
         lines = Path(f).read_text(encoding='utf-8').split('\n')
         if args.fix:
-            fixed = [escape_code_spans(l) if l.startswith('|') else l for l in lines]
+            rows = {j for table in table_rows(lines) for j in table}
+            fixed = [escape_code_spans(l) if j in rows else l for j, l in enumerate(lines)]
             if fixed != lines:
                 Path(f).write_text('\n'.join(fixed), encoding='utf-8')
                 print(f'{f}: escaped pipes in code spans')

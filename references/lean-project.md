@@ -46,7 +46,7 @@ lakefile.toml, lean-toolchain, lake-manifest.json
 PaperName/                   -- all the Lean code, under one root named after the paper
   Basic/                     -- general mathematics, filed by Mathlib area, in Mathlib's namespaces
     README.md                -- where each part could be contributed
-    Analysis/Calculus/Rolle.lean
+    Analysis/<Topic>.lean
   External/                  -- the results the paper cites from other works
     Source/                  -- one per source, with a README.md; namespace External.Source
   Defs.lean                  -- the definitions that the Challenge copies (when it needs any)
@@ -94,13 +94,11 @@ Name the root, the paper's directories and its namespace after the paper (its fi
 short title), not after its subject: another paper on the subject may join later, and it needs a
 name of its own. Namespaces do not follow directories. The paper's library is in the namespace
 `PaperName`; `External/Source/` is in the namespace `External.Source`, and `Basic/` in Mathlib's
-namespaces. The Challenge and the Solution are the modules `PaperName.Challenge` and
-`PaperName.Solution` of the source directory `palomar/` (Section 3), so `PaperName/` has no file
-`Challenge.lean` or `Solution.lean`. The Challenge's theorems are in the namespace
-`PaperNameChallenge`: the Solution, which imports the library, restates them under their exact
-names, so they need a namespace distinct from the library's and from any other paper's Challenge.
+namespaces. The Challenge and the Solution are modules of the source directory `palomar/`
+(Section 3), so `PaperName/` has no file `Challenge.lean` or `Solution.lean`, and the Challenge's
+theorems are in the namespace `PaperNameChallenge` (`palomar.md`, Section 2).
 
-The code has three layers. `Basic/` imports only Mathlib (and the other libraries the project
+The code is layered. `Basic/` imports only Mathlib (and the other libraries the project
 requires) and itself. `External/` imports the same, `Basic/` and itself. The paper's library imports
 anything below it. Nothing in `Basic/` or `External/` imports the paper's library. `Defs.lean` and
 the Challenge import only Mathlib, or the libraries that Palomar allows in statements (`palomar.md`,
@@ -109,34 +107,32 @@ Section 1), and nothing else of the project. The audit, `scripts/Audit.lean`, im
 of the library's definitions under the same names (SKILL.md, Phase 6).
 
 Keep general mathematics apart from the start. A lemma that says nothing about the paper's objects
-(a calculus fact, a real inequality, a lemma about probability measures) goes to
-`PaperName/Basic/`, not to the paper's library. File it by field, under the directory that Mathlib
-uses for that field (`Basic/Algebra/`, `Basic/AlgebraicGeometry/`, `Basic/Analysis/`,
-`Basic/Combinatorics/`, `Basic/Probability/`, …), in a file named for its topic, and give it the
-name and namespace that Mathlib would give it, so that it can later be contributed to Mathlib or
-another library. File it by its mathematics, not by what motivated it: a lemma about graphs goes to
-`Combinatorics/` whatever the paper's subject. Only objects that no field of Mathlib covers get a
-new field directory, named as Mathlib would name a new area (`Basic/NewArea/`), and
-`Basic/README.md` says where each part could go: a new area of Mathlib, proposed on the Lean Zulip
-first, or a library for that domain, as PhysLean is for physics.
+(a calculus fact, a real inequality, a lemma about probability measures) goes to `PaperName/Basic/`,
+not to the paper's library. File it by field, under the directory that Mathlib uses for that field
+(`Basic/Algebra/`, `Basic/AlgebraicGeometry/`, `Basic/Analysis/`, `Basic/Combinatorics/`,
+`Basic/Probability/`, …), in a file named for its topic, and give it the name and namespace that
+Mathlib would give it, so that it can later be contributed to Mathlib or another library. File it by
+its mathematics, not by what motivated it: a lemma about graphs goes to `Combinatorics/` whatever
+the paper's subject. Only objects that no field of Mathlib covers get a new field directory, named
+as Mathlib would name a new area (`Basic/NewArea/`), and `Basic/README.md` says where each part
+could go: a new area of Mathlib, proposed on the Lean Zulip first, or a library for that domain.
 
-A cited result that is general is proved in `Basic/` too; its `External/Source/README.md` still
-gives the source, how the paper uses it and the argument that proves it, and points to the proof.
+A cited result that is general is proved in `Basic/` too, under its Mathlib-style name.
+`External/Source/` still states it in the source's terms and derives it from that lemma, and its
+`README.md` gives the source, how the paper uses it and the argument that proves it.
 The definitions that a Challenge statement uses are the exception: they stay in the paper's
 `Defs.lean` (`palomar.md`, Section 2), even the general ones, because Comparator needs them in one
 module, and the lemmas about them stay with them until they are contributed.
 
-Keep the results that the paper takes from other works apart too, in `PaperName/External/`. They
-are another paper's mathematics, not this one's: another formalization that cites the same source
-can reuse them, a later paper of the project that cites the same source shares them, and the
-source's own authors can check them. Give each source or cited result its own directory
-`External/Source/`, with modules `PaperName.External.Source.…` and declarations in the namespace
-`External.Source`, each named after the source's numbering (`External.Author.lemma2`). State each
-result in the source's own terms, with the source's definitions (or Mathlib's, or those of
-`Basic/`), not the paper's: the paper's library proves that the paper's objects are the source's
-and applies the result, and when the paper's object is one of the Challenge's definitions, that
-bridge is often `Iff.rfl` or a short lemma. Decide where each file belongs when you create it
-(SKILL.md, Phase 2).
+Keep the results that the paper takes from other works apart too, in `PaperName/External/`. They are
+another paper's mathematics, not this one's: another formalization that cites the same source can
+reuse them, a later paper of the project that cites the same source shares them, and the source's
+own authors can check them. Give each source its own directory `External/Source/`, with modules
+`PaperName.External.Source.…` and declarations in the namespace `External.Source`, each named after
+the source's numbering (`External.Source.lemma2`). State each result in the source's own terms, with
+the source's definitions (or Mathlib's, or those of `Basic/`), not the paper's: the paper's library
+proves that the paper's objects are the source's and applies the result, and when the paper's object
+is one of the Challenge's definitions, that bridge is often `Iff.rfl` or a short lemma.
 
 ## 3. `lakefile.toml`
 
@@ -168,10 +164,9 @@ srcDir = "palomar"
 roots = ["PaperName.Challenge", "PaperName.Solution"]
 ```
 
-The two libraries are the default targets. The `Palomar` library holds the Challenge and the
-Solution, the modules `PaperName.Challenge` and `PaperName.Solution` of the source directory
-`palomar/`, and `comparator.json` names them so. Palomar takes a Challenge's source root from its
-path, so the source directory `palomar/` is accepted.
+The libraries are the default targets. The `Palomar` library holds the Challenge and the Solution,
+the modules `PaperName.Challenge` and `PaperName.Solution` of the source directory `palomar/`, which
+Palomar accepts (`palomar.md`, Section 1), and `comparator.json` names them so.
 
 Declare the `Palomar` library last. Lake gives a module to the last library whose patterns match
 its name, and the glob `PaperName.+` of the code library matches `PaperName.Challenge` and
@@ -186,16 +181,15 @@ order of the libraries.
 
 Lake fails on a root whose file does not exist. Create `palomar/PaperName/Challenge.lean` and
 `Solution.lean` with the project, as modules that are empty except for their imports, so that
-`lake build` works from the start. Phase 3 fills in the Challenge, and Phase 6 the Solution. The
-Solution imports the paper's library and serves as its entry point. No umbrella file
-`PaperName.lean` is needed: the glob keeps every module of `PaperName/` in the build, and it does
-not match `PaperName.lean` itself.
+`lake build` works from the start. Phase 3 fills in the Challenge, and Phase 6 the Solution, which
+imports the paper's library. No umbrella file `PaperName.lean` is needed: the glob keeps every
+module of `PaperName/` in the build, and it does not match `PaperName.lean` itself.
 
 A library beyond Mathlib that proves a cited result, an earlier formalization of a cited work
-included, is required the same way, pinned to a full commit hash (`git = "…"`,
-`rev = "<commit>"`), rather than copied (SKILL.md, Phase 5). A package of the project's own, split
-out for a theory that Lean lacks (`separate-packages.md`), is required by `path = "../package"`
-while it is developed and by its published commit before the project is pushed.
+included, is required the same way, pinned to a full commit hash (`git = "…"`, `rev = "<commit>"`),
+rather than copied (SKILL.md, Phase 5). A package of the project's own, split out for a theory that
+Lean lacks (`separate-packages.md`), is required by `path = "../lean4-<area>"` while it is developed
+and by its published commit before the project is pushed.
 
 With several papers, the lakefile has a library `Common` and one library per paper, and the
 `Palomar` library, still last, lists every paper's two modules (`multi-paper.md`, Section 2).
@@ -305,7 +299,8 @@ particular, do not change a statement to make an error go away.
     proof never used `h` compiles with the stronger statement. Check with `#check` that each
     statement has the hypotheses its proof uses. Add `include h` after the `variable` (or
     `include h in` before a single theorem): this restores the statement the draft meant, so it
-    corrects a slip. Record it, with a counterexample to the statement as compiled.
+    corrects a slip. Record it in the commit message, with a counterexample to the statement as
+    compiled.
 - Reserved words. Identifiers such as `given`, `at` or `from` clash with keywords, `λ` is
   `fun`, and characters such as `₋` and `₊` cannot appear in identifiers. Rename them.
 - Order of declarations. A draft may use a definition before declaring it. Reorder, or move

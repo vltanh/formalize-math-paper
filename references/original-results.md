@@ -34,22 +34,22 @@ Everything that makes the result checkable and reusable:
   Rules, "Statements").
 - Proofs. The user's argument is where the proofs start, not a standard that they must keep to:
   prefer the shorter or more general proof, whoever found it. A gap in the argument is repaired in
-  Lean and told to the user. There are no departures to report, so there are no route files, no
-  route check and no table of departures.
-- Documents. They present the work as an original result, never as an audit of a paper: there is
-  no `REPORT.md` with findings. The README says what is proved, with the exact statements, how to
-  check it, the prior work and the credits (`audit-report.md`, Section 3, adapted). `docs/ResultName/`
+  Lean and told to the user. There are no departures to report, so there are no route files in
+  `docs/`, no route check in CI and no table of departures.
+- Documents. They present the work as an original result, never as an audit of a paper: there is no
+  `REPORT.md` with findings. The README says what is proved, with the exact statements, how to check
+  it, the prior work and the credits (`audit-report.md`, Section 3, adapted). `docs/ResultName/`
   holds what a reader needs beyond the README:
   - the definitions and statements, explained;
   - an outline of the proof;
-  - the prior work, written and checked like the report's literature section (`audit-report.md`,
-    Section 2, Section 10);
+  - the prior work, written and checked like the report's literature section (the report's
+    Section 10, in `audit-report.md`, Section 2);
   - the paper, if one is written (Section 3);
   - `CREDITS.md`.
 - Follow-up papers (SKILL.md, Phase 8) only if the user asks for them.
-- Prior work. Search for the result itself before calling it new, as the report's literature
-  section would (Phase 0). If it is already published, tell the user at once: the work is then a new
-  proof of a known result, and the documents say so.
+- Prior work. Search for the result itself at the start (SKILL.md, Phase 0), as the report's
+  literature section would (Phase 8), before calling it new. If it is already published, tell the
+  user at once: the work is then a new proof of a known result, and the documents say so.
 - Palomar. In `formalization.yaml`, one source declares the original proof (`type: original-proof`,
   `relationship: other`), and every other source is `background` or `other`. A new proof of a
   published result is not an original result for Palomar: that publication is the source, with
@@ -76,13 +76,15 @@ proof. Facts that the paper only quotes from the literature are its scope, not d
 
 ## 4. A paper's formalization with results of its own
 
-A project that formalizes a paper and also proves results beyond it keeps the two apart. The
-paper's library, Challenge and documents follow the workflow for the paper, and stay about the
-paper. The additions are original results: they have a library of their own, which may import the
-paper's library, and their own Challenge, Solution and documents. What both use goes in a library
-that they share, and the paper's library never imports the additions. Each is a Palomar submission
-of its own: the paper's `formalizes` the paper, and the additions' declares the original proof, with
-the paper as `background` (`palomar.md`, Section 4).
+A project that formalizes a paper and also proves results beyond it keeps the two apart. The paper's
+library, Challenge and documents follow the workflow for the paper, and stay about the paper. The
+additions are original results: they have a library of their own, which may import the paper's
+library, and their own Challenge, Solution and documents, laid out as another paper of the
+repository (`multi-paper.md`, Sections 2 and 9). A theorem that only combines results of papers
+formalized in the repository is not an addition: `multi-paper.md`, Section 4, places it. What both
+use goes in a library that they share, and the paper's library never imports the additions. Each is
+a Palomar submission of its own: the paper's `formalizes` the paper, and the additions' declares the
+original proof, with the paper as `background` (`palomar.md`, Section 4).
 
 Whether the additions are published, and where, is the user's decision. Until then they stay out of
 the paper's public files, which do not mention them.

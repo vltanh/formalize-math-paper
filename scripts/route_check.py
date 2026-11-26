@@ -26,7 +26,8 @@ statement of a theorem-like environment: its label, its environment, whether the
   unlabelled statement that restates a labelled one, numbered after it
   (`\\def\\thetheorem{\\ref{a}}` before it, or `\\ref{a}` in its title), stands for that one.
 
-The two heuristics, and every proof that cannot be attributed, are reported on standard error:
+The two heuristics, when the closest statement is separated from the proof by another proof or a
+paragraph of text, and every proof that cannot be attributed, are reported on standard error:
 check them against the paper. The output contains only labels, so it can be committed even when
 the TeX source cannot be. It covers statements and their proof environments only: a result
 proved in running text, or a labelled equation that the paper treats as a result, needs a row
@@ -173,6 +174,11 @@ def extract(text, warn=lambda msg: None):
                     elif owner is None:
                         warn(f'a proof follows no labelled statement and is not attributed: '
                              f'{snippet(m.end())}')
+                    elif last_end > current_end or len(text[current_end:m.start()].split()) > 40:
+                        # another proof, or a paragraph of text, comes between the statement and
+                        # this proof: the attribution is a guess
+                        warn(f'a proof is attributed to {owner}, the closest statement before it, '
+                             f'across the text between them: {snippet(m.end())}')
                 proof_owner, proof_start, proof_cited = owner, m.end(), cited
         else:                                            # \end{proof}
             depth = max(0, depth - 1)
@@ -208,6 +214,8 @@ def load_deps(path, paper):
     """Lean result -> (label, used Lean results); the label is the first docstring code span that
     is a label of the paper."""
     lean = {}
+    if not os.path.isfile(path):
+        sys.exit(f'{path} does not exist: run the audit (scripts/Audit.lean) first, which writes it')
     for line in open(path, encoding='utf-8'):
         if not line.strip():
             continue
@@ -220,7 +228,10 @@ def load_deps(path, paper):
 
 def load_accept(path):
     accept = {}
-    if not path or not os.path.isfile(path):
+    if not path:
+        return accept
+    if not os.path.isfile(path):
+        print(f'warning: {path} does not exist; no difference is recorded', file=sys.stderr)
         return accept
     for n, line in enumerate(open(path, encoding='utf-8'), 1):
         if not line.strip() or line.startswith('#'):

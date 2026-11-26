@@ -14,8 +14,8 @@ The rules change. Before you package, read the current versions:
   in `tests/fixtures/`; taxonomies in `taxonomies/`);
 - the agent instructions: https://submit.palomar-registry.org/llms.txt.
 
-Clone the two repositories to a scratch directory. Their scripts check the metadata and sources
-locally.
+Clone the policy and verifier repositories to a scratch directory. Their scripts check the metadata
+and sources locally.
 
 Package every project for Palomar unless the user declined (SKILL.md, Phase 0). The files and the
 local checks need no permission, and they make the project ready to submit whenever the user
@@ -35,8 +35,9 @@ decides to.
 
 ## 1. Repository requirements
 
-- `lean-toolchain` names a Lean release, no older than the minimum in PalomarSubmission's
-  `toolchains.json`, and identical to the pinned Mathlib commit's `lean-toolchain`.
+- `lean-toolchain` names a Lean release or release candidate, no older than the minimum in
+  PalomarSubmission's `toolchains.json`, and identical to the pinned Mathlib commit's
+  `lean-toolchain`.
 - `lakefile.toml` (or `lakefile.lean`) and `lake-manifest.json` are committed. Dependencies are
   public GitHub repositories pinned to full commit hashes; the manifest provides the pins.
   Mathlib must be pinned to a commit on its `master` branch or to an exact release tag. Use the
@@ -46,7 +47,7 @@ decides to.
   CSLib is allowed, but it marks the entry as having qualified statement dependencies. No other
   statement dependency is accepted, not even a project that Palomar has already registered.
 - Only the Challenge's imports are restricted. Dependencies used only by the Solution may be any
-  public Git repository pinned to a commit, including a project that Palomar has registered
+  public GitHub repository pinned to a commit, including a project that Palomar has registered
   (PalomarSubmission's README: "arbitrary pinned dependencies remain available to the proof in
   `Solution.lean`"). A general library split out of a formalization (SKILL.md, Phase 2) can
   therefore be registered on its own and still be imported by the formalization's proofs. Package
@@ -89,14 +90,14 @@ decides to.
 ## 2. Challenge and Solution
 
 - The Challenge, `palomar/PaperName/Challenge.lean` (module `PaperName.Challenge`), contains only
-  the statements of record, which are the paper's main results, with `sorry` proofs, in Mathlib's
-  vocabulary. It imports nothing from the project. Use Tau Ceti's or CSLib's vocabulary only when
-  restating its definitions would cost more than the qualified mark (Section 1). Restate project
-  definitions inline with Mathlib constructions. For example, a probability over a finite set
-  becomes a count divided by a cardinality. Write the module docstring as a plain-language account
-  of each theorem, with every convention it uses. State the results exactly as the paper does,
-  including quantifiers and constants, except for obvious misprints, which are corrected and
-  documented (SKILL.md, Rules).
+  the statements of record, with `sorry` proofs, in Mathlib's vocabulary: the paper's main results,
+  and the compared theorems that tie unfamiliar definitions to known facts (end of this section). It
+  imports nothing from the project. Use Tau Ceti's or CSLib's vocabulary only when restating its
+  definitions would cost more than the qualified mark (Section 1). Restate project definitions
+  inline with Mathlib constructions. For example, a probability over a finite set becomes a count
+  divided by a cardinality. Write the module docstring as a plain-language account of each theorem,
+  with every convention it uses. State the results exactly as the paper does, including quantifiers
+  and constants, except for obvious misprints, which are corrected and documented (SKILL.md, Rules).
 - A conditional result states each assumed result as a hypothesis, never as an axiom. Several may
   be bundled in a class of hypotheses, named for what it is. Write the class in the signature of
   each theorem that needs it. Do not declare it with `variable`, which hides which theorems use it.
@@ -162,17 +163,16 @@ The metadata is `palomar/PaperName/formalization.yaml`. Start from the current t
   Check them. Codes classify the mathematics of the result. Do not use 68V15 or 68V20 (theorem
   proving, formalization of mathematics): Palomar's editorial review rejects them, since
   formalizing a result in Lean does not make theorem proving its subject.
-- `sources`: the paper with `relationship: formalizes`, and with `author_endorsement:
-  not-contacted` unless the authors were contacted. Cited works that the formalization proves go
-  under `background`, with a note that names the argument used (the source's, another work's, a
-  library theorem, or the formalization's own); so does a work whose argument it uses, and so do
-  cited works that it assumes, with a note that says so. A formalization that proves a published
-  result by another argument relates to it by `independently-proves` instead of `formalizes`. A
-  result that the formalization presents first is declared by a source of `type: original-proof`
-  with `relationship: other`, and every other source is then `background` or `other`
-  (`original-results.md`). A submission that formalizes a paper and also states a new result keeps
-  the paper as `formalizes`, and records the document of the new argument as a source of its own,
-  its location pinned to a commit.
+- `sources`: the paper with `relationship: formalizes`, and with `author_endorsement: not-contacted`
+  unless the authors were contacted. Cited works that the formalization proves go under
+  `background`, with a note that names the argument used (the source's, another work's, a library
+  theorem, or the formalization's own); so does a work whose argument it uses, and so do cited works
+  that it assumes, with a note that says so. A formalization that proves a published result by
+  another argument relates to it by `independently-proves` instead of `formalizes`. A result that
+  the formalization presents first is declared by a source of `type: original-proof` with
+  `relationship: other`, and every other source is then `background` or `other`
+  (`original-results.md`). Results of the project's own beyond the paper are a submission of their
+  own, with the paper as `background` (`original-results.md`, Section 4).
 - `related_formalizations`: earlier, independent formalizations, as found in Phase 0, each with
   `relationship: independent` (or another honest value) and a note that says whether this work
   consulted it. An old draft of this same project does not belong here. Palomar does not index
@@ -306,7 +306,7 @@ Submissions go to https://submit.palomar-registry.org only. Before submitting, s
 - the authorization relationship. This is a claim about the user ("I am a responsible author or
   maintainer"), and Palomar records it permanently.
 
-Then offer the two ways to submit:
+Then offer the ways to submit:
 
 - The browser (the user signs in with GitHub). This gives the stronger proof of who submitted.
 - The `gh` route described in `llms.txt` (intake, a temporary tag, a secret gist, verify,

@@ -15,15 +15,14 @@ Put the missing mathematics in a package of its own when all of these hold:
   pull request for it is close to merging.
 - A theory. It is more than one quick contribution to Mathlib: definitions and the results around
   them that the proof builds on, as a rough guide several hundred lines or more. A theorem known
-  by name, with the theory under it, qualifies (Kakutani's fixed-point theorem, the
-  Kahane–Khintchine inequality, the `L^p` boundedness of the Hilbert transform); one long lemma
-  that only this paper needs does not.
+  by name, with the theory under it, qualifies; one long lemma that only this paper needs does
+  not.
 - General. Its statements say nothing about the paper's objects, and it imports only Mathlib
   and other such packages.
 - Reusable. Someone outside this project could plausibly import it.
 
-Otherwise it stays in `Basic/` or `External/`, and small general lemmas are offered to Mathlib, the
-long-term home of general mathematics. Nor does a result move because another project might need
+Otherwise it stays in `Basic/` or `External/`, and small general lemmas are candidates for Mathlib,
+the long-term home of general mathematics. Nor does a result move because another project might need
 it some day: that project requires this one and imports it. Decide during the inventory (Phase 1),
 so that the code is written in the package from the start rather than moved there later. Build the
 package by default and say so in the next status report, with the plan and its estimate. The user
@@ -107,8 +106,8 @@ Others will import the package without knowing the project, so it reads as a lib
   package has it, and names the argument. The project is published only once the package's proofs
   follow their sources, unless the user asks for an earlier release (SKILL.md, Rules). The route
   check and the audit treat it like any other cited result.
-- The project's README, `REPORT.md` (Section 2) and `formalization.yaml` say where it uses the
-  package; the dependency runs one way.
+- The project's README, the report's Section 2 (`audit-report.md`) and `formalization.yaml` say
+  where it uses the package; the dependency runs one way.
 - Palomar restricts only the Challenge's imports (`references/palomar.md`, Section 1): the Solution
   may depend on the package, even when the package is registered as an entry of its own.
 
@@ -121,23 +120,23 @@ them. The layout, the files and the checks are a project's (`palomar.md`), with 
 - The entry is in `palomar/<Entry>/`, with modules `<Entry>.Challenge` and `<Entry>.Solution`, the
   Challenge's theorems in the namespace `<Entry>Challenge`, and its own `comparator.json` and
   `formalization.yaml` (named by its preflight workflow and by the submission, as
-  `palomar.md`, Section 8). Name an entry for its topic (`Burkholder`, `Khintchine`), not after the
-  package or a paper.
-- What goes in: the package's headline theorems, each in its general, standard form, with the
-  definitions a reader needs. The sources of `formalization.yaml` are the mathematical sources
-  whose arguments the Solution's proofs follow, with `relationship: formalizes`;
-  `fidelity.divergences` lists the facts proved by a named argument instead of their cited works
-  (the README's list). Nothing in the entry names the project or its paper (Section 3). The
-  package's definitions that the statements use must be in a module that imports only what the
-  Challenge imports; keep them there, or move them, with `rfl`
-  bridges for the old names, so that `scripts/sync_challenge_defs.py` can copy the block.
+  `palomar.md`, Section 8). Name an entry for its topic (`<Topic>`), not after the package or a
+  paper.
+- What goes in: the package's headline theorems, each in the form the package proves (its general,
+  standard form where it has one), with the definitions a reader needs. The sources of
+  `formalization.yaml` are the mathematical sources whose arguments the Solution's proofs follow,
+  with `relationship: formalizes`; `fidelity.divergences` lists the facts proved by a named argument
+  instead of their cited works (the README's list). Nothing in the entry names the project or its
+  paper (Section 3). The package's definitions that the statements use must be in a module that
+  imports only what the Challenge imports; keep them there, or move them, with `rfl` bridges for the
+  old names, so that `scripts/sync_challenge_defs.py` can copy the block.
 - Length: Palomar refuses a Challenge over 1,000 lines or 100 KiB, and prefers at most about 300
   lines (32 KiB) with definitions. When the headline theorems together would pass 300, split them
   into several entries, one per theory or topic, each its own Palomar submission with its own
   definitions block. Group related theorems in one entry rather than one entry per theorem: a
   reviewer checks one circle of definitions per entry, and fewer entries need fewer permissions.
-  Split along the package's directories, so that each Challenge defines one circle of objects
-  (martingales and UMD; random sums and Schatten norms; …) and a reader can check it alone. Do not
+  Split along the package's directories, so that each Challenge defines one circle of objects and
+  a reader can check it alone. Do not
   split a theorem from the definitions it needs, and do not share one Challenge between entries. A
   theorem that two entries would both state belongs to one of them.
 - Each entry is verified, and submitted, on its own: its preflight and its submission need the

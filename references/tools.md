@@ -10,7 +10,7 @@ that CI runs into the project's `scripts/` directory.
 | `scripts/check_file.py FILE [--autosorry]` | check one file with the lakefile's options (a file under `palomar/` as a module of that source directory); with `--autosorry`, replace failing proofs with `sorry` until the file elaborates |
 | `scripts/autosorry.py FILE LOG` | the replacement step on its own, given Lean's output |
 | `scripts/to_module.py FILE…` | convert files to the module system |
-| `scripts/stmt_diff.py REV [PATH…]` | list the declarations whose statements or definitions changed since `REV`, following renamed files |
+| `scripts/stmt_diff.py REV [PATH…]` | list the declarations whose statements or definitions changed since `REV`, following renamed files, and the declarations of deleted files, found where they moved or reported as removed |
 | `scripts/strip_unused.py LOG [--dry-run]` | delete the binders that the unused-variables linter reports |
 | `scripts/strip_call_args.py [REV] [--dry-run]` | delete, at every call site, the arguments of binders removed since `REV` (default `HEAD`); run it once per cleanup round, right after `strip_unused.py`, with the commit that started the round |
 | `scripts/snapshot_check.py take DIR` / `check DIR FILE [--emit]` | check files against a private copy of the build outputs, so that parallel agents do not break each other's imports |

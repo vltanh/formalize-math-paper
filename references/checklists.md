@@ -95,7 +95,7 @@ needs from user:  decisions or permissions; sources that could not be read
   check passes on the final commit, and every difference it records has its reason; every departure
   from the paper's proofs is necessary (Rules) and reported in its docstring, in the report's table
   of departures, in `formalization.yaml` and to the user; the formal proofs compared with the
-  paper's independently of their provers.
+  paper's independently of their provers, at least those that SKILL.md, Phase 6, names.
 - Verification: clean build; `scripts/Audit.lean` passes for every declaration; the Solution and
   `comparator.json` written in `palomar/PaperName/`, and Comparator accepts the solution; no
   assumption hidden in a parameter; every structure or class of hypotheses has an instance, or the
@@ -104,8 +104,8 @@ needs from user:  decisions or permissions; sources that could not be read
   those of paper results recorded; misleading names fixed; the route check passes as before.
 - Documentation:
   - `docs/PaperName/REPORT.md` written, its findings checked against the source, and every departure
-    from the paper's proofs listed in it; a conditional formalization says so in the README's first
-    paragraph, in `formalization.yaml` and in the report, which lists what it assumes;
+    from the paper's proofs listed in it; a conditional formalization says so in the README's
+    opening paragraphs, in `formalization.yaml` and in the report, which lists what it assumes;
   - the report's literature section written from a dated search for the work before, alongside
     and after the paper (or, without network access, saying that no search could be made), with
     every source linked and its summary and date checked against it, and earlier formalizations
@@ -123,11 +123,10 @@ needs from user:  decisions or permissions; sources that could not be read
   with the statement that none meets the bar and what came closest; the file and `notes/follow-up/`
   ignored by git, absent from every commit and mentioned in no public document; the user told where
   they are.
-- Packaging (unless declined): every file that adapts code from another project keeps that
-  project's notice; `formalization.yaml` written; `automation` names every system that
-  `CREDITS.md` names, `review.reviewers` lists the reviewing agents, and no coverage claim goes
-  beyond the cited results that the paper uses; Palomar's metadata and source checks pass on a
-  clean clone; the dependencies shared with Verso pinned at Verso's revisions for the toolchain;
-  with the user's permission for each step, the repository published, CI passing, and the
-  preflight reporting `status: pass` on the exact commit to submit; the user decides about
-  submission and registration.
+- Packaging (unless declined): every file that adapts code from another project keeps that project's
+  notice; `formalization.yaml` written; `automation` names every system that `CREDITS.md` names,
+  `review.reviewers` lists the reviewing agents, and no coverage claim goes beyond the cited results
+  that the paper uses; Palomar's metadata and source checks pass on a clean clone; the dependencies
+  shared with Verso pinned at Verso's revisions for the toolchain; as far as the user permits
+  publishing, the repository published, CI passing, and the preflight reporting `status: pass` on
+  the exact commit to submit; the user decides about submission and registration.

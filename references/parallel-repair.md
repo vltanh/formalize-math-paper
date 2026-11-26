@@ -54,21 +54,23 @@ The statements already elaborate; the proofs marked `sorry` remain.
 Your files (only edit these): [list, with sorry counts]
 Check a file with: [lake env lean -D... <file>]   (upstream .oleans are built)
 
-Goal: replace every `sorry` in your files with a proof. No `sorry`, `admit`, `axiom`,
-`native_decide` or `implemented_by` in the result. Do not raise `maxHeartbeats`; if a raise cannot
-be avoided, make it local to one declaration and report it.
+Goal: replace every `sorry` in your files with a proof. No `sorry` (except the lemmas for missing
+mathematics described below), `admit`, `axiom`, `native_decide` or `implemented_by` in the result.
+Do not raise `maxHeartbeats`; if a raise cannot be avoided, make it local to one declaration and
+report it.
 
 Proofs: prove each result by the paper's proof, given below, step by step: the same intermediate
 claims and constructions, and the same earlier results where the paper cites them (they are
 compiled; use them by name, and do not prove their content again). You choose the tactics, the
-Mathlib lemmas for routine steps, and the helper lemmas that package a step of the paper. You do
-not choose the argument: use the paper's, not another one, even a shorter or easier one. If you
-see a simpler argument, still use the paper's, and describe the simpler one in your report. Depart
-from the paper's proof only if its step is wrong or has a gap you cannot repair along its lines;
-then change as little as the step requires, say so in the docstring ("Departure from the paper:
-…"), and report it. If a whole proof would have to be replaced, stop and report instead. If a step
-needs mathematics that Lean lacks, do not argue around it: state what is missing as a lemma with
-`sorry`, use it, and report it, so that it can be built.
+Mathlib lemmas for routine steps, and the helper lemmas that package a step of the paper. You do not
+choose the argument: use the paper's, not another one, even a shorter or easier one. If you see a
+simpler argument, still use the paper's, and describe the simpler one in your report. Depart from
+the paper's proof only if its step is wrong, or has a gap you cannot repair along its lines, or has
+no meaning in the representation that the Lean statements use; then change as little as the step
+requires, say so in the docstring ("Departure from the paper: …"), and report it. If a whole proof
+would have to be replaced, stop and report instead. If a step needs mathematics that Lean lacks, do
+not argue around it: state what is missing as a lemma with `sorry`, use it, and report it, so that
+it can be built.
 [For each result: its Lean name, its TeX label, the TeX of its proof, the results it cites.]
 [For a cited result, in place of the paragraph above: prove its statement by the route given here
 (a library theorem, a short argument from the literature, or your own), name the argument in the
@@ -76,15 +78,15 @@ docstring, and attribute the proof to the source only if it is the source's argu
 paper uses more than the statement, follow the source's proof, given below. In a package: the
 sources' proofs, given below, in place of the paper's.]
 
-Statements: keep every existing statement exactly as it is. The paper's results, listed here,
-must never change: [names]. Never add a hypothesis to one of them. If one looks false, or its
-proof in the paper has a gap you cannot fill, stop work on it and report the counterexample,
-or the gap and what you tried. If a helper lemma is false as stated, find a concrete counterexample
-(checked in Lean when possible), add the minimal hypothesis, fix its callers in your files, and
-report it. A lemma can also be false because a hypothesis declared with `variable` never reached
-its statement (Lean leaves out the section variables that a statement does not mention): then the
-fix is `include`, not a new hypothesis; report it the same way. Never change a statement just to
-make a proof easier.
+Statements: keep every existing statement exactly as it is, except as this paragraph allows for
+helper lemmas. The paper's results, listed here, must never change: [names]. Never add a hypothesis
+to one of them. If one looks false, or its proof in the paper has a gap you cannot fill, stop work
+on it and report the counterexample, or the gap and what you tried. If a helper lemma is false as
+stated, find a concrete counterexample (checked in Lean when possible), add the minimal hypothesis,
+fix its callers in your files, and report it. A lemma can also be false because a hypothesis
+declared with `variable` never reached its statement (Lean leaves out the section variables that a
+statement does not mention): then the fix is `include`, not a new hypothesis; report it the same
+way. Never change a statement just to make a proof easier.
 
 Upstream lemmas you may use as stated (some are still `sorry` and other agents are proving them):
 [list or "anything in imported modules"]. If one of them looks false, report it and do not rely
@@ -148,7 +150,8 @@ upstream lemma you found false; new public helpers; anything the coordinator mus
    - A change that no agent reported is either a false statement that was fixed silently (find
      the counterexample) or a weakening without reason (revert it).
    - A paper result appears in the list only through a documented decision: an obvious misprint
-     corrected, or a correction the user agreed to.
+     corrected, a correction the user agreed to, or a named hypothesis for a cited result that is
+     still assumed (SKILL.md, Rules, "Mathematics that Lean lacks").
 4. Commit. The message lists every helper lemma found false, the hypothesis added and why, and
    every departure from the paper's proofs with its reason: commit messages are where the repair's
    history belongs (`audit-report.md`, Section 4).
@@ -167,5 +170,5 @@ proof. In repair work, also:
 
 Pass a false paper result to the user at once, with the counterexample and its TeX location. Once
 corrected, it is recorded as an E-item, in the report's list of corrections under "How the
-formalization reads the paper", and in `formalization.yaml`'s `fidelity`. A repaired gap is an
-E-item and a departure.
+formalization reads the paper", and in `formalization.yaml`'s `fidelity`. A gap repaired along the
+paper's own lines is an E-item; one repaired by another argument is also a departure.

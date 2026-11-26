@@ -19,7 +19,7 @@ paper gets. Then audit the paper separately, against its TeX source. For each ki
 | --- | --- | --- |
 | Error | A step or claim that is false as written: a wrong inequality, constant or index range, a term counted twice, a theorem applied wrongly | Location and TeX line; why it is false (a counterexample or the computation); the correct version; whether the result still holds |
 | Gap | A claim used without justification: "clearly", "it is easy to see", a missing case, a step that needs a condition the statement does not give | What is missing, and why it holds or does not; if the statement holds anyway, the corrected argument |
-| Typo | A wrong cross-reference ("Theorem 1.2" for 1.3), a self-citation, a slip in a variable name | Location and correction |
+| Typo | A wrong cross-reference ("Theorem 1.2" for 1.3), a reference to the result being proved, a slip in a variable name | Location and correction |
 | Missing hypothesis | A statement that is false without a condition that the paper leaves implicit | The condition, a counterexample without it, and where the formalization states it (a correction agreed with the user) |
 | Redundant hypothesis | A hypothesis that a statement includes but its proof never uses: start from the hypotheses that the cleanup removed | The hypothesis, and whether the Lean statement drops it |
 | Use of a cited result | Each citation used in a proof: are its hypotheses checked, and is it applied in the form it was proved in? | A verdict: correct, applied loosely but correctly, or stated or applied wrongly |
@@ -36,9 +36,9 @@ works from the TeX source and the inventory:
   formalization choice, such as rounding to `ℕ`, is a reading, recorded in Section 6 of the report,
   not an error of the paper.
 - Check every departure in Section 7 against the paper's proof in the TeX. The report must describe
-  the paper's argument as the paper gives it, and the reason must be one of the two that SKILL.md's
-  Rules allow ("Faithful proofs"), or the user's own decision. A departure that its reason does not
-  force is a proof to rewrite, not a line of the report.
+  the paper's argument as the paper gives it, and the reason must be one that SKILL.md's Rules allow
+  ("Faithful proofs"), or the user's own decision. A departure that its reason does not force is a
+  proof to rewrite, not a line of the report.
 
 Number the findings E1, E2, … in the order they occur in the paper. Group typos into one final
 item. If you add or remove a finding later, renumber the findings, and update every reference to
@@ -73,7 +73,7 @@ Status of the formalization: <bullets: what is proved; where the cited results t
 are proved, and by which arguments (Section 2); what is assumed, if anything, which makes the result
 conditional; the build, sorry and axiom status, and how the audit script checks it; Challenge and
 Comparator; whether any statement of the paper had to change; whether every proof follows the
-paper's, and how many depart from it (Section 7)>
+paper's, and which depart from it (Section 7)>
 
 ## 1. Summary
 | Kind | Findings |
@@ -121,12 +121,12 @@ proved. If a statement of the paper had to be corrected, a second list: the corr
 
 ## 7. Departures from the paper's proofs
 <Every result whose formal proof does not follow the paper's argument, at any step, and why the
-departure is necessary: one of the two reasons of SKILL.md's Rules (the paper's step is wrong or
-has a gap that cannot be repaired along its lines; it has no meaning in the formalization's
-representation), or the user's own decision, said as such. Mathematics that Lean lacks is not a
-reason: it is built (SKILL.md, Rules). Keep this section
-consistent with the docstrings, `formalization.yaml` and `docs/PaperName/route_differences.tsv`. If
-there are none, say that every proof follows the paper's.>
+departure is necessary: a reason that SKILL.md's Rules allow (the paper's step is wrong or has a gap
+that cannot be repaired along its lines; it has no meaning in the formalization's representation),
+or the user's own decision, said as such. Mathematics that Lean lacks is not a reason: it is built
+(SKILL.md, Rules). Keep this section consistent with the docstrings, `formalization.yaml` and
+`docs/PaperName/route_differences.tsv`. If there are none, say that every proof follows the
+paper's.>
 | Result | The paper's argument | The formalization's | Why it is necessary | E-item |
 
 ## 8. What each result depends on
@@ -234,12 +234,13 @@ shows what a reader needs first. In order:
    corrected form, conditional on a named hypothesis, or not formalized.
 3. Main results: a table with the paper's number, the Lean name and a one-line statement in plain
    language. Mark the Challenge theorems. For a well-known problem, compare the Challenge's
-   formulation with the standard one briefly (Palomar's review looks for this).
+   formulation with the standard one in a few lines, and give the careful comparison that Palomar's
+   review expects in the report.
 4. If the formalization is conditional, one short paragraph: what is assumed, why it is not an
    axiom, and what will discharge it. Say it there and in the status table, not in every section.
 5. What the audit found: a table of the findings a reader most needs, one line each with its
    E-number (errors and false statements first, then gaps that change what the paper proves, then
-   missing hypotheses), followed by the total and a link to the report. Then one sentence on
+   missing hypotheses), followed by a link to the full list in the report. Then one sentence on
    whether the proofs follow the paper's, with a link to the report's table of departures.
 6. Trust, in a few bullets: the build, `sorry` and `axiom` status; the audit script; the route
    check; who reviewed the statements and the proofs, and whether any person did.
