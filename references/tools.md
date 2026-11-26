@@ -15,12 +15,12 @@ that CI runs into the project's `scripts/` directory.
 | `scripts/strip_call_args.py [REV] [--dry-run]` | delete, at every call site, the arguments of binders removed since `REV` (default `HEAD`); run it once per cleanup round, right after `strip_unused.py`, with the commit that started the round |
 | `scripts/snapshot_check.py take DIR` / `check DIR FILE [--emit]` | check files against a private copy of the build outputs, so that parallel agents do not break each other's imports |
 | `scripts/session_stats.py [TRANSCRIPT…] [--since TIME] [--until TIME]` | the run log's figures (elapsed time, models, sub-agents, the most running at once, agent time, tokens, tool calls) from Claude Code session transcripts, for the whole run or for one round |
-| `scripts/linkify_docs.py [--check]` | link the Lean names in the documents to their lines; copy it into the project and configure its first block |
+| `scripts/linkify_docs.py [--check]` | link the Lean names in the documents to their lines, and the names of the required libraries listed in `LIBRARIES` to their lines on GitHub at the pinned commit; copy it into the project and configure its first block |
 | `scripts/check_md_tables.py FILE… [--fix]` | find, or fix, Markdown table rows broken by a `\|` inside a cell; copy it into the project |
 | `scripts/route_check.py extract TEX…` / `check ROUTES [--accept FILE]` | record which results each of the paper's proofs cites; compare these with the routes of the formal proofs that the audit writes, and fail on any difference not recorded with its reason; copy it into the project |
 | `scripts/sync_challenge_defs.py [--check]` | copy the block of shared definitions from `PaperName/Defs.lean` into `palomar/PaperName/Challenge.lean`, or check that the copy is up to date (`references/palomar.md`, Section 2); copy it into the project and configure its first block |
 | `assets/Audit.lean` | the axiom and dependency audit, which also writes the route of every numbered result for `route_check.py`; copy it to `scripts/Audit.lean` and fill in its lists |
-| `assets/lean_action_ci.yml` | CI: build, the audit's imports, audit, route check, the Challenge's copy of shared definitions, links, tables |
+| `assets/lean_action_ci.yml` | CI: build, the audit's imports, audit, route check, the Challenge's copy of shared definitions, the libraries that the documents link to, links, tables |
 | `assets/palomar_preflight.yml` | Palomar's mechanical preflight, run on demand; copy it to `.github/workflows/palomar_preflight_papername.yml` |
 
 ## 2. The routes of the paper's proofs

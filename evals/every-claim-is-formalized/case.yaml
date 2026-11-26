@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: every-claim-is-formalized
+expected_outcome: |
+  An answer that the formalization is not complete: the remark's uniqueness claim, the unnumbered
+  example and the corollary asserted in the introduction are claims of the paper, to be stated and
+  proved (with labels of their own) whether or not another proof uses them; only the numerical
+  experiments and the announced extension, which are not precise mathematical claims, are reported
+  as not formalized.

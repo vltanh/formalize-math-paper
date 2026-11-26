@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: existing-formalization-is-required
+expected_outcome: |
+  A recommendation against copying: require the Lee–Park repository at a pinned commit, prove a
+  bridge between its weighted trees and the project's, answer the module-name clash by proposing
+  that the repository rename its modules (raised with the user or its maintainers), keep
+  Propositions 3 and 11 stated in External/LeePark2019/ and proved from the dependency, and copy
+  only as a last resort, keeping the original notice.

@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: shared-packages-not-edited
+expected_outcome: |
+  An answer that rules out editing .lake/packages (the hard links would change every checkout, and
+  Lake may overwrite the file), fixes the lemma in the package's own repository, moves the
+  project's pin to the fixed commit without moving Mathlib, and offers passing the implicit argument
+  by name at the call site as an immediate workaround.

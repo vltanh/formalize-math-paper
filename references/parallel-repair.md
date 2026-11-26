@@ -91,7 +91,8 @@ Upstream lemmas you may use as stated (some are still `sorry` and other agents a
 on it.
 
 New helpers: make them `private`, or prefix their names with [file-specific prefix], so they
-cannot clash with other agents' helpers.
+cannot clash with other agents' helpers. Docstrings and comments describe the mathematics, not your
+work on it.
 
 Builds: do not run a full `lake build`. If you must rebuild an upstream module, build only that
 module. If another build is running, you may see "object file … does not exist": wait and retry,

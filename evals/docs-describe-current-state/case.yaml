@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: docs-describe-current-state
+expected_outcome: |
+  README.md and the docstring of theorem3 describe the current state as if they had always said it:
+  Theorem 3 for every n, Lemma 4 proved as lemma4, Section 4 proved; no words that point at the
+  change or the round ("now", "no longer", "newly", "this round", "with Lemma 4 formalized").
+context:
+  scaffold_script: place-files.sh

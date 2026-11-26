@@ -75,7 +75,8 @@ proofs drift away from the paper while no statement changes:
   the paper's argument with another one, even a better one, is a departure, and convenience is not
   a reason for one (SKILL.md, Rules). A cited result may take a shorter sound proof, with its
   docstring and the report's table of cited results renamed to the new argument. If the other
-  argument is simpler for a reader of the paper, record it for the report's "What's next" section.
+  argument is simpler for a reader of the paper, record it for the report's "What's next" section,
+  and keep a Lean proof of it as a theorem of its own (SKILL.md, Rules, "Faithful proofs").
 - Delete a `have` that nothing uses, even when it names a result that the paper cites. The route
   check then reports the difference, which is the truth about the proof. Then decide whether the
   proof should use that result after all.

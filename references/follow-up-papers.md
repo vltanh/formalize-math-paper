@@ -189,7 +189,8 @@ the bar, say so, and what came closest.>
 The follow-up file holds unpublished research ideas, and the formalization is usually published.
 It and its scratch files stay in `notes/`, which git ignores (`lean-project.md`, Section 1). Before
 writing it, check that git ignores it (`git check-ignore notes/follow-up-papers.md`). Never commit
-it, and leave it out of every package and pull request. Publish it only if the user asks.
+it, and leave it out of every package and pull request: check each staged diff and commit message
+as SKILL.md's Rules say ("Permissions and credit"). Publish it only if the user asks.
 
 No public file of the project, `.gitignore` and `formalization.yaml` included, mentions the
 follow-up file or says that a private file holds plans for follow-up papers. The report's "Open

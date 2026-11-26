@@ -36,8 +36,9 @@ works from the TeX source and the inventory:
   formalization choice, such as rounding to `ℕ`, is a reading, recorded in Section 6 of the report,
   not an error of the paper.
 - Check every departure in Section 7 against the paper's proof in the TeX. The report must describe
-  the paper's argument as the paper gives it, and the reason must be one of the three. A departure
-  that its reason does not force is a proof to rewrite, not a line of the report.
+  the paper's argument as the paper gives it, and the reason must be one of the two that SKILL.md's
+  Rules allow ("Faithful proofs"), or the user's own decision. A departure that its reason does not
+  force is a proof to rewrite, not a line of the report.
 
 Number the findings E1, E2, … in the order they occur in the paper. Group typos into one final
 item. If you add or remove a finding later, renumber the findings, and update every reference to
@@ -70,9 +71,9 @@ LaTeX source of that version. Section, result and equation numbers are the paper
 
 Status of the formalization: <bullets: what is proved; where the cited results that the paper uses
 are proved, and by which arguments (Section 2); what is assumed, if anything, which makes the result
-conditional; the build, sorry and axiom status, and how the audit script checks it; Challenge and Comparator; whether
-any statement of the paper had to change; whether every proof follows the paper's, and how many
-depart from it (Section 7)>
+conditional; the build, sorry and axiom status, and how the audit script checks it; Challenge and
+Comparator; whether any statement of the paper had to change; whether every proof follows the
+paper's, and how many depart from it (Section 7)>
 
 ## 1. Summary
 | Kind | Findings |
@@ -134,9 +135,12 @@ there are none, say that every proof follows the paper's.>
 except the differences recorded in docs/PaperName/route_differences.tsv, each with its reason.>
 
 ## 9. Not formalized
-<Everything in the paper that is not formalized: deductions that combine the paper with
-unformalized prior work, surveys, remarks, experiments, and the citations that only give context
-(Section 2).>
+<What the paper says that is not a mathematical claim to formalize: empirical or experimental
+findings, surveys of other work, announcements with no precise statement (an extension "expected to
+hold"), and the citations that only give context (Section 2). Every other claim of the paper, its
+remarks, examples and asserted consequences included, is formalized (SKILL.md, Phase 1). A claim
+that is not formalized yet, because the user decided so or a layer of missing theory is not done,
+is listed here with the reason. The paper's open questions and conjectures go to Section 11.>
 
 ## 10. The paper in the literature
 <Where the paper stands in the work on its questions: what came before it, what appeared
@@ -197,13 +201,13 @@ mention that file.>
 simpler arguments recorded while proving, which the formal proofs could not use (SKILL.md, Rules);
 departures whose argument is simpler than the paper's (Section 7); cited results that the source
 proves at greater length than needed, with a shorter argument (say whether the formalization uses
-it), or of which the paper needs only a special case with an elementary proof
-(Section 2); and steps that the paper proves at length but that are special cases of a standard
-result. For each: the result or step, the paper's
-argument and the simpler one, in a sentence or a short sketch, what it saves, and whether it was
-checked in Lean (in a scratch file, outside the library) or only on paper. A shorter Lean proof is
-not a simpler argument: a tactic or a Mathlib lemma that closes a routine step does not belong
-here. A simpler proof that has been published belongs in Section 10. If there is none, say so.>
+it), or of which the paper needs only a special case with an elementary proof (Section 2); and
+steps that the paper proves at length but that are special cases of a standard result. For each:
+the result or step, the paper's argument and the simpler one, in a sentence or a short sketch, what
+it saves, and whether it was checked in Lean (as an alternative theorem in the library, or in a
+scratch file) or only on paper. A shorter Lean proof is not a simpler argument: a tactic or a
+Mathlib lemma that closes a routine step does not belong here. A simpler proof that has been
+published belongs in Section 10. If there is none, say so.>
 ### The formalization
 <What would extend the formalization itself. Point to the assumed results of Section 2 and the
 items of Section 9 instead of repeating them, and add what they lack: the generality to reach, and
@@ -267,14 +271,27 @@ proves.
   in `formalization.yaml` stay prose.
 - Before publishing, read the README as a newcomer would. Its first screen should say what is
   proved, what is conditional and what is not formalized.
-- The report describes only the paper and the current formalization. Leave out the history of the
-  repair (which draft lemmas were false, what was renamed), and do not link to old drafts or pull
-  requests. That history belongs in commit messages.
+- Write every document, docstring and comment for the current state, as if it had always said what
+  it says. The report describes only the paper and the current formalization: leave out the history
+  of the repair (which draft lemmas were false, what was renamed), and do not link to old drafts or
+  pull requests. Leave out, too, any text whose only purpose is to point at a change or at the work
+  done:
+  - "now", "previously", "no longer", "in the first round", "with X formalized";
+  - a remark that something is consistent, complete or fixed, when the reader does not need it;
+  - first-person claims of the work.
+
+  That history belongs in commit messages and in `CREDITS.md`. After each revision, reread the
+  changed text and delete what only announces or justifies the change.
+- Mention another project only when this one uses something from it: a dependency describes its
+  theorems by their content, never by the project that uses them.
 - Do not write down numbers that change, such as declaration counts, unless they are rechecked
   against the audit script's output after every change.
 - Links: name Lean declarations in code spans, and let `scripts/linkify_docs.py` turn them into
   links to their lines. It reads the `.ilean` files, so run `lake build` first. Configure the
-  documents and namespaces at the top of the script, and run it with `--check` in CI.
+  documents and namespaces at the top of the script, and run it with `--check` in CI. The names of
+  a library that the project requires (a package of its own, another formalization) link to their
+  lines on GitHub, at the commit that the manifest pins, once the library is in the script's
+  `LIBRARIES` and built in full (`lake build <Library>`).
 - Tables: in GitHub's Markdown, every `|` in a table row ends a cell, even inside backticks. Write
   `\|` for absolute values and cardinalities in tables (`` `\|S\| ≥ 2` ``).
   `scripts/check_md_tables.py --fix` escapes them, and without `--fix` it reports broken rows.

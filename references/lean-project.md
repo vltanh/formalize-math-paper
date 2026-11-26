@@ -17,7 +17,9 @@ release tag for that toolchain, not to `master`. Palomar renders the Challenge w
 the documentation tool Verso for the same toolchain, and the packages that Verso and Mathlib share
 must then be pinned at the same revisions. Mathlib's release tag meets this; later `master` commits
 soon do not (`palomar.md`, Section 1). The project's `lean-toolchain` must equal the pinned Mathlib
-commit's exactly, including any release-candidate suffix.
+commit's exactly, including any release-candidate suffix. Palomar's verifier can lag behind a new
+release: its preflight then fails with an error that it attributes to itself (`palomar.md`,
+Section 8).
 
 ```sh
 lake +leanprover/lean4:<version> new PaperName math     # then set Mathlib's rev to the release tag
@@ -189,10 +191,11 @@ Solution imports the paper's library and serves as its entry point. No umbrella 
 `PaperName.lean` is needed: the glob keeps every module of `PaperName/` in the build, and it does
 not match `PaperName.lean` itself.
 
-A library beyond Mathlib that proves a cited result is required the same way, pinned to a full
-commit hash (`git = "…"`, `rev = "<commit>"`). A package of the project's own, split out for a
-theory that Lean lacks (`references/separate-packages.md`), is required by `path = "../package"` while it is
-developed and by its published commit before the project is pushed.
+A library beyond Mathlib that proves a cited result, an earlier formalization of a cited work
+included, is required the same way, pinned to a full commit hash (`git = "…"`,
+`rev = "<commit>"`), rather than copied (SKILL.md, Phase 5). A package of the project's own, split
+out for a theory that Lean lacks (`separate-packages.md`), is required by `path = "../package"`
+while it is developed and by its published commit before the project is pushed.
 
 With several papers, the lakefile has a library `Common` and one library per paper, and the
 `Palomar` library, still last, lists every paper's two modules (`multi-paper.md`, Section 2).

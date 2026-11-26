@@ -23,11 +23,12 @@ Put the missing mathematics in a package of its own when all of these hold:
 - Reusable. Someone outside this project could plausibly import it.
 
 Otherwise it stays in `Basic/` or `External/`, and small general lemmas are offered to Mathlib, the
-long-term home of general mathematics. Decide during the inventory (Phase 1), so that the code is
-written in the package from the start rather than moved there later. Build the package by default
-and say so in the next status report, with the plan and its estimate. The user decides its name,
-its visibility and when to publish it, and may prefer to keep it in the project. Building it
-locally needs no permission; creating and pushing its repository does (Rules).
+long-term home of general mathematics. Nor does a result move because another project might need
+it some day: that project requires this one and imports it. Decide during the inventory (Phase 1),
+so that the code is written in the package from the start rather than moved there later. Build the
+package by default and say so in the next status report, with the plan and its estimate. The user
+decides its name, its visibility and when to publish it, and may prefer to keep it in the project.
+Building it locally needs no permission; creating and pushing its repository does (Rules).
 
 State the package's results in their general form, as a library would, when the general proof is
 not much harder than the case the paper needs. Otherwise prove the case needed, say so in the
@@ -57,16 +58,19 @@ Others will import the package without knowing the project, so it reads as a lib
   a reader may want to open, as in the project's documents: every Lean name to its line
   (`scripts/linkify_docs.py`, configured for the package and checked in CI), every project of the
   literature section to its repository or registry entry, and every reference to its DOI, arXiv or
-  zbMATH page, each checked to be the work it names. The README is short, as the project's is (`audit-report.md`, Section 3); long explanations go in a `docs/` file
-  it links. It states only
+  zbMATH page, each checked to be the work it names. The README is short, as the project's is
+  (`audit-report.md`, Section 3); long explanations go in a `docs/` file it links. It states only
   what is true of the package: where a fact is not settled yet (a commit hash, the exact form of a
   statement, a file name), it leaves a marked placeholder rather than a plausible guess. While
   proofs are still open, the audit may list the `sorry`s instead of failing on them; switch that off
   before publishing. Its library globs are `<Area>.*`, since Lake's `.+` would skip the root file.
 - Its proofs follow its sources (SKILL.md, Rules, "Mathematics that Lean lacks"): a result that it
   attributes to a source is proved by that source's argument, and the works that the source cites
-  are treated alike, level by level, when they can be read. Another proof of the same result is a
-  theorem of its own beside it, attributed to its own argument.
+  are treated alike, level by level, when they can be read. Ask the user for the works you cannot
+  get, and go on meanwhile. A fact that a source only recalls, states without proof, or takes from a
+  work out of reach gets a named argument or a theorem of a library, listed in the README. Another
+  proof of the same result (shorter, sharper, more general) is a theorem of its own beside it,
+  attributed to its own argument.
 - It carries no provenance. It says what it proves and on which mathematical sources, not what it
   was written for, who asked for it, or how it was made. Code split out of the project needs no
   credit, and no README, docstring, comment, name or commit message of the package mentions the
@@ -85,7 +89,8 @@ Others will import the package without knowing the project, so it reads as a lib
   the project cannot be pushed until the package is published. A project and its packages share
   one Mathlib revision and are upgraded together.
 - To avoid rebuilding Mathlib for the package, hard-link the project's `.lake/packages` and copy the
-  Mathlib entries of its manifest. The project's builds also build the package through the path
+  Mathlib entries of its manifest. Never edit a file there: every checkout that shares it through
+  the hard link would change. The project's builds also build the package through the path
   dependency, so agents working in both at once check files without building
   (`scripts/check_file.py`) and build only when their files are done. To integrate a package
   into the project while the package is still changing, give the project a frozen copy: a git

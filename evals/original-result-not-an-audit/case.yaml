@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: original-result-not-an-audit
+expected_outcome: |
+  A plan that treats the work as the formalization of the user's original result, not as an audit
+  of a paper: no report of findings and no route check or table of departures; the proofs may be
+  shorter or more general than the user's argument, gaps are repaired and reported to the user, and
+  a stronger statement is stated when the proof gives it. The verification machinery stays
+  (statements first, axiom audit, Challenge/Solution and Comparator, formalization.yaml with the
+  original proof declared), and publishing and submission wait for the user's permission.

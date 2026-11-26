@@ -3,15 +3,19 @@
 
 Every inline code span that names a declaration, a module, a file or a directory of this
 repository becomes a relative link; the link of a declaration points at the line of its
-name. A code span that names a module of the pinned Mathlib links to the module's page in
-Mathlib's documentation. Existing links are kept, except links to a line of a Lean file and
-links to the page of a Mathlib module, which are recomputed: running the script after editing
-the code brings them up to date. Private files (the notes in `notes/`, and anything git ignores)
+name. A declaration or module of a library that the project requires (`LIBRARIES`) links to its
+line on GitHub, at the commit that `lake-manifest.json` pins. A code span that names a module of
+the pinned Mathlib links to the module's page in Mathlib's documentation. Existing links are kept,
+except links to a line of a Lean file, links into a library of `LIBRARIES` and links to the page of
+a Mathlib module, which are recomputed: running the script after editing the code, or after moving
+a pin, brings them up to date. Private files (the paths in `PRIVATE`, and anything git ignores)
 are never linked, and existing links to them are removed, since they are not published. Fenced
 code blocks, headings and table headers are left alone, and the text of a link may run over
 several lines of a paragraph.
 
-Run from the repository root, after `lake build`:
+Run from the repository root, after `lake build` (and, when `LIBRARIES` names libraries,
+`lake build <Library> …`, which compiles every module of each; a plain `lake build` compiles only
+the modules that the project imports):
 
     python3 scripts/linkify_docs.py           # update the links
     python3 scripts/linkify_docs.py --check   # list the files whose links are out of date
@@ -19,15 +23,17 @@ Run from the repository root, after `lake build`:
 The declaration locations come from the `.ilean` files that `lake build` writes.
 
 Configure the block below for the project: the documents to process, the namespaces in which the
-documents name declarations without their prefix, the top-level module names of the project, and
-the module whose declarations win when a name is declared twice (the Challenge, whose theorems
-the Solution restates).
+documents name declarations without their prefix, the top-level module names of the project, the
+module whose declarations win when a name is declared twice (the Challenge, whose theorems the
+Solution restates), and the libraries whose names link to GitHub.
 """
 
 import argparse
 import json
+import functools
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -68,20 +74,24 @@ SOURCE_DIRS = {'PaperName': 'palomar'}
 # README none: {'': ['.github/workflows'], 'docs/PaperA': ['palomar/PaperA'], …}.
 PATH_BASES = {'': ['.github/workflows', 'docs/PaperName', 'palomar/PaperName'],
               'docs/PaperName': ['palomar/PaperName']}
-# Paths that are never linked, whether or not git ignores them: the private notes, follow-up papers
-# included, which are not published (SKILL.md, Phase 8). Any other path that git ignores is not
-# linked either.
+# Paths that are never linked, whether or not git ignores them: the working notes, which are not
+# published. Any other path that git ignores is not linked either.
 PRIVATE = ('notes',)
+# The libraries beyond Mathlib that the project requires and whose names the documents link to:
+# each package's name in `lake-manifest.json`, which is also the root of its modules, and the
+# address of its files on GitHub, up to the commit. Their names link to their lines at the commit
+# that the manifest pins, so build them in full first (`lake build <Library>`), in CI too. Example:
+# {'Convexity': 'https://github.com/<owner>/lean4-convexity/blob/'}.
+LIBRARIES = {}
 # ---------------------------------------------------------------------------------------------
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
 def private(path):
-    """Whether `path` (relative to the repository root) must not be linked: a path in the private
-    notes (`PRIVATE`), or a file that git ignores (build outputs). Such files are not published,
-    so a link to them would be broken in the repository."""
-    import subprocess
+    """Whether `path` (relative to the repository root) must not be linked: a path in `PRIVATE`,
+    or a file that git ignores (build outputs). Such files are not published, so a link to them
+    would be broken in the repository."""
     parts = Path(os.path.normpath(path)).parts
     if any(part in PRIVATE for part in parts):
         return True
@@ -138,9 +148,55 @@ def mathlib_page(module):
     return DOCS_URL + module.replace('.', '/') + '.html' if module.startswith('Mathlib.') else None
 
 
+@functools.lru_cache(maxsize=None)
+def library_sources():
+    """Each library of `LIBRARIES` that the manifest pins to a Git commit: its checkout and the
+    commit to link to. A library required by path, while it is developed, has no published commit:
+    its names are not linked."""
+    if not LIBRARIES:
+        return {}
+    manifest = json.loads((ROOT / 'lake-manifest.json').read_text(encoding='utf-8'))
+    pins = {pkg['name']: pkg for pkg in manifest.get('packages', [])}
+    sources = {}
+    for library in LIBRARIES:
+        pkg = pins.get(library)
+        if pkg is None or pkg.get('type') != 'git':
+            warn('lake-manifest.json pins no Git commit of %s; its names are not linked' % library)
+            continue
+        sources[library] = (ROOT / '.lake' / 'packages' / library, pkg['rev'])
+    return sources
+
+
+def library_file(checkout, module):
+    """The file of a module of a library, relative to its checkout: at its root, or in `palomar/`
+    for the modules of a Palomar submission."""
+    path = '/'.join(module.split('.')) + '.lean'
+    if not (checkout / path).is_file() and (checkout / 'palomar' / path).is_file():
+        return 'palomar/' + path
+    return path
+
+
+def library_url(library, module, line=None):
+    """The address of a module of a library on GitHub, at the pinned commit."""
+    checkout, rev = library_sources()[library]
+    url = LIBRARIES[library] + rev + '/' + library_file(checkout, module)
+    return url if line is None else '%s#L%d' % (url, line)
+
+
 def load_locations():
-    """Each declaration's module and the line of its name, read from the `.ilean` files."""
-    locations, preferred, rank = {}, {}, {}
+    """Each declaration's module and the line of its name, read from the `.ilean` files, and the
+    address on GitHub of each declaration of a library of `LIBRARIES`."""
+    locations, preferred, rank, urls = {}, {}, {}, {}
+    for library, (checkout, _) in library_sources().items():
+        for ilean in sorted((checkout / '.lake' / 'build' / 'lib' / 'lean').rglob('*.ilean')):
+            data = json.loads(ilean.read_text(encoding='utf-8'))
+            # A library's build may also hold the outputs of the packages that it requires; only
+            # its own modules hold its declarations.
+            if not (checkout / library_file(checkout, data['module'])).is_file():
+                continue
+            for name, ranges in data.get('decls', {}).items():
+                locations[name] = (data['module'], ranges[4] + 1)
+                urls[name] = library_url(library, data['module'], ranges[4] + 1)
     for ilean in sorted(BUILD.rglob('*.ilean')):
         data = json.loads(ilean.read_text(encoding='utf-8'))
         # A restored build cache keeps the outputs of deleted modules; skip them.
@@ -150,6 +206,7 @@ def load_locations():
         preferred_modules = ((PREFERRED_MODULE,) if isinstance(PREFERRED_MODULE, str)
                              else tuple(PREFERRED_MODULE))
         for name, ranges in data.get('decls', {}).items():
+            urls.pop(name, None)  # the project's own declaration wins over a library's
             # `ranges` holds the declaration's range, then its name's; lines count from 0.
             location = (data['module'], ranges[4] + 1)
             if data['module'] not in preferred_modules:
@@ -162,12 +219,21 @@ def load_locations():
     locations.update(preferred)
     if not locations:
         sys.exit('no .ilean files under %s; run `lake build` first' % BUILD)
-    return locations
+    return locations, urls
 
 
 class Linker:
-    def __init__(self, locations):
+    def __init__(self, locations, urls):
         self.locations = locations
+        self.urls = urls
+
+    def place(self, name):
+        """The link target of the declaration `name`: its line in this repository, or its address
+        in a library."""
+        if name in self.urls:
+            return self.urls[name]
+        module, line = self.locations[name]
+        return '%s#L%d' % (module_file(module), line)
 
     def declaration(self, name, doc_dir=''):
         candidates = [name]
@@ -178,8 +244,7 @@ class Linker:
             # library's before the Challenge's, whose Solution restates its theorems).
             own_hits = [c for c in own if c in self.locations]
             if name not in self.locations and own_hits:
-                module, line = self.locations[own_hits[0]]
-                return '%s#L%d' % (module_file(module), line)
+                return self.place(own_hits[0])
             candidates += [ns + '.' + name for ns in NAMESPACES]
         hits = [c for c in candidates if c in self.locations]
         if not hits:
@@ -187,8 +252,7 @@ class Linker:
         if hits[0] != name and len(hits) > 1:
             warn('`%s` is ambiguous: %s' % (name, ', '.join(hits)))
             return None
-        module, line = self.locations[hits[0]]
-        return '%s#L%d' % (module_file(module), line)
+        return self.place(hits[0])
 
     def target(self, text, doc_dir):
         """The repository path or URL that `text` names, or None."""
@@ -202,6 +266,10 @@ class Linker:
                     return candidate
         if not IDENT.match(text):
             return None
+        for library, (checkout, _) in library_sources().items():
+            if (text.startswith(library + '.')
+                    and (checkout / library_file(checkout, text)).is_file()):
+                return library_url(library, text)
         if text.split('.')[0] in MODULE_ROOTS:
             if (ROOT / module_file(text)).is_file():
                 return module_file(text)
@@ -230,6 +298,7 @@ class Linker:
         if text is not None:
             dest = old[1:-1] if old.startswith('<') else old
             recompute = LINE_LINK.match(dest) or dest == mathlib_page(text) or (
+                LIBRARIES and dest.startswith(tuple(LIBRARIES.values())) and IDENT.match(text)) or (
                 not dest.startswith(('http:', 'https:', 'mailto:', '#'))
                 and (not (ROOT / doc_dir / dest.partition('#')[0]).exists()
                      or private(os.path.join(doc_dir, dest.partition('#')[0]))))
@@ -300,7 +369,7 @@ def main():
     parser.add_argument('docs', nargs='*', help='Markdown files (default: %s)' % ', '.join(DOCS))
     args = parser.parse_args()
     docs = [os.path.relpath(os.path.abspath(d), ROOT) for d in args.docs] or DOCS
-    linker = Linker(load_locations())
+    linker = Linker(*load_locations())
     changed = []
     for doc in docs:
         new = linker.rewrite(doc)

@@ -166,11 +166,13 @@ The metadata is `palomar/PaperName/formalization.yaml`. Start from the current t
   not-contacted` unless the authors were contacted. Cited works that the formalization proves go
   under `background`, with a note that names the argument used (the source's, another work's, a
   library theorem, or the formalization's own); so does a work whose argument it uses, and so do
-  cited works that it assumes, with a note that says so. A
-  source of `type: original-proof` declares that the formalization is where its result first
-  appears, and Palomar then requires every source to be `background` or `other`. A project that
-  formalizes a paper and adds a new result keeps the paper as `formalizes`, and records the
-  document of the new argument with `type: other`, its location pinned to a commit.
+  cited works that it assumes, with a note that says so. A formalization that proves a published
+  result by another argument relates to it by `independently-proves` instead of `formalizes`. A
+  result that the formalization presents first is declared by a source of `type: original-proof`
+  with `relationship: other`, and every other source is then `background` or `other`
+  (`original-results.md`). A submission that formalizes a paper and also states a new result keeps
+  the paper as `formalizes`, and records the document of the new argument as a source of its own,
+  its location pinned to a commit.
 - `related_formalizations`: earlier, independent formalizations, as found in Phase 0, each with
   `relationship: independent` (or another honest value) and a note that says whether this work
   consulted it. An old draft of this same project does not belong here. Palomar does not index
@@ -208,9 +210,8 @@ The metadata is `palomar/PaperName/formalization.yaml`. Start from the current t
 
 The editorial review also reads the README, which sums up the report's account of the literature:
 the history of the problem, the sources, the earlier, concurrent and later work, and the other
-formalizations. For a well-known problem,
-Palomar also expects a careful comparison of the Challenge with the standard formulation of the
-problem.
+formalizations. For a well-known problem, Palomar also expects a careful comparison of the
+Challenge with the standard formulation of the problem.
 
 ## 5. Local checks
 
@@ -287,6 +288,12 @@ run the editorial review (Section 1).
    Only `status: pass` counts. If it is anything else, read `errors`, `build_log_tail` and
    `comparator_log_tail`, and fix the problem. Then, with the user's permission, push and run
    the preflight again.
+5. An error that the report attributes to Palomar itself, such as a toolchain that its verifier
+   does not recognize yet, is not the repository's to fix: change nothing in the repository, and
+   tell the user. Look for the fix in PalomarSubmission's recent commits and issues. Once it is
+   merged, pin the workflow's `uses:` reference and `pipeline_commit` to a commit that contains it,
+   and, with the user's permission, run the preflight again. If no fix or issue exists, offer to
+   report the problem there; opening the issue needs the user's permission too.
 
 ## 9. Submitting and registering
 

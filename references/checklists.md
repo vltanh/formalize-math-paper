@@ -11,6 +11,8 @@
 
 Review every statement, including the Challenge's, against the TeX source. Check:
 
+- that every claim of the paper has a statement, those without a number included (remarks,
+  examples, uniqueness claims, asserted consequences);
 - the order of quantifiers, and where constants are chosen (does `∃ C` come before or after `∀ p`?);
 - strict versus weak inequalities, and the endpoints of ranges;
 - casts and truncation (`ℕ` subtraction and division, `Nat.floor`);
@@ -75,10 +77,13 @@ needs from user:  decisions or permissions; sources that could not be read
 
 ## 4. Completion gates
 
-- Statements: every numbered result stated; Challenge written, with the main results only and
-  within Palomar's size limits; the statements checked against the paper independently;
-  representation bridges proved; baseline committed.
-- Stage 1: every internal result proved by the paper's argument; cited results isolated in
+- Statements: every claim of the paper stated, numbered or not (remarks, examples, asserted
+  consequences included); Challenge written, with the main results only and within Palomar's size
+  limits; the statements checked against the paper independently; representation bridges proved;
+  baseline committed.
+- Stage 1: every claim of the paper proved, by the paper's argument where it gives one; the "Not
+  formalized" section of the report holds only what is not a mathematical claim, or what the user
+  held back; cited results isolated in
   `External/`, with citations, stated in their sources' terms, and importing nothing from the
   paper's library.
 - Stage 2: every cited result, its statement checked against its source, proved or derived from a
